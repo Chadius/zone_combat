@@ -12,12 +12,12 @@ My graphical displays took too much time and effort to start, so we're going to 
 Movement lets you move between Zones unless an enemy is in the way. It's kind of like American football.
 
 TODO LIST:
-Create Text Input Loop
 Create Zones
 - Zones hold Units
 - Print a Zone's contents
 Map holds multiple Zones
 - Tell Map to print all of the Zones
+Build Command objects
 Units have abbreviations (up to 2 letters)
 - Move distance
 - Can pass through

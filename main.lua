@@ -35,7 +35,14 @@ Check for failure
 --]]
 
 function main()
-   print("HI")
+   print("HI. Type in something and we'll mirror it.")
+
+   while(b ~= "q") do
+      print("Type q to quit.")
+      b = io.read()
+      print("You typed in " .. b)
+   end
+   print("quitting.")
 end
 
 main()

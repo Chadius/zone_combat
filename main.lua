@@ -13,7 +13,6 @@ Movement lets you move between Zones unless an enemy is in the way. It's kind of
 
 TODO LIST:
 ZONES
- Print list of zones
  Make Zone Objects
  Objects can print
  Zones have IDs
@@ -21,12 +20,21 @@ ZONES
 --]]
 
 function main()
-   print("HI. Type in something and we'll mirror it.")
+   print("Zone combat, baby!")
 
-   while(b ~= "q") do
+   while(keyboard_input ~= "q") do
       print("Type q to quit.")
-      b = io.read()
-      print("You typed in " .. b)
+      keyboard_input = io.read()
+      print("You typed in " .. keyboard_input)
+
+	  if keyboard_input == "p" then
+		 print("Printing Zone list:")
+		 print("Zone 1")
+		 print("Zone 2")
+		 print("Zone 3")
+		 print("Zone 4")
+		 print("Zone 5")
+	  end
    end
    print("quitting.")
 end

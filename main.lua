@@ -12,26 +12,12 @@ My graphical displays took too much time and effort to start, so we're going to 
 Movement lets you move between Zones unless an enemy is in the way. It's kind of like American football.
 
 TODO LIST:
-Create Zones
-- Zones hold Units
-- Print a Zone's contents
-Map holds multiple Zones
-- Tell Map to print all of the Zones
-Build Command objects
-Units have abbreviations (up to 2 letters)
-- Move distance
-- Can pass through
-- Describe itself
-- Check zones for blockades
-Add input to move Units
-Add Enemy units
-- Player can't control them
-- Enemy can't skip
-- Ask Player unit who they can target
-Let Players attack enemies
-Check Victory conditions
-Enemies can fight back
-Check for failure
+ZONES
+ Print list of zones
+ Make Zone Objects
+ Objects can print
+ Zones have IDs
+ Zones have neighbors
 --]]
 
 function main()

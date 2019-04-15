@@ -13,14 +13,30 @@ Movement lets you move between Zones unless an enemy is in the way. It's kind of
 
 TODO LIST:
 ZONES
- Make Zone Objects
- Objects can print
- Zones have IDs
  Zones have neighbors
 --]]
 
+local Zone = require "zone"
+local Map = require "map"
+
 function main()
    print("Zone combat, baby!")
+
+   local map = Map:new({
+	 id = "DA MAP",
+	 zones = {
+	    Zone:new(
+	       {
+		  id="A"
+	       }
+	    ),
+	    Zone:new(
+	       {
+		  id="B"
+	       }
+	    )
+	 }
+   })
 
    while(keyboard_input ~= "q") do
       print("Type q to quit.")
@@ -29,11 +45,9 @@ function main()
 
 	  if keyboard_input == "p" then
 		 print("Printing Zone list:")
-		 print("Zone 1")
-		 print("Zone 2")
-		 print("Zone 3")
-		 print("Zone 4")
-		 print("Zone 5")
+		 for index, z in ipairs(map.zones) do
+			print (string.format("#%d %s", index, tostring(z)))
+		 end
 	  end
    end
    print("quitting.")

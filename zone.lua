@@ -15,4 +15,8 @@ function Zone:new(args)
   return newZone
 end
 
+function Zone:__tostring()
+   return string.format("Zone ID: %s", self.id)
+end
+
 return Zone

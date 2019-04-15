@@ -13,7 +13,6 @@ Movement lets you move between Zones unless an enemy is in the way. It's kind of
 
 TODO LIST:
 ZONES
- Objects can print
  Zones have neighbors
 --]]
 
@@ -43,7 +42,7 @@ function main()
 	  if keyboard_input == "p" then
 		 print("Printing Zone list:")
 		 for index, z in ipairs(zones) do
-			print (string.format("Zone %d: %s", index, z.id))
+			print (string.format("#%d %s", index, tostring(z)))
 		 end
 	  end
    end

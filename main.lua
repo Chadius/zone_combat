@@ -19,6 +19,8 @@ ZONES
  Zones have neighbors
 --]]
 
+local Zone = require "zone"
+
 function main()
    print("Zone combat, baby!")
 

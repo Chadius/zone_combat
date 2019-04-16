@@ -12,15 +12,25 @@ function Map:new(args)
   local newMap = {}
   setmetatable(newMap,Map)
   newMap.id = args.id
+  newMap.zones = {}
 
-  -- TODO
-  newMap.zones = (args.zones and args.zones ~= "") and args.zones or {}
+  if args.zones and args.zones ~= nil then
+     for i, zone_info in ipairs(args.zones) do
+	newMap:addZone(zone_info)
+     end
+  end
 
   if newMap.id == nil then
-	 error("Map needs an id")
+     error("Map needs an id")
   end
 
   return newMap
+end
+
+function Map:addZone(zone_info)
+   --[[ Add the new zone to the list.
+   --]]
+   table.insert(self.zones, zone_info)
 end
 
 function Map:__tostring()

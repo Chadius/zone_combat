@@ -20,37 +20,36 @@ local Zone = require "zone"
 local Map = require "map"
 
 function main()
-   print("Zone combat, baby!")
+  print("Zone combat, baby!")
 
-   local map = Map:new({
-	 id = "DA MAP",
-	 zones = {
-	    Zone:new(
-	       {
-		  id="A"
-	       }
-	    ),
-	    Zone:new(
-	       {
-		  id="B"
-	       }
-	    )
-	 }
-   })
+  local map = Map:new({
+    id = "DA MAP",
+    zones = {
+      Zone:new(
+        {
+	       id="A"
+        }
+      ),
+      Zone:new(
+        {
+	         id="B"
+        }
+      )
+    }
+  })
 
-   while(keyboard_input ~= "q") do
-      print("Type q to quit.")
-      keyboard_input = io.read()
-      print("You typed in " .. keyboard_input)
-
-      if keyboard_input == "p" then
-	 print("Printing Zone list:")
-	 for index, z in ipairs(map.zones) do
-	    print (string.format("#%d %s", index, tostring(z)))
-	 end
+  while(keyboard_input ~= "q") do
+    print("Type q to quit.")
+    keyboard_input = io.read()
+    print("You typed in " .. keyboard_input)
+    if keyboard_input == "p" then
+      print("Printing Zone list:")
+      for index, z in ipairs(map.zones) do
+        print (string.format("#%d %s", index, tostring(z)))
       end
-   end
-   print("quitting.")
+    end
+  end
+  print("quitting.")
 end
 
 main()

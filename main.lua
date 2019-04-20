@@ -17,6 +17,7 @@ ZONES
 --]]
 
 local Zone = require "zone"
+local ZoneNeighbor = require "zone_neighbor"
 local Map = require "map"
 
 function main()
@@ -35,6 +36,12 @@ function main()
 	         id="B"
         }
       )
+    },
+    zone_neighbors = {
+      ZoneNeighbor:new({
+        fromZoneID = "A",
+        toZoneID = "B",
+      })
     }
   })
 
@@ -42,12 +49,21 @@ function main()
     print("Type q to quit.")
     keyboard_input = io.read()
     print("You typed in " .. keyboard_input)
+
     if keyboard_input == "p" then
       print("Printing Zone list:")
       for index, z in ipairs(map.zones) do
         print (string.format("#%d %s", index, tostring(z)))
       end
     end
+
+    if keyboard_input == "n" then
+      print("Printing Zone Neighbors:")
+      for index, z in ipairs(map.zone_neighbors) do
+        print (string.format(tostring(z)))
+      end
+    end
+
   end
   print("quitting.")
 end

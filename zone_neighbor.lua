@@ -10,11 +10,11 @@ function ZoneNeighbor:new(args)
   --[[ Create a new Zone Neighbor.
   --]]
   local newZN = {}
-  setmetatable(newZoneNeighbor,ZoneNeighbor)
+  setmetatable(newZN,ZoneNeighbor)
 
-  newZN.fromZoneID = args.fromZoneID
-  newZN.toZoneID = args.toZoneID
-  newZN.moveCost = args.moveCost or 1
+  newZN.fromZoneID = args.fromZoneID or args.from
+  newZN.toZoneID = args.toZoneID or args.to
+  newZN.moveCost = args.moveCost or args.movementCost or 1
   newZN.travelMethods = args.travelMethods or {"foot"}
 
   return newZN
@@ -38,7 +38,7 @@ function ZoneNeighbor:__tostring()
    for i, method in ipairs(self.travelMethods) do
       allTravelMethods = allTravelMethods .. method .. ", "
    end
-   return string.format("%s to %s. Cost %d, Methods %s", self.fromZoneID, self.toZoneID, self.moveCost)
+   return string.format("%s to %s. Cost %d, Methods %s", self.fromZoneID, self.toZoneID, self.moveCost, allTravelMethods)
 end
 
 return ZoneNeighbor

@@ -43,12 +43,12 @@ function main()
       keyboard_input = io.read()
       print("You typed in " .. keyboard_input)
 
-	  if keyboard_input == "p" then
-		 print("Printing Zone list:")
-		 for index, z in ipairs(map.zones) do
-			print (string.format("#%d %s", index, tostring(z)))
-		 end
-	  end
+      if keyboard_input == "p" then
+	 print("Printing Zone list:")
+	 for index, z in ipairs(map.zones) do
+	    print (string.format("#%d %s", index, tostring(z)))
+	 end
+      end
    end
    print("quitting.")
 end

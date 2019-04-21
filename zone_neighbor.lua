@@ -12,9 +12,9 @@ function ZoneNeighbor:new(args)
   local newZN = {}
   setmetatable(newZN,ZoneNeighbor)
 
-  newZN.fromZoneID = args.fromZoneID
-  newZN.toZoneID = args.toZoneID
-  newZN.moveCost = args.moveCost or 1
+  newZN.fromZoneID = args.fromZoneID or args.from
+  newZN.toZoneID = args.toZoneID or args.to
+  newZN.moveCost = args.moveCost or args.movementCost or 1
   newZN.travelMethods = args.travelMethods or {"foot"}
 
   return newZN

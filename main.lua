@@ -26,22 +26,15 @@ function main()
   local map = Map:new({
     id = "DA MAP",
     zones = {
-      Zone:new(
-        {
-	       id="A"
-        }
-      ),
-      Zone:new(
-        {
-	         id="B"
-        }
-      )
-    },
-    zone_neighbors = {
-      ZoneNeighbor:new({
-        fromZoneID = "A",
-        toZoneID = "B",
-      })
+      {
+        id="A",
+        neighbors={{
+          to="B",
+        }}
+      },
+      {
+         id="B",
+      }
     }
   })
 
@@ -59,9 +52,7 @@ function main()
 
     if keyboard_input == "n" then
       print("Printing Zone Neighbors:")
-      for index, z in ipairs(map.zone_neighbors) do
-        print (string.format(tostring(z)))
-      end
+      map:describeZones()
     end
 
   end

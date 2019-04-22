@@ -7,6 +7,25 @@ local ZoneNeighbor = require "zone_neighbor"
 local Map={}
 Map.__index = Map
 
+local function AddZoneNeighbor(self, from, to, cost, travelMethods)
+  --- Set the other info
+  local newNeighbor = ZoneNeighbor:new({
+    from = from,
+    to = to,
+    cost = cost,
+    travelMethods = travelMethods,
+  })
+
+  -- Add to this zone
+  if self.zone_by_id[from] == nil then
+    self.zone_by_id[from] = {
+      zone=nil,
+      neighbors={},
+    }
+  end
+  self.zone_by_id[from]["neighbors"][to] = newNeighbor
+end
+
 function Map:new(args)
   --[[ Create a new Map.
   --]]
@@ -47,25 +66,26 @@ function Map:addZone(zone_info)
    })
 
    -- Add the zone to the info.
-   self.zone_by_id[newZone.id] = {
-     zone=newZone,
-     neighbors={},
-   }
+   if self.zone_by_id[newZone.id] == nil then
+     self.zone_by_id[newZone.id] = {
+       zone=newZone,
+       neighbors={},
+     }
+   end
 
    -- If there are zone neighbors
    for index, neighbor_info in ipairs(zone_info.neighbors or {}) do
-     -- Create a new neighbor
+
+     -- Create a new neighbor.
      --- This zone is the from point
      --- Set the other info
-     local newNeighbor = ZoneNeighbor:new({
-       from = newZone.id,
-       to = neighbor_info.to,
-       cost = neighbor_info.cost,
-       travelMethods = neighbor_info.travelMethods,
-     })
-
-     -- Add to this zone
-     self.zone_by_id[newZone.id]["neighbors"][newNeighbor.toZoneID] = newNeighbor
+     AddZoneNeighbor(
+      self,
+      newZone.id,
+      neighbor_info.to,
+      neighbor_info.cost,
+      neighbor_info.travelMethods
+    )
    end
 end
 

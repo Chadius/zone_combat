@@ -73,6 +73,10 @@ function Map:addZone(zone_info)
      }
    end
 
+   if self.zone_by_id[newZone.id]["zone"] == nil then
+     self.zone_by_id[newZone.id]["zone"] = newZone
+   end
+
    -- If there are zone neighbors
    for index, neighbor_info in ipairs(zone_info.neighbors or {}) do
 
@@ -86,6 +90,17 @@ function Map:addZone(zone_info)
       neighbor_info.cost,
       neighbor_info.travelMethods
     )
+
+    -- If the neighbor is bidirectional, add a neighbor with reversed direction.
+    if neighbor_info.bidirectional then
+      AddZoneNeighbor(
+       self,
+       neighbor_info.to,
+       newZone.id,
+       neighbor_info.cost,
+       neighbor_info.travelMethods
+      )
+    end
    end
 end
 

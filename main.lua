@@ -30,6 +30,7 @@ function main()
         id="A",
         neighbors={{
           to="B",
+          bidirectional=true,
         }}
       },
       {

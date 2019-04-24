@@ -35,6 +35,15 @@ function main()
       },
       {
          id="B",
+         neighbors={
+           {
+             to="B",
+           },
+           {
+             to="C",
+             bidirectional=true,
+           },
+         }
       }
     }
   })

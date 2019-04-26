@@ -126,13 +126,11 @@ function Map:VerifyZoneNeighbor()
       local delete_neighbor = false
       -- If the to points to nowhere, mark to delete
       if self.zone_by_id[neighbor_info.toZoneID] == nil then
-        print("nil zone " .. neighbor_info.toZoneID)
         delete_neighbor = true
       end
 
       -- If the from and to to the same ID, mark to delete
       if neighbor_info.toZoneID == neighbor_info.fromZoneID then
-        print(neighbor_info.fromZoneID .. " points to itself " .. neighbor_info.toZoneID)
         delete_neighbor = true
       end
 

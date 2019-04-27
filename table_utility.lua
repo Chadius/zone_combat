@@ -24,4 +24,16 @@ function TableUtility:keys(source)
   return result
 end
 
+function TableUtility:keyCount(source)
+  -- [[ Returns the number of keys in this indexed table.
+  -- ]]
+
+  local count = 0
+  for key, value in pairs(source) do
+     count = count + 1
+  end
+
+  return count
+end
+
 return TableUtility

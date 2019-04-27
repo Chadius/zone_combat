@@ -10,3 +10,18 @@ function cloneTable(source)
 
    return newTable
 end
+
+local TableUtility = {}
+function TableUtility:keys(source)
+  -- [[ Returns an indexed table where the values are the keys of source.
+  -- ]]
+
+  local result = {}
+  for key, value in pairs(source) do
+     table.insert(result, key)
+  end
+
+  return result
+end
+
+return TableUtility

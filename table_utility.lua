@@ -36,4 +36,9 @@ function TableUtility:keyCount(source)
   return count
 end
 
+function TableUtility:size(source)
+  -- Alias for keyCount
+  return TableUtility:keyCount(source)
+end
+
 return TableUtility

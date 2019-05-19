@@ -200,6 +200,16 @@ function TableUtility:equivalent(left, right)
   return TableUtility:all(matching)
 end
 
--- Any
+-- Sort
+--- Sort, altering original table
+---- Sort a table of numbers first
+---- Sort, given a comparison function
+---- Sort, given  "nil" , "number" , "string" , "boolean"
+---- Sort, given other types (use string representation)
+--- Sort, return copy of table
+--- Sort, return a ranking of each elemetn
 
+-- Equivalent (order doesn't matter)
+--- Sort, generating copies of the tables
+--- Return true if they are equivalent
 return TableUtility

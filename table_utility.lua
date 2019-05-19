@@ -80,4 +80,126 @@ function TableUtility:pluck(source, key_to_pluck)
   return TableUtility:map(source, plucker)
 end
 
+function TableUtility:sum(source, accumulator, start_value)
+  --[[ Return a single value by adding each value in the source table.
+  ]]
+  accumulator = accumulator or nil
+  local sum = start_value
+  if not accumulator then
+    sum = 0
+  end
+
+  for key, value in ipairs(source) do
+    if accumulator then
+      sum = accumulator(sum, value)
+    else
+      sum = sum + value
+    end
+  end
+
+  return sum
+end
+
+function TableUtility:each(source, action)
+  --[[ Perform the action on each element in the source.
+
+  The action will be a function that accepts 3 parameters: The key, the value, and the source.
+  ]]
+
+  for key, value in ipairs(source) do
+    action(key, value, source)
+  end
+end
+
+function TableUtility:listcomp(source, postprocess, filter)
+  --[[ Perform a Python-style list comprehension on the source.
+  Filter the source with filter as the function.
+  Each item that is true will have Postprocess applied.
+  ]]
+
+  local filtered_items = TableUtility:filter(source, filter)
+  local postprocessed_items = TableUtility:map(filtered_items, postprocess)
+  return postprocessed_items
+end
+
+function TableUtility:all(source, predicate)
+  --[[ Tests all of the items in the source are truthy.
+  Predicate is a function that takes the key, value and source as parameters.
+  If not provided, Predicate just checks the values to see if they are truthy.
+  ]]
+
+  local is_truthy = function(key, value, source)
+    if value then
+      return true
+    else
+      return false
+    end
+  end
+  predicate = predicate or is_truthy
+
+  for key, value in ipairs(source) do
+    if not predicate(key, value, source) then
+      return false
+    end
+  end
+
+  return true
+end
+
+function TableUtility:any(source, predicate)
+  --[[ Tests at least one items in the source is truthy.
+  Predicate is a function that takes the key, value and source as parameters.
+  If not provided, Predicate just checks the values to see if they are truthy.
+  ]]
+
+  local is_truthy = function(key, value, source)
+    if value then
+      return true
+    else
+      return false
+    end
+  end
+  predicate = predicate or is_truthy
+
+  for key, value in ipairs(source) do
+    if predicate(key, value, source) then
+      return true
+    end
+  end
+
+  return false
+end
+
+function TableUtility:equivalent(left, right)
+  --[[ Given two tables, return true if they are the same size and the elements are equivalent.
+  Order matters.
+  ]]
+
+  -- Equivalent tables are the same length.
+  if TableUtility:size(left) ~= TableUtility:size(right) then
+    return false
+  end
+
+  local equivalentComp = function (key, value, source)
+    -- Get the target value
+    local target_value = right[key]
+
+    -- Make sure the values are the same type
+    if type(value) ~= type(target_value) then return false end
+
+    -- If they are tables, recurse
+    if type(value) == 'table' then
+      return TableUtility:equivalent(value, target_value)
+    else
+      return value == right[key]
+    end
+  end
+
+  local matching = TableUtility:map(left, equivalentComp)
+
+  return TableUtility:all(matching)
+end
+
+-- Any
+
 return TableUtility

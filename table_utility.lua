@@ -200,6 +200,29 @@ function TableUtility:equivalent(left, right)
   return TableUtility:all(matching)
 end
 
+function TableUtility:swap(source, from, to)
+  --[[ Swap the values of source[from] and source[to].
+  Modifies the source.
+  ]]
+
+  local swap_space = source[from]
+
+  source[from] = source[to]
+  source[to] = swap_space
+end
+
+function TableUtility:clone(source)
+  --[[ Make a shallow copy of the source table.
+  ]]
+  return cloneTable(source)
+end
+
+--function TableUtility:sort(source)
+--  --[[ Sort the source table from least to greatest value.
+--  source is modified in place.
+--  ]]
+--end
+
 -- Sort
 --- Sort, altering original table
 ---- Sort a table of numbers first

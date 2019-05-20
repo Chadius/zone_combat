@@ -242,3 +242,24 @@ function test_any()
   assert_true(TableUtility:any({0,2,4,6}, is_even))
   assert_false(TableUtility:any({1,3,5,7}, is_even))
 end
+
+function test_swap()
+  local numbers = {"a",4,3,2,1}
+  local expected = {1,4,3,2,"a"}
+  TableUtility:swap(numbers, 1, 5)
+  assert_true(TableUtility:equivalent(numbers, expected))
+end
+
+function test_clone_table()
+  local original = {"a",4,3,2,1}
+  local clone = TableUtility:clone(original)
+  assert_false(original == clone)
+  assert_true(TableUtility:equivalent(original, clone))
+end
+
+--function test_sort_numbers()
+--  local numbers = {3,4,5,2,1}
+--  local expected = {1,2,3,4,5}
+--  TableUtility:sort(numbers)
+--  assert_true(TableUtility:equivalent(numbers, expected))
+--end

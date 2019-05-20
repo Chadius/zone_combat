@@ -263,3 +263,18 @@ function test_sort_numbers()
   TableUtility:sort(numbers)
   assert_true(TableUtility:equivalent(numbers, expected))
 end
+
+function test_sort_comparison()
+  local numbers = {3,4,5,2,1}
+  local expected = {5,4,3,2,1}
+  local reverse_compare = function (a,b)
+    if a < b then
+      return 1
+    elseif a > b then
+      return -1
+    end
+    return 0
+  end
+  TableUtility:sort(numbers, reverse_compare)
+  assert_true(TableUtility:equivalent(numbers, expected))
+end

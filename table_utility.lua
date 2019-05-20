@@ -196,7 +196,6 @@ function TableUtility:equivalent(left, right)
   end
 
   local matching = TableUtility:map(left, equivalentComp)
-
   return TableUtility:all(matching)
 end
 
@@ -220,7 +219,7 @@ function TableUtility:clone(source)
   return cloneTable(source)
 end
 
-local function partition(source, low, high)
+local function partition(source, low, high, comparison)
   --[[ Assuming source[high] is the pivot,
   rearrange the table so all values less than the pivot are closer to low,
   and all values greater than the pivot are closer to high.
@@ -238,7 +237,7 @@ local function partition(source, low, high)
   -- Look at each element from the low index to high, skipping the pivot.
   for index=low, high - 1 do
     -- If the element is less than the pivot, then
-    if source[index] < pivot_value then
+    if comparison(source[index], pivot_value) < 0 then
       -- Swap this element with the pivot's final index.
       TableUtility:swap(source, index, sorted_pivot_index)
       -- Increment the pivot's final index, since we know it isn't here.
@@ -251,7 +250,7 @@ local function partition(source, low, high)
   return sorted_pivot_index
 end
 
-local function quicksort(source, low, high)
+local function quicksort(source, low, high, comparison)
   --[[ Sort the source table so every element from low to high is sorted
   from smallest to greatest value.
   ]]
@@ -260,19 +259,36 @@ local function quicksort(source, low, high)
   if low >= high then return end
 
   -- Partition the table and get the pivot's location.
-  local pivot_location = partition(source, low, high)
+  local pivot_location = partition(source, low, high, comparison)
 
   -- The pivot has been sorted correctly, so recurse and sort the two subtables.
-  quicksort(source, low, pivot_location - 1)
-  quicksort(source, pivot_location + 1, high)
+  quicksort(source, low, pivot_location - 1, comparison)
+  quicksort(source, pivot_location + 1, high, comparison)
 end
 
-function TableUtility:sort(source)
+function TableUtility:sort(source, comparison)
   --[[ Sort the source table from least to greatest value.
   source is modified in place.
+  
+  comparison function is optional. It accepts 2 objects a and b and returns a number.
+  -- If negative, then a is less than b
+  -- If positive, then a is greater than b
+  -- If zero, then a equals b
   ]]
+  
+  local defaultComparison = function (a,b)
+    if a < b then
+      return -1
+    elseif a > b then
+      return 1
+    end
+    return 0
+  end
+  
+  comparison = comparison or defaultComparison
+
   -- Execute QuickSort, starting from the start to the end of the table.
-  quicksort(source, 1, #source)
+  quicksort(source, 1, #source, comparison)
 end
 
 -- Sort

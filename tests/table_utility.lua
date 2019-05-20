@@ -257,9 +257,9 @@ function test_clone_table()
   assert_true(TableUtility:equivalent(original, clone))
 end
 
---function test_sort_numbers()
---  local numbers = {3,4,5,2,1}
---  local expected = {1,2,3,4,5}
---  TableUtility:sort(numbers)
---  assert_true(TableUtility:equivalent(numbers, expected))
---end
+function test_sort_numbers()
+  local numbers = {3,4,5,2,1}
+  local expected = {1,2,3,4,5}
+  TableUtility:sort(numbers)
+  assert_true(TableUtility:equivalent(numbers, expected))
+end

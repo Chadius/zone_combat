@@ -205,6 +205,9 @@ function TableUtility:swap(source, from, to)
   Modifies the source.
   ]]
 
+  -- If from and to are the same, do nothing
+  if from == to then return end
+
   local swap_space = source[from]
 
   source[from] = source[to]
@@ -217,15 +220,63 @@ function TableUtility:clone(source)
   return cloneTable(source)
 end
 
---function TableUtility:sort(source)
---  --[[ Sort the source table from least to greatest value.
---  source is modified in place.
---  ]]
---end
+local function partition(source, low, high)
+  --[[ Assuming source[high] is the pivot,
+  rearrange the table so all values less than the pivot are closer to low,
+  and all values greater than the pivot are closer to high.
+  The pivot will be in its sorted location.
+  
+  Return the index of the pivot.
+  ]]
+
+  -- The pivot value is the last item on the table.
+  local pivot_value = source[high]
+
+  -- Track the pivot's final index, starting at low.
+  local sorted_pivot_index = low
+
+  -- Look at each element from the low index to high, skipping the pivot.
+  for index=low, high - 1 do
+    -- If the element is less than the pivot, then
+    if source[index] < pivot_value then
+      -- Swap this element with the pivot's final index.
+      TableUtility:swap(source, index, sorted_pivot_index)
+      -- Increment the pivot's final index, since we know it isn't here.
+      sorted_pivot_index = sorted_pivot_index + 1
+    end
+  end
+
+  -- Swap the pivot to its final index and return the index.
+  TableUtility:swap(source, sorted_pivot_index, high)
+  return sorted_pivot_index
+end
+
+local function quicksort(source, low, high)
+  --[[ Sort the source table so every element from low to high is sorted
+  from smallest to greatest value.
+  ]]
+
+  -- If there are no items to sort, stop
+  if low >= high then return end
+
+  -- Partition the table and get the pivot's location.
+  local pivot_location = partition(source, low, high)
+
+  -- The pivot has been sorted correctly, so recurse and sort the two subtables.
+  quicksort(source, low, pivot_location - 1)
+  quicksort(source, pivot_location + 1, high)
+end
+
+function TableUtility:sort(source)
+  --[[ Sort the source table from least to greatest value.
+  source is modified in place.
+  ]]
+  -- Execute QuickSort, starting from the start to the end of the table.
+  quicksort(source, 1, #source)
+end
 
 -- Sort
 --- Sort, altering original table
----- Sort a table of numbers first
 ---- Sort, given a comparison function
 ---- Sort, given  "nil" , "number" , "string" , "boolean"
 ---- Sort, given other types (use string representation)

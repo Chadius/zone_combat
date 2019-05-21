@@ -350,5 +350,15 @@ function TableUtility:join(source, separator)
   return joinedStr
 end
 
--- First (filter but you return the first item you find)
+function TableUtility:first(source, predicate)
+  -- Returns the first element that satisfies the predicate.
+
+  for key, value in ipairs(source) do
+    if predicate(value) then
+      return value
+    end
+  end
+
+  return nil
+end
 return TableUtility

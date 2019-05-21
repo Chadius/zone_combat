@@ -329,3 +329,13 @@ function test_join()
 
   assert_equal("", TableUtility:join({}, ","))
 end
+
+function test_first()
+  local numbers = {1,2,3,4,5}
+  local isEven = function(a) return a % 2 == 0 end
+  local isMoreThanTen = function(a) return a > 10 end
+  local firstEven = TableUtility:first(numbers, isEven)
+  assert_equal(2, firstEven)
+  local firstMoreThanTen = TableUtility:first(numbers, isMoreThanTen)
+  assert_equal(nil, firstMoreThanTen)
+end

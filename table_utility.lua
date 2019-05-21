@@ -328,7 +328,27 @@ function TableUtility:reverse(source)
   return newTable
 end
 
--- First (filter but you return the first item you find)
+function TableUtility:join(source, separator)
+  --[[ Prints the contents of a numeric table, using separator to space multiple elements.
+  ]]
+  separator = separator or ","
 
--- Join
+  -- If it's empty, return an empty string
+  if #source == 0 then return "" end
+
+  -- If there is only 1 item in the array, just return that
+  if #source == 1 then return tostring(source[1]) end
+
+  -- Otherwise append the value and separator combo.
+  local joinedStr = ""
+  for key, value in ipairs(source) do
+    joinedStr = joinedStr .. value
+    if key < #source then
+      joinedStr = joinedStr .. separator
+    end
+  end
+  return joinedStr
+end
+
+-- First (filter but you return the first item you find)
 return TableUtility

@@ -318,3 +318,14 @@ function test_reverse()
   local reversed = TableUtility:reverse(numbers)
   assert_true(TableUtility:equivalent(reversed, expected))
 end
+
+function test_join()
+  local numbers = {1,2,3,4,5}
+  local contents = TableUtility:join(numbers, ",")
+  assert_equal("1,2,3,4,5", contents)
+
+  local short_contents = TableUtility:join({1}, ",")
+  assert_equal("1", short_contents)
+
+  assert_equal("", TableUtility:join({}, ","))
+end

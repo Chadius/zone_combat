@@ -275,8 +275,10 @@ function TableUtility:sort(source, comparison)
   -- If positive, then a is greater than b
   -- If zero, then a equals b
   ]]
-  
+
   local defaultComparison = function (a,b)
+    if type(a) ~= type(b) then return 0 end
+
     if a < b then
       return -1
     elseif a > b then
@@ -284,22 +286,49 @@ function TableUtility:sort(source, comparison)
     end
     return 0
   end
-  
+
   comparison = comparison or defaultComparison
 
   -- Execute QuickSort, starting from the start to the end of the table.
   quicksort(source, 1, #source, comparison)
+  
+  return source
 end
 
--- Sort
---- Sort, altering original table
----- Sort, given a comparison function
----- Sort, given  "nil" , "number" , "string" , "boolean"
----- Sort, given other types (use string representation)
---- Sort, return copy of table
---- Sort, return a ranking of each elemetn
+function TableUtility:equivalentSet(left, right, sortComparison)
+  --[[ Given two tables, return true if they are the same size and the elements are equivalent.
+  Order does not matter.
+  ]]
 
--- Equivalent (order doesn't matter)
---- Sort, generating copies of the tables
---- Return true if they are equivalent
+  -- Equivalent tables are the same length.
+  if TableUtility:size(left) ~= TableUtility:size(right) then
+    return false
+  end
+
+  sortComparison = sortComparison or nil
+
+  -- Clone the tables, then sort them.
+  local leftClone = TableUtility:sort( TableUtility:clone(left), sortComparison )
+  local rightClone = TableUtility:sort( TableUtility:clone(right), sortComparison )
+
+  -- Now test the objects are in the same order.
+  return TableUtility:equivalent(leftClone, rightClone)
+end
+
+function TableUtility:reverse(source)
+  --[[ Returns a copy of the source where the first item is the last item of the source.
+  ]]
+
+  local newTable = {}
+
+  for i=#source, 0, -1 do
+    table.insert(newTable, source[i])
+  end
+
+  return newTable
+end
+
+-- First (filter but you return the first item you find)
+
+-- Join
 return TableUtility

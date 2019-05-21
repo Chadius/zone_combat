@@ -278,3 +278,43 @@ function test_sort_comparison()
   TableUtility:sort(numbers, reverse_compare)
   assert_true(TableUtility:equivalent(numbers, expected))
 end
+
+function test_equivalent_set()
+  local a = {1,2,3}
+  local b = {1,2,3}
+  local reordered_b = {3,2,1}
+  local different_length = {1, 2, 3, 4}
+  local different_elements = {1, 2, "3"}
+
+  -- Tables are equivalent sets if they are the same length and they have the same elements
+  assert_true(TableUtility:equivalentSet(a, b))
+  assert_true(TableUtility:equivalentSet(b, a))
+
+  -- The order does NOT matter, so rearranging the elements doesn't matter.
+  assert_true(TableUtility:equivalentSet(b, reordered_b))
+
+  -- different length tables are not equivalent either.
+  assert_false(TableUtility:equivalentSet(a, different_length))
+
+  -- different is not equivalent and does not contain the same elements as a
+  assert_false(TableUtility:equivalentSet(different_elements, a))
+
+  -- Check for nested tables, too.
+  local nested_table_a = {{2}, {1}}
+  local nested_table_b = {{1}, {2}}
+  local nested_comparison = function(a,b)
+    if a[1] < b[1] then
+      return -1
+    else
+      return 1
+    end
+  end
+  assert_true(TableUtility:equivalentSet(nested_table_a, nested_table_b, nested_comparison))
+end
+
+function test_reverse()
+  local numbers = {1,2,3,4,5}
+  local expected = {5,4,3,2,1}
+  local reversed = TableUtility:reverse(numbers)
+  assert_true(TableUtility:equivalent(reversed, expected))
+end

@@ -22,6 +22,7 @@ function test_size()
   }
 
   assert_equal(3, TableUtility:size(tab))
+  assert_equal(2, TableUtility:size({1,2}))
 end
 
 function test_map()
@@ -44,6 +45,11 @@ function test_map()
   assert_equal(2, map_table[2])
   assert_equal(1, map_table[3])
   assert_equal(3, map_table[4])
+
+  local square_value = function(key, value, list) return key * key end
+  local numbers = {1,2,3,4,5}
+  local squared = TableUtility:map(numbers, square_value)
+  assert_true(TableUtility:equivalent({1,4,9,16,25}, squared))
 end
 
 function test_filter()
@@ -67,6 +73,11 @@ function test_filter()
 
   assert_equal(1, TableUtility:size(map_table))
   assert_equal("am", map_table[1])
+
+  local numbers = {1,2,3,4,5}
+  local isEven = function(a) return a % 2 == 0 end
+  local onlyEvenNumbers = TableUtility:filter(numbers, isEven)
+  assert_true(TableUtility:equivalent({2,4}, onlyEvenNumbers))
 end
 
 function test_pluck()
@@ -338,4 +349,19 @@ function test_first()
   assert_equal(2, firstEven)
   local firstMoreThanTen = TableUtility:first(numbers, isMoreThanTen)
   assert_equal(nil, firstMoreThanTen)
+end
+
+function test_keys()
+  local numbers = {1,2,5}
+  local index_keys = TableUtility:keys(numbers)
+  assert_true(TableUtility:equivalentSet({1,2,3}, index_keys))
+
+  local tab = {
+    top="bread",
+    middle="peanut butter",
+    bottom="bread",
+  }
+
+  local tab_keys = TableUtility:keys(tab)
+  assert_true(TableUtility:equivalentSet({"top","middle","bottom"}, tab_keys))
 end

@@ -1,15 +1,44 @@
-function cloneTable(source)
-   --[[ Returns a copy of the table, using shallow copies.
-   --]]
+--[[ Utility library to add functional programming for Tables, and reduce for loops in general.
 
-   local newTable = {}
+Works on Indexed Tables (The ipairs function works, keys are integers starting with 1)
+size()
+keyCount()
+keys()
+map()
+filter()
+pluck()
+sum()
+each()
+listcomp()
+equaivalent()
+any()
+all()
+swap()
+clone()
+sort()
+equaivalentSet()
+reverse()
+join()
+first()
 
-   for i, item in ipairs(source) do
-      table.insert(newTable, item)
-   end
+Works on Associative Tables (No defined key order, you would use the pairs function to iterate)
+size()
+keyCount()
+keys()
+filter()
+sum()
 
-   return newTable
-end
+need to test
+any()
+all()
+map()
+pluck()
+each()
+listcomp()
+clone()
+equaivalentSet()
+join()
+]]
 
 local TableUtility = {}
 function TableUtility:keys(source)
@@ -137,7 +166,7 @@ function TableUtility:all(source, predicate)
   end
   predicate = predicate or is_truthy
 
-  for key, value in ipairs(source) do
+  for key, value in pairs(source) do
     if not predicate(key, value, source) then
       return false
     end
@@ -161,7 +190,7 @@ function TableUtility:any(source, predicate)
   end
   predicate = predicate or is_truthy
 
-  for key, value in ipairs(source) do
+  for key, value in pairs(source) do
     if predicate(key, value, source) then
       return true
     end
@@ -216,7 +245,14 @@ end
 function TableUtility:clone(source)
   --[[ Make a shallow copy of the source table.
   ]]
-  return cloneTable(source)
+
+ local newTable = {}
+
+ for i, item in ipairs(source) do
+    table.insert(newTable, item)
+ end
+
+ return newTable
 end
 
 local function partition(source, low, high, comparison)

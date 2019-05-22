@@ -7,7 +7,13 @@ else
     module( "enhanced", package.seeall, lunit.testcase )
 end
 
+local children = {}
 function setup()
+  children = {
+    billi = { age=5, color="red" },
+    sydney = { age=8, color="blue" },
+    alex = { age=2, color="orange" }
+  }
 end
 
 function teardown()
@@ -88,21 +94,6 @@ function test_filter()
   local onlyEvenNumbers = TableUtility:filter(numbers, isEven)
   assert_true(TableUtility:equivalent({2,4}, onlyEvenNumbers))
 
-  local children = {
-    billi = {
-      age=5,
-      color="red"
-    },
-    sydney = {
-      age=8,
-      color="blue"
-    },
-    alex = {
-      age=2,
-      color="orange"
-    }
-  }
-
   local even_aged_children = TableUtility:filter(
     children,
     function (k, v)
@@ -166,18 +157,8 @@ function test_pluck()
   local just_bogus = TableUtility:pluck(tab, "bogus")
   assert_equal(0, TableUtility:size(just_bogus))
 
-  local children = {
-    billi = {
-      age=5,
-      color="red"
-    },
-    sydney = {
-      age=8,
-      color="blue"
-    }
-  }
   local favorite_colors = TableUtility:pluck(children, "color")
-  assert_true(TableUtility:equivalent({billi="red", sydney="blue"}, favorite_colors))
+  assert_true(TableUtility:equivalent({billi="red", sydney="blue", alex="orange"}, favorite_colors))
 end
 
 function test_accumulate()
@@ -205,21 +186,11 @@ function test_each()
   assert_equal(21, sum)
 
   local totalAge = 0
-  local children = {
-    billi = {
-      age=5,
-      color="red"
-    },
-    sydney = {
-      age=8,
-      color="blue"
-    }
-  }
   local addToAge = function(key, val, tab)
     totalAge = totalAge + val.age
   end
   TableUtility:each(children, addToAge)
-  assert_equal(13, totalAge)
+  assert_equal(15, totalAge)
 end
 
 function test_list_comprehension()
@@ -267,22 +238,6 @@ function test_list_comprehension()
   assert_equal("B", even_indexed_letters[1])
   assert_equal("D", even_indexed_letters[2])
   assert_equal("F", even_indexed_letters[3])
-
-  local children = {
-    billi = {
-      age=5,
-      color="red"
-    },
-    sydney = {
-      age=8,
-      color="blue"
-    },
-    alex = {
-      age=2,
-      color="orange"
-    }
-  }
-
   local even_aged_children = TableUtility:listcomp(
     children,
     function (k, v)
@@ -393,22 +348,6 @@ function test_clone_table()
   local clone = TableUtility:clone(original)
   assert_false(original == clone)
   assert_true(TableUtility:equivalent(original, clone))
-
-  local children = {
-    billi = {
-      age=5,
-      color="red"
-    },
-    sydney = {
-      age=8,
-      color="blue"
-    },
-    alex = {
-      age=2,
-      color="orange"
-    }
-  }
-
   local cloned_children = TableUtility:clone(children)
   assert_false(children == cloned_children)
   assert_true(TableUtility:equivalent(children, cloned_children))
@@ -457,36 +396,8 @@ function test_equivalent_set()
   assert_false(TableUtility:equivalentSet(different_elements, a))
 
   -- Check for nested tables, too.
-  local children = {
-    billi = {
-      age=5,
-      color="red"
-    },
-    sydney = {
-      age=8,
-      color="blue"
-    },
-    alex = {
-      age=2,
-      color="orange"
-    }
-  }
-
-  local more_kids = {
-    billi = {
-      age=5,
-      color="red"
-    },
-    sydney = {
-      age=8,
-      color="blue"
-    },
-    alex = {
-      age=2,
-      color="orange"
-    }
-  }
-
+  local more_kids = TableUtility:clone(children)
+  assert_false(children == more_kids)
   assert_true(TableUtility:equivalentSet(children, more_kids))
 end
 
@@ -536,21 +447,6 @@ function test_toorderedlist()
   local numbers = {1,2,5}
   local ordered_numbers = TableUtility:toOrderedTable(numbers)
   assert_equal(numbers, ordered_numbers)
-
-  local children = {
-    billi = {
-      age=5,
-      color="red"
-    },
-    sydney = {
-      age=8,
-      color="blue"
-    },
-    alex = {
-      age=2,
-      color="orange"
-    }
-  }
 
   local expected = {
     {

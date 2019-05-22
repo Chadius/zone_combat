@@ -8,11 +8,18 @@ else
 end
 
 local children = {}
+local sandwich = {}
 function setup()
   children = {
     billi = { age=5, color="red" },
     sydney = { age=8, color="blue" },
     alex = { age=2, color="orange" }
+  }
+  
+  sandwich = {
+    top="bread",
+    middle="peanut butter",
+    bottom="bread",
   }
 end
 
@@ -21,13 +28,7 @@ end
 
 function test_size()
   -- Make sure you can return the number of keys
-  local tab = {
-    top="bread",
-    middle="peanut butter",
-    bottom="bread",
-  }
-
-  assert_equal(3, TableUtility:size(tab))
+  assert_equal(3, TableUtility:size(sandwich))
   assert_equal(2, TableUtility:size({1,2}))
 end
 
@@ -110,7 +111,7 @@ function test_filter()
           age=2,
           color="orange"
         }
-      },
+      }, 
       even_aged_children
     )
   )
@@ -184,7 +185,7 @@ function test_each()
   end
   TableUtility:each(numbers, addToSum)
   assert_equal(21, sum)
-
+  
   local totalAge = 0
   local addToAge = function(key, val, tab)
     totalAge = totalAge + val.age
@@ -293,7 +294,7 @@ function test_all()
 
   assert_true(TableUtility:all({0,2,4,6}, is_even))
   assert_false(TableUtility:all({0,2,4,7}, is_even))
-
+  
   local positiveDict = {
     top = 20,
     middle = 16,
@@ -305,7 +306,7 @@ function test_all()
     bottom = 30,
   }
   assert_true(TableUtility:all(positiveDict, is_even))
-  assert_false(TableUtility:all(negativeDict, is_even))
+  assert_false(TableUtility:all(negativeDict, is_even))  
 end
 
 function test_any()
@@ -321,7 +322,7 @@ function test_any()
 
   assert_true(TableUtility:any({0,2,4,6}, is_even))
   assert_false(TableUtility:any({1,3,5,7}, is_even))
-
+  
     local positiveDict = {
     top = 20,
     middle = 15,
@@ -333,7 +334,7 @@ function test_any()
     bottom = 3,
   }
   assert_true(TableUtility:any(positiveDict, is_even))
-  assert_false(TableUtility:any(negativeDict, is_even))
+  assert_false(TableUtility:any(negativeDict, is_even))  
 end
 
 function test_swap()
@@ -434,20 +435,14 @@ function test_keys()
   local index_keys = TableUtility:keys(numbers)
   assert_true(TableUtility:equivalentSet({1,2,3}, index_keys))
 
-  local tab = {
-    top="bread",
-    middle="peanut butter",
-    bottom="bread",
-  }
-
-  local tab_keys = TableUtility:keys(tab)
+  local tab_keys = TableUtility:keys(sandwich)
   assert_true(TableUtility:equivalentSet({"top","middle","bottom"}, tab_keys))
 end
 function test_toorderedlist()
   local numbers = {1,2,5}
   local ordered_numbers = TableUtility:toOrderedTable(numbers)
   assert_equal(numbers, ordered_numbers)
-
+  
   local expected = {
     {
       billi = { age=5, color="red" }

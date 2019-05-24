@@ -107,7 +107,7 @@ function TableUtility:filter(source, filter_func)
   --[[ Return a new table containing key/value pairs that passed a test.
   Args:
     source(table): If this is an indexed table, the order of the mapped table is preserved.
-    filter_func(function): Should accept the parameters (key, value, source). 
+    filter_func(function): Should accept the parameters (key, value, source).
       The function will get each key/value pair in the source, as well as a copy of the source.
       If the function returns a truthy value, the key/value pair will be added to the new table.
       
@@ -177,9 +177,12 @@ function TableUtility:sum(source, accumulator, start_value)
 end
 
 function TableUtility:each(source, action)
-  --[[ Perform the action on each element in the source.
-
-  The action will be a function that accepts 3 parameters: The key, the value, and the source.
+  --[[ Perform an action on each item in the source table.
+  Args:
+    source(table): If the table responds to the # operator, order of keys is preserved.
+    action(function): The function gets 3 parameters: (key, value, source).
+  Returns:
+    nil
   ]]
 
   local iterator = TableUtility:getIterator(source)
@@ -190,9 +193,17 @@ function TableUtility:each(source, action)
 end
 
 function TableUtility:listcomp(source, postprocess, filter)
-  --[[ Perform a Python-style list comprehension on the source.
-  Filter the source with filter as the function.
-  Each item that is true will have Postprocess applied.
+  --[[ In Python, a list comprehension filters a list, then processes the results into another list.
+  This function mimics the behavior against an array.
+  Args:
+    source(table): If the table responds to the # operator, order of elements is preserved.
+    postprocess(function): Should accept the parameters (key, value, source).
+      This is passed to TableUtility:map() as the map_func.
+    filter(function): Should accept the parameters (key, value, source).
+      This is passed to TableUtility:filter() as the filter_func.
+
+  Returns:
+    A table
   ]]
 
   local filtered_items = TableUtility:filter(source, filter)
@@ -201,9 +212,16 @@ function TableUtility:listcomp(source, postprocess, filter)
 end
 
 function TableUtility:all(source, predicate)
-  --[[ Tests all of the items in the source are truthy.
-  Predicate is a function that takes the key, value and source as parameters.
-  If not provided, Predicate just checks the values to see if they are truthy.
+  --[[ Test to see if all of the itmes in the source Table are truthy, based on a predicate.
+  This function stops as soon as one item is tested falsy.
+
+  Args:
+    source(table): If this is an indexed table, the order of the mapped table is preserved.
+    predicate(function, optional): This function takes the parameters (key, value, source).
+      It should return true or false.
+      The default function tests if the value is truthy.
+  Returns:
+    A boolean.
   ]]
 
   local is_truthy = function(key, value, source)
@@ -214,8 +232,9 @@ function TableUtility:all(source, predicate)
     end
   end
   predicate = predicate or is_truthy
+  local iterator = TableUtility:getIterator(source)
 
-  for key, value in pairs(source) do
+  for key, value in iterator(source) do
     if not predicate(key, value, source) then
       return false
     end
@@ -225,9 +244,16 @@ function TableUtility:all(source, predicate)
 end
 
 function TableUtility:any(source, predicate)
-  --[[ Tests at least one items in the source is truthy.
-  Predicate is a function that takes the key, value and source as parameters.
-  If not provided, Predicate just checks the values to see if they are truthy.
+  --[[ Test to see if at least one item in the source Table is truthy, based on a predicate.
+  This function stops as soon as one item is tested truthy.
+
+  Args:
+    source(table): If this is an indexed table, the order of the mapped table is preserved.
+    predicate(function, optional): This function takes the parameters (key, value, source).
+      It should return true or false.
+      The default function tests if the value is truthy.
+  Returns:
+    A boolean.
   ]]
 
   local is_truthy = function(key, value, source)
@@ -238,8 +264,9 @@ function TableUtility:any(source, predicate)
     end
   end
   predicate = predicate or is_truthy
+  local iterator = TableUtility:getIterator(source)
 
-  for key, value in pairs(source) do
+  for key, value in iterator(source) do
     if predicate(key, value, source) then
       return true
     end
@@ -249,8 +276,19 @@ function TableUtility:any(source, predicate)
 end
 
 function TableUtility:equivalent(left, right)
-  --[[ Given two tables, return true if they are the same size and the elements are equivalent.
-  Order matters.
+  --[[ Given two numerically indexed tables, return true if:
+  -- left and right are the same size
+  -- left and right have the same keys
+  -- For any given key, left[key] is equivalent to right[key].
+  ---- Both values are the same type.
+  ---- Tables are recursed to make sure they are equivalent.
+  ---- Other object types use the == operator.
+
+  Args:
+    left(table): Must be numerically indexed (The # operator works on them)
+    right(table): Must be numerically indexed (The # operator works on them)
+  Returns:
+    A boolean.
   ]]
 
   -- Equivalent tables are the same length.
@@ -278,8 +316,13 @@ function TableUtility:equivalent(left, right)
 end
 
 function TableUtility:swap(source, from, to)
-  --[[ Swap the values of source[from] and source[to].
-  Modifies the source.
+  --[[ Swap the values of source[from] and source[to]. Modifies the source.
+  Args:
+    source(table): Table should have ordered keys.
+    from(integer > 0): Index to start the swap from.
+    to(integer > 0): Index to swap with.
+  Returns:
+    nil
   ]]
 
   -- If from and to are the same, do nothing
@@ -292,7 +335,12 @@ function TableUtility:swap(source, from, to)
 end
 
 function TableUtility:clone(source)
-  --[[ Make a shallow copy of the source table.
+  --[[ Makes a shallow copy of the source table.
+
+  Args:
+    source(table): If this is an indexed table, the clone's order of the mapped table is preserved.
+  Returns:
+    A table.
   ]]
 
   local newTable = {}
@@ -305,12 +353,21 @@ function TableUtility:clone(source)
 end
 
 local function partition(source, low, high, comparison)
-  --[[ Assuming source[high] is the pivot,
-  rearrange the table so all values less than the pivot are closer to low,
+  --[[ Helper function for quicksort() that paritions the table.
+  Assuming source[high] is the pivot, rearrange the table
+  so all values less than the pivot are closer to low,
   and all values greater than the pivot are closer to high.
-  The pivot will be in its sorted location.
-  
-  Return the index of the pivot.
+  The pivot will be moved to its final, sorted location.
+
+  Args:
+    source(table): The table has ordered indexed keys. This will be modified.
+    low(integer): Index of the start of the subtable to partition.
+    high(integer): Index of the end of the subtable to partition.
+    comparison(function): Function takes two parameters.
+      If the first parameter is less than the other, returns -1.
+      Otherwise return something besides -1.
+  Returns:
+    The sorted index of the pivot.
   ]]
 
   -- The pivot value is the last item on the table.
@@ -336,8 +393,20 @@ local function partition(source, low, high, comparison)
 end
 
 local function quicksort(source, low, high, comparison)
-  --[[ Sort the source table so every element from low to high is sorted
-  from smallest to greatest value.
+  --[[ Helper function for sort().
+  The table will be modified so source[low] is the smallest value and source[high]
+  is the greatest value in the table. The next value in the table is never
+  less than the previous.
+
+  Args:
+    source(table): The table has ordered indexed keys. This will be modified.
+    low(integer): Index of the start of the subtable to partition.
+    high(integer): Index of the end of the subtable to partition.
+    comparison(function): Function takes two parameters.
+      If the first parameter is less than the other, returns -1.
+      Otherwise return something besides -1.
+  Returns:
+    nil
   ]]
 
   -- If there are no items to sort, stop
@@ -352,13 +421,17 @@ local function quicksort(source, low, high, comparison)
 end
 
 function TableUtility:sort(source, comparison)
-  --[[ Sort the source table from least to greatest value.
-  source is modified in place.
-  
-  comparison function is optional. It accepts 2 objects a and b and returns a number.
-  -- If negative, then a is less than b
-  -- If positive, then a is greater than b
-  -- If zero, then a equals b
+  --[[ sort the values in the source table from smallest to greatest, based on a comparison.
+  If two items have the same value, the order is arbitrary.
+
+  Args:
+    source(table): The table has ordered indexed keys. This will be modified.
+    comparison(function): Function takes two parameters.
+      If the first parameter is less than the other, returns -1.
+      If the first parameter is greater than the other, returns 1.
+      Otherwise return 0.
+  Returns:
+    source, now properly sorted
   ]]
 
   local defaultComparison = function (a,b)
@@ -381,8 +454,23 @@ function TableUtility:sort(source, comparison)
 end
 
 function TableUtility:equivalentSet(left, right, sortComparison)
-  --[[ Given two tables, return true if they are the same size and the elements are equivalent.
-  Order does not matter.
+  --[[ Given two tables, return true if:
+  -- left and right are the same size
+  -- left and right have the same keys
+
+  -- For any given key, the value of left[key] can be found in right.
+  ---- Both values are the same type.
+  ---- Tables are recursed to make sure they are equivalent.
+  ---- Other object types use the == operator.
+  Notice that order doesn't matter.
+
+  Args:
+    left(table)
+    right(table)
+    sortComparison(function, optional): If left and right are numerically indexed tables,
+      you can supply a function to help speed this function up. See sort() for an example.
+  Returns:
+    A boolean.
   ]]
 
   -- Equivalent tables are the same length.
@@ -405,7 +493,11 @@ function TableUtility:equivalentSet(left, right, sortComparison)
 end
 
 function TableUtility:reverse(source)
-  --[[ Returns a copy of the source where the first item is the last item of the source.
+  --[[ Creates a copy of the source table where the indecies are in the opposite order.
+  Args:
+    source(table): Table must have integer indecies starting from 1.
+  Returns:
+    A new table.
   ]]
 
   local newTable = {}
@@ -418,7 +510,11 @@ function TableUtility:reverse(source)
 end
 
 function TableUtility:join(source, separator)
-  --[[ Prints the contents of a numeric table, using separator to space multiple elements.
+  --[[ Creates a string showing the values of the ordered source table and a separator.
+  Args:
+    source(table): The table has numeric ordered indecies.
+    separator(string, optional, default=","): Each value will be separated by this string.
+      If there are 0 or 1 values the separator is not used.
   ]]
   separator = separator or ","
 
@@ -440,6 +536,17 @@ function TableUtility:join(source, separator)
 end
 
 function TableUtility:first(source, predicate)
+  --[[ Finds the first element in the ordered table that passes a predicate function.
+  This function stops as soon as one item is tested truthy.
+
+  Args:
+    source(table): A table with ordered indecies.
+    predicate(function): This function takes the parameters (value).
+      It should return true or false.
+  Returns:
+    An object in the source that satisfies the predicate.
+    nil otherwise.
+  ]]
   -- Returns the first element that satisfies the predicate.
 
   for key, value in ipairs(source) do
@@ -451,7 +558,11 @@ function TableUtility:first(source, predicate)
   return nil
 end
 function TableUtility:toOrderedTable(source)
-  --[[ Takes an unordered table and turns each key : value pair into an item on an ordered list.
+  --[[ Unfolds an unordered table. Each key: value pair becomes an item in a new ordered list.
+  Args:
+    source(table)
+  Returns:
+    A new table.
   ]]
 
   -- If the table is already ordered, return the table

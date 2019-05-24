@@ -354,28 +354,6 @@ function test_clone_table()
   assert_true(TableUtility:equivalent(children, cloned_children))
 end
 
-function test_sort_numbers()
-  local numbers = {3,4,5,2,1}
-  local expected = {1,2,3,4,5}
-  TableUtility:sort(numbers)
-  assert_true(TableUtility:equivalent(numbers, expected))
-end
-
-function test_sort_comparison()
-  local numbers = {3,4,5,2,1}
-  local expected = {5,4,3,2,1}
-  local reverse_compare = function (a,b)
-    if a < b then
-      return 1
-    elseif a > b then
-      return -1
-    end
-    return 0
-  end
-  TableUtility:sort(numbers, reverse_compare)
-  assert_true(TableUtility:equivalent(numbers, expected))
-end
-
 function test_equivalent_set()
   local a = {1,2,3}
   local b = {1,2,3}
@@ -418,6 +396,9 @@ function test_join()
   assert_equal("1", short_contents)
 
   assert_equal("", TableUtility:join({}, ","))
+
+  local unordered_table_join = TableUtility:join({a=1, b=2}, ",")
+  assert_true(unordered_table_join == "a:1,b:2" or unordered_table_join == "b:2,a:1")
 end
 
 function test_first()
@@ -463,6 +444,3 @@ function test_toorderedlist()
   local ordered_kids = TableUtility:toOrderedTable(expected)
   assert_true(TableUtility:equivalentSet(expected, ordered_kids, sort_by_name))
 end
-
--- join should work on unordered tables.
--- table.sort() exists? I don't need a homebrew sort function, then.

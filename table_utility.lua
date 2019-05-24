@@ -1,6 +1,6 @@
 --[[ Utility library to add functional programming for Tables, and reduce for loops in general.
 
-These functions work on all tables:
+These functions work on all tables. If the table is an array the order will be respected:
 all()
 any()
 clone()
@@ -20,10 +20,9 @@ equaivalent()
 first()
 join()
 reverse()
-sort()
 swap()
 
-These functions only work on Associative Tables (keys are arbitraty, table is unordered)
+These functions only work on dictionaries (a table where keys are unordered)
 toOrderedTable()
 ]]
 
@@ -352,107 +351,6 @@ function TableUtility:clone(source)
   return newTable
 end
 
-local function partition(source, low, high, comparison)
-  --[[ Helper function for quicksort() that paritions the table.
-  Assuming source[high] is the pivot, rearrange the table
-  so all values less than the pivot are closer to low,
-  and all values greater than the pivot are closer to high.
-  The pivot will be moved to its final, sorted location.
-
-  Args:
-    source(table): The table has ordered indexed keys. This will be modified.
-    low(integer): Index of the start of the subtable to partition.
-    high(integer): Index of the end of the subtable to partition.
-    comparison(function): Function takes two parameters.
-      If the first parameter is less than the other, returns -1.
-      Otherwise return something besides -1.
-  Returns:
-    The sorted index of the pivot.
-  ]]
-
-  -- The pivot value is the last item on the table.
-  local pivot_value = source[high]
-
-  -- Track the pivot's final index, starting at low.
-  local sorted_pivot_index = low
-
-  -- Look at each element from the low index to high, skipping the pivot.
-  for index=low, high - 1 do
-    -- If the element is less than the pivot, then
-    if comparison(source[index], pivot_value) < 0 then
-      -- Swap this element with the pivot's final index.
-      TableUtility:swap(source, index, sorted_pivot_index)
-      -- Increment the pivot's final index, since we know it isn't here.
-      sorted_pivot_index = sorted_pivot_index + 1
-    end
-  end
-
-  -- Swap the pivot to its final index and return the index.
-  TableUtility:swap(source, sorted_pivot_index, high)
-  return sorted_pivot_index
-end
-
-local function quicksort(source, low, high, comparison)
-  --[[ Helper function for sort().
-  The table will be modified so source[low] is the smallest value and source[high]
-  is the greatest value in the table. The next value in the table is never
-  less than the previous.
-
-  Args:
-    source(table): The table has ordered indexed keys. This will be modified.
-    low(integer): Index of the start of the subtable to partition.
-    high(integer): Index of the end of the subtable to partition.
-    comparison(function): Function takes two parameters.
-      If the first parameter is less than the other, returns -1.
-      Otherwise return something besides -1.
-  Returns:
-    nil
-  ]]
-
-  -- If there are no items to sort, stop
-  if low >= high then return end
-
-  -- Partition the table and get the pivot's location.
-  local pivot_location = partition(source, low, high, comparison)
-
-  -- The pivot has been sorted correctly, so recurse and sort the two subtables.
-  quicksort(source, low, pivot_location - 1, comparison)
-  quicksort(source, pivot_location + 1, high, comparison)
-end
-
-function TableUtility:sort(source, comparison)
-  --[[ sort the values in the source table from smallest to greatest, based on a comparison.
-  If two items have the same value, the order is arbitrary.
-
-  Args:
-    source(table): The table has ordered indexed keys. This will be modified.
-    comparison(function): Function takes two parameters.
-      If the first parameter is less than the other, returns -1.
-      If the first parameter is greater than the other, returns 1.
-      Otherwise return 0.
-  Returns:
-    source, now properly sorted
-  ]]
-
-  local defaultComparison = function (a,b)
-    if type(a) ~= type(b) then return 0 end
-
-    if a < b then
-      return -1
-    elseif a > b then
-      return 1
-    end
-    return 0
-  end
-
-  comparison = comparison or defaultComparison
-
-  -- Execute QuickSort, starting from the start to the end of the table.
-  quicksort(source, 1, #source, comparison)
-  
-  return source
-end
-
 function TableUtility:equivalentSet(left, right)
   --[[ Given two tables, return true if:
   -- left and right are the same size
@@ -535,35 +433,57 @@ function TableUtility:reverse(source)
 end
 
 function TableUtility:join(source, separator)
-  --[[ Creates a string showing the values of the ordered source table and a separator.
+  --[[ Creates a string showing the values of the source table and a separator.
+  If the source has ordered keys, the keys are not shown.
+  Otherwise the key/value pairs are shown as key:value
   Args:
-    source(table): The table has numeric ordered indecies.
+    source(table)
     separator(string, optional, default=","): Each value will be separated by this string.
       If there are 0 or 1 values the separator is not used.
+  Return:
+    A string.
   ]]
   separator = separator or ","
 
   -- If it's empty, return an empty string
-  if #source == 0 then return "" end
+  if TableUtility:size(source) == 0 then return "" end
 
-  -- If there is only 1 item in the array, just return that
-  if #source == 1 then return tostring(source[1]) end
+  local iterator = TableUtility:getIterator(source)
 
-  -- Otherwise append the value and separator combo.
   local joinedStr = ""
-  for key, value in ipairs(source) do
-    local valueStr = value
+  local toString = function (value)
     if type(value) == "boolean" then
       if value then
-        valueStr = "true"
+        return "true"
       else
-        valueStr = "false"
+        return "false"
       end
     end
-    joinedStr = joinedStr .. valueStr
-    if key < #source then
+    return value
+  end
+
+  if iterator == ipairs then
+    -- If there is only 1 item in the array, just return that
+    if #source == 1 then return tostring(source[1]) end
+
+    -- Otherwise append the value and separator combo.
+    for key, value in ipairs(source) do
+      local valueStr = toString(value)
+      joinedStr = joinedStr .. valueStr
+      if key < #source then
+        joinedStr = joinedStr .. separator
+      end
+    end
+    return joinedStr
+  end
+
+  local first_pair = true
+  for key, value in pairs(source) do
+    if not first_pair then
       joinedStr = joinedStr .. separator
     end
+    joinedStr = joinedStr .. toString(key) .. ":" .. toString(value)
+    first_pair = false
   end
   return joinedStr
 end

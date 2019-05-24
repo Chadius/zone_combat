@@ -15,7 +15,7 @@ pluck()
 size()
 sum()
 
-These functions only work on indexed tables (keys are integers starting with 1, table is ordered)
+These functions only work on arrays (tables whose keys are integers starting with 1, table is ordered)
 equaivalent()
 first()
 join()
@@ -453,7 +453,7 @@ function TableUtility:sort(source, comparison)
   return source
 end
 
-function TableUtility:equivalentSet(left, right, sortComparison)
+function TableUtility:equivalentSet(left, right)
   --[[ Given two tables, return true if:
   -- left and right are the same size
   -- left and right have the same keys
@@ -467,8 +467,6 @@ function TableUtility:equivalentSet(left, right, sortComparison)
   Args:
     left(table)
     right(table)
-    sortComparison(function, optional): If left and right are numerically indexed tables,
-      you can supply a function to help speed this function up. See sort() for an example.
   Returns:
     A boolean.
   ]]
@@ -478,18 +476,45 @@ function TableUtility:equivalentSet(left, right, sortComparison)
     return false
   end
 
-  -- Indexed tables don't care about their keys, so we'll have to sort their values before comparing them.
-  if #left > 0 then 
-    -- Clone the tables, then sort them.
-    local leftClone = TableUtility:sort( TableUtility:clone(left), sortComparison )
-    local rightClone = TableUtility:sort( TableUtility:clone(right), sortComparison )
+  -- Track all of the right keys that are accounted for
+  local right_keys_marked = {}
+  TableUtility:each(right, function(key, value, source) right_keys_marked[key] = false end)
 
-    -- Now test the objects are in the same order.
-    return TableUtility:equivalent(leftClone, rightClone)
+  -- For each key in left
+  for leftKey, leftValue in pairs(left) do
+    -- If all right keys have been marked before the left keys were examined, return false.
+    if TableUtility:all(right_keys_marked, function(key, value, source) return value == true end) then
+      return false
+    end
+
+    for rightKey, markedValue in pairs(right_keys_marked) do
+      -- Only look in unmarked right keys
+      if not right_keys_marked[rightKey] then
+        local rightValue = right[rightKey]
+        local equalValue = false
+        --- If the left value and right value have different types, continue to the next right key
+        if type(leftValue) == type(rightValue) then
+          -- If they are tables, recurse
+          if type(leftValue) == 'table' then
+            equalValue = TableUtility:equivalentSet(leftValue, rightValue)
+          else
+            equalValue = (leftValue == rightValue)
+          end
+        end
+
+        --- If they are equal, mark the right key.
+        if equalValue then
+          right_keys_marked[rightKey] = true
+        end
+      end
+    end
   end
-  
-  -- Unordered tables use unique keys, so we can compare them directly.
-  return TableUtility:equivalent(left, right)
+
+  -- See if there are any unmarked right keys. If so, return false
+  if TableUtility:any(right_keys_marked, function(key, value, source) return value == false end) then
+    return false
+  end
+  return true
 end
 
 function TableUtility:reverse(source)
@@ -527,7 +552,15 @@ function TableUtility:join(source, separator)
   -- Otherwise append the value and separator combo.
   local joinedStr = ""
   for key, value in ipairs(source) do
-    joinedStr = joinedStr .. value
+    local valueStr = value
+    if type(value) == "boolean" then
+      if value then
+        valueStr = "true"
+      else
+        valueStr = "false"
+      end
+    end
+    joinedStr = joinedStr .. valueStr
     if key < #source then
       joinedStr = joinedStr .. separator
     end

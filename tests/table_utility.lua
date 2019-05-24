@@ -457,14 +457,12 @@ function test_toorderedlist()
   local sort_by_name = function(a, b)
     local a_keys = TableUtility:keys(a)
     local b_keys = TableUtility:keys(b)
-    if a_keys[1] < b_keys[1] then return -1 end
-    if a_keys[1] > b_keys[1] then return 1 end
-    return 0
+    if a_keys[1] < b_keys[1] then return true end
+    return false
   end
   local ordered_kids = TableUtility:toOrderedTable(expected)
   assert_true(TableUtility:equivalentSet(expected, ordered_kids, sort_by_name))
 end
 
--- equivalentSet should work on unordered tables.
 -- join should work on unordered tables.
 -- table.sort() exists? I don't need a homebrew sort function, then.

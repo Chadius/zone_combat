@@ -15,7 +15,7 @@ function setup()
     sydney = { age=8, color="blue" },
     alex = { age=2, color="orange" }
   }
-  
+
   sandwich = {
     top="bread",
     middle="peanut butter",
@@ -111,7 +111,7 @@ function test_filter()
           age=2,
           color="orange"
         }
-      }, 
+      },
       even_aged_children
     )
   )
@@ -167,7 +167,7 @@ function test_accumulate()
   local numbers = {1,2,3,4,5,6,7,-7}
   local sum = TableUtility:sum(numbers)
   assert_equal(21, sum)
-  
+
   local concat = function(arg1, arg2)
     return arg1 .. arg2
   end
@@ -179,13 +179,13 @@ end
 function test_each()
   local sum = 0
   local numbers = {1,2,3,4,5,6,7,-7}
-  
+
   local addToSum = function(key, val, tab)
     sum = sum + val
   end
   TableUtility:each(numbers, addToSum)
   assert_equal(21, sum)
-  
+
   local totalAge = 0
   local addToAge = function(key, val, tab)
     totalAge = totalAge + val.age
@@ -196,7 +196,7 @@ end
 
 function test_list_comprehension()
   -- Cloning Python list comprehension to filter and map items in a list.
-  
+
   -- Get a list of all even items in the list.
   local alphabet = {
     {
@@ -222,9 +222,9 @@ function test_list_comprehension()
     {
       letter = "F",
       index = 6
-    }    
+    }
   }
-  
+
   local even_indexed_letters = TableUtility:listcomp(
     alphabet,
     function (k, v)
@@ -234,7 +234,7 @@ function test_list_comprehension()
       return v["index"] % 2 == 0
     end
   )
-  
+
   assert_equal(3, TableUtility:size(even_indexed_letters))
   assert_equal("B", even_indexed_letters[1])
   assert_equal("D", even_indexed_letters[2])
@@ -261,20 +261,20 @@ function test_equivalent()
   -- Tables are equivalent if they are the same length and the elements are equivalent
   assert_true(TableUtility:equivalent(a, b))
   assert_true(TableUtility:equivalent(b, a))
-  
+
   -- The order counts, so rearranging the elements will not make them equivalent.
   assert_false(TableUtility:equivalent(b, reordered_b))
-  
+
   -- different length tables are not equivalent either.
   assert_false(TableUtility:equivalent(a, different_length))
-  
+
   -- different is not equivalent and does not contain the same elements as a
   assert_false(TableUtility:equivalent(different_elements, a))
-  
+
   -- But b and c do contain the same elements
   --  assert_true(TableUtility:equivalent_unordered(b, c))
   -- assert_false(TableUtility:equivalent_unordered(different, a))
-  
+
   -- Check for nested tables, too.
   local nested_table_a = {{1}}
   local nested_table_b = {{1}}
@@ -284,17 +284,17 @@ end
 function test_all()
   local positive = {true, true, true}
   local negative = {false, true, true}
-  
+
   assert_true(TableUtility:all(positive))
   assert_false(TableUtility:all(negative))
-  
+
   local is_even = function(key, value, source)
     return value % 2 == 0
   end
 
   assert_true(TableUtility:all({0,2,4,6}, is_even))
   assert_false(TableUtility:all({0,2,4,7}, is_even))
-  
+
   local positiveDict = {
     top = 20,
     middle = 16,
@@ -306,7 +306,7 @@ function test_all()
     bottom = 30,
   }
   assert_true(TableUtility:all(positiveDict, is_even))
-  assert_false(TableUtility:all(negativeDict, is_even))  
+  assert_false(TableUtility:all(negativeDict, is_even))
 end
 
 function test_any()
@@ -322,8 +322,8 @@ function test_any()
 
   assert_true(TableUtility:any({0,2,4,6}, is_even))
   assert_false(TableUtility:any({1,3,5,7}, is_even))
-  
-    local positiveDict = {
+
+  local positiveDict = {
     top = 20,
     middle = 15,
     bottom = -1,
@@ -334,7 +334,7 @@ function test_any()
     bottom = 3,
   }
   assert_true(TableUtility:any(positiveDict, is_even))
-  assert_false(TableUtility:any(negativeDict, is_even))  
+  assert_false(TableUtility:any(negativeDict, is_even))
 end
 
 function test_swap()
@@ -423,7 +423,7 @@ function test_toorderedlist()
   local numbers = {1,2,5}
   local ordered_numbers = TableUtility:toOrderedTable(numbers)
   assert_equal(numbers, ordered_numbers)
-  
+
   local expected = {
     {
       billi = { age=5, color="red" }

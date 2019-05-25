@@ -29,10 +29,10 @@ toOrderedTable()
 local TableUtility = {}
 function TableUtility:getIterator(source)
   --[[ Return the correct iterator for the given source.
-  
+
   Args:
     source(table)
-    
+
   Returns:
     A function.
   ]]
@@ -44,7 +44,7 @@ function TableUtility:keys(source)
   --[[ Return a table containing the keys from source.
   Args:
     source(table)
-    
+
   Returns:
     indexed table. Each value represents a key from source. Order is arbitrary.
   ]]
@@ -61,7 +61,7 @@ function TableUtility:keyCount(source)
   --[[ Returns the number of keys in this indexed table.
   Args:
     source(table)
-    
+
   Returns:
     A number.
   ]]
@@ -83,10 +83,10 @@ function TableUtility:map(source, map_func)
   --[[ Apply some task to each item in the source table, creating a new table in the process.
   Args:
     source(table): If this is an indexed table, the order of the mapped table is preserved.
-    map_func(function): Should accept the parameters (key, value, source). 
+    map_func(function): Should accept the parameters (key, value, source).
       The function will get each key/value pair in the source, as well as a copy of the source.
       The function's return value will be added to the new table, using the same key.
-      
+
   Returns:
     A new table.
   ]]
@@ -109,7 +109,7 @@ function TableUtility:filter(source, filter_func)
     filter_func(function): Should accept the parameters (key, value, source).
       The function will get each key/value pair in the source, as well as a copy of the source.
       If the function returns a truthy value, the key/value pair will be added to the new table.
-      
+
   Returns:
     A new table.
   ]]
@@ -152,7 +152,7 @@ function TableUtility:sum(source, accumulator, start_value)
   --[[ Accumulate value based on each value in the source table.
     Args:
       source(table)
-      accumulator(function, optional): Signature(sum, value). The accumulator will 
+      accumulator(function, optional): Signature(sum, value). The accumulator will
         transofrm the value as necessary and apply to the sum.
         The default function is numeric addition.
       start_value(object, optional, default=""): Start value to begin adding/

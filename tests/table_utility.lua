@@ -111,7 +111,7 @@ function test_filter()
           age=2,
           color="orange"
         }
-      }
+      },
       even_aged_children
     )
   )

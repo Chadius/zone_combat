@@ -1,4 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
+local Map = require "map"
+local MapUnit = require "map/mapUnit"
 
 if _VERSION >= 'Lua 5.2' then
     _ENV = lunit.module('enhanced','seeall')
@@ -7,6 +9,7 @@ else
 end
 
 local map = {}
+local human
 
 function setup()
     --[[Set up a forest glade, with a pond surrounded by 3 trails.
@@ -48,8 +51,32 @@ function setup()
             { id="pond" }
         }
     })
+
+    human = MapUnit:new({
+        displayName = "human"
+    })
 end
 
 function teardown()
 end
 
+function test_place_unit_on_map()
+    --[[ You can create units with given movement types.
+    ]]
+
+    -- Human has a name, but no id since it's not on the map.
+    assert_equal("human", human.name)
+    assert_equal(nil, human.id)
+
+    -- Place human on the map, map knows its location
+    map:addMapUnit(human, "trail1")
+
+    trail1_units = map:getMapUnitsAtLocation("trail1")
+    assert_equal(1, #trail1_units)
+    assert_equal(human, trail1_units[1])
+end
+
+-- Can't place the same unit on the map at two places at once
+-- Can't put the unit in a zone that doesn't exist
+-- Can remove units from zones
+-- Unit ID should not change if it's moved to another zone

@@ -168,6 +168,12 @@ function Map:addMapUnit(mapUnit, zoneName)
   --[[ Adds a MapUnit to a given zone.
   ]]
 
+  -- Make sure the zone exists
+  if not self.zone_by_id[zoneName] then
+
+    error("MapUnit " .. mapUnit.name .. " cannot be added because zone " .. zoneName .. " does not exist.")
+  end
+
   -- If the map unit was already added, raise an error
   if self.mapUnitsByID[mapUnit.id] then
     error("MapUnit " .. mapUnit.name .. " already exists.")

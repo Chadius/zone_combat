@@ -93,6 +93,18 @@ function test_one_mapunit_location()
     assert_equal(human, trail1_units[1])
 end
 
--- Can't put the unit in a zone that doesn't exist
+function testNonexistentZoneAdd()
+  -- Can't put the unit in a zone that doesn't exist
+  local bad_unit_add = function()
+    map:addMapUnit(human, "bogus")
+  end
+
+  assert_error_match(
+      "Added human to trail that doesn't exist without error. That's bad.",
+      "MapUnit human cannot be added because zone bogus does not exist.",
+      bad_unit_add
+  )
+end
+
 -- Can remove units from zones
 -- Unit ID should not change if it's moved to another zone

@@ -76,7 +76,23 @@ function test_place_unit_on_map()
     assert_equal(human, trail1_units[1])
 end
 
--- Can't place the same unit on the map at two places at once
+function test_one_mapunit_location()
+    -- Can't place the same unit on the map at two places at once
+    map:addMapUnit(human, "trail1")
+    local bad_unit_add = function()
+        map:addMapUnit(human, "trail2")
+    end
+
+    assert_error_match(
+        "Added human to trail2 without error. That's bad.",
+        "MapUnit human already exists.",
+        bad_unit_add
+    )
+    trail1_units = map:getMapUnitsAtLocation("trail1")
+    assert_equal(1, #trail1_units)
+    assert_equal(human, trail1_units[1])
+end
+
 -- Can't put the unit in a zone that doesn't exist
 -- Can remove units from zones
 -- Unit ID should not change if it's moved to another zone

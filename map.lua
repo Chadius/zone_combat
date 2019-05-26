@@ -3,6 +3,7 @@
 
 local Zone = require "zone"
 local ZoneNeighbor = require "zone_neighbor"
+local TableUtility = require "table_utility"
 
 local Map={}
 Map.__index = Map
@@ -53,8 +54,7 @@ function Map:new(args)
   -- Set an id to track MapUnits.
   newMap.nextMapUnitID = 1
 
-  -- Track all of the map units by which zone they are in. This counts active units only.
-  self.mapUnitsByZone = {}
+  self.mapUnitsByID = {}
 
   return newMap
 end
@@ -168,21 +168,36 @@ function Map:addMapUnit(mapUnit, zoneName)
   --[[ Adds a MapUnit to a given zone.
   ]]
 
+  -- If the map unit was already added, raise an error
+  if self.mapUnitsByID[mapUnit.id] then
+    error("MapUnit " .. mapUnit.name .. " already exists.")
+  end
+
   -- Give the mapUnit an id.
   mapUnit.id = self.nextMapUnitID
   self.nextMapUnitID = self.nextMapUnitID + 1
 
   -- Store in a zone.
-  if self.mapUnitsByZone[zoneName] == nil then
-    self.mapUnitsByZone[zoneName] = {}
-  end
-  table.insert(self.mapUnitsByZone[zoneName], mapUnit)
+  self.mapUnitsByID[mapUnit.id] = {
+    mapUnit = mapUnit,
+    zone = zoneName
+  }
 end
 
 function Map:getMapUnitsAtLocation(zoneName)
-  --[[ Return a table of MapUnits in a given zone.
+  --[[ Return a table of active MapUnits in a given zone.
   ]]
-  return self.mapUnitsByZone[zoneName]
+
+  local mapUnitsByZone = {}
+  TableUtility:each(
+      self.mapUnitsByID,
+      function(_, info)
+        local zoneID = info.zone
+        if mapUnitsByZone[zoneID] == nil then mapUnitsByZone[zoneID] = {} end
+        table.insert(mapUnitsByZone[zoneID], info.mapUnit)
+      end
+  )
+  return mapUnitsByZone[zoneName]
 end
 
 return Map

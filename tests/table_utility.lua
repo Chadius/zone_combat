@@ -7,8 +7,20 @@ else
     module( "enhanced", package.seeall, lunit.testcase )
 end
 
-local children = {}
-local sandwich = {}
+local children
+local sandwich
+local numbers
+local numbers2
+local numbers3
+
+local is_even = function(_, value)
+  return value % 2 == 0
+end
+
+local has_even_age = function (_, v)
+  return v.age % 2 == 0
+end
+
 function setup()
   children = {
     billi = { age=5, color="red" },
@@ -21,6 +33,10 @@ function setup()
     middle="peanut butter",
     bottom="bread",
   }
+
+  numbers = {1,2,3,4,5}
+  numbers2 = {1,2,3,4,5,6,7,-7}
+  numbers3 = {1,2,5}
 end
 
 function teardown()
@@ -34,7 +50,7 @@ end
 
 function test_map()
   -- Test the map function to show it transforms the list.
-  local getStringLength = function(index, str, list)
+  local getStringLength = function(_, str)
     return string.len(str)
   end
 
@@ -53,8 +69,7 @@ function test_map()
   assert_equal(1, map_table[3])
   assert_equal(3, map_table[4])
 
-  local square_value = function(key, value, list) return value* value end
-  local numbers = {1,2,3,4,5}
+  local square_value = function(_, value) return value* value end
   local squared = TableUtility:map(numbers, square_value)
   assert_true(TableUtility:equivalent({1,4,9,16,25}, squared))
 
@@ -70,7 +85,7 @@ end
 
 function test_filter()
   -- Test the filter function to show it can split the list.
-  local onlyEvenLength = function(index, str, list)
+  local onlyEvenLength = function(_, str)
     local str_len = string.len(str)
     if str_len % 2 == 0 then
       return true
@@ -90,16 +105,12 @@ function test_filter()
   assert_equal(1, TableUtility:size(map_table))
   assert_equal("am", map_table[1])
 
-  local numbers = {1,2,3,4,5}
-  local isEven = function(a) return a % 2 == 0 end
-  local onlyEvenNumbers = TableUtility:filter(numbers, isEven)
+  local onlyEvenNumbers = TableUtility:filter(numbers, is_even)
   assert_true(TableUtility:equivalent({2,4}, onlyEvenNumbers))
 
   local even_aged_children = TableUtility:filter(
     children,
-    function (k, v)
-      return v.age % 2 == 0
-    end
+    has_even_age
   )
   assert_true(TableUtility:equivalent(
       {
@@ -164,8 +175,7 @@ end
 
 function test_accumulate()
   -- Test you can sum numbers and strings in a list.
-  local numbers = {1,2,3,4,5,6,7,-7}
-  local sum = TableUtility:sum(numbers)
+  local sum = TableUtility:sum(numbers2)
   assert_equal(21, sum)
 
   local concat = function(arg1, arg2)
@@ -178,16 +188,15 @@ end
 
 function test_each()
   local sum = 0
-  local numbers = {1,2,3,4,5,6,7,-7}
 
-  local addToSum = function(key, val, tab)
+  local addToSum = function(_, val)
     sum = sum + val
   end
-  TableUtility:each(numbers, addToSum)
+  TableUtility:each(numbers2, addToSum)
   assert_equal(21, sum)
 
   local totalAge = 0
-  local addToAge = function(key, val, tab)
+  local addToAge = function(_, val)
     totalAge = totalAge + val.age
   end
   TableUtility:each(children, addToAge)
@@ -227,10 +236,10 @@ function test_list_comprehension()
 
   local even_indexed_letters = TableUtility:listcomp(
     alphabet,
-    function (k, v)
+    function (_, v)
       return v["letter"]
     end,
-    function (k, v)
+    function (_, v)
       return v["index"] % 2 == 0
     end
   )
@@ -241,12 +250,10 @@ function test_list_comprehension()
   assert_equal("F", even_indexed_letters[3])
   local even_aged_children = TableUtility:listcomp(
     children,
-    function (k, v)
+    function (k)
       return k
     end,
-    function (k, v)
-      return v.age % 2 == 0
-    end
+    has_even_age
   )
   assert_true(TableUtility:equivalent({sydney = "sydney", alex = "alex"}, even_aged_children))
 end
@@ -288,10 +295,6 @@ function test_all()
   assert_true(TableUtility:all(positive))
   assert_false(TableUtility:all(negative))
 
-  local is_even = function(key, value, source)
-    return value % 2 == 0
-  end
-
   assert_true(TableUtility:all({0,2,4,6}, is_even))
   assert_false(TableUtility:all({0,2,4,7}, is_even))
 
@@ -316,10 +319,6 @@ function test_any()
   assert_true(TableUtility:any(positive))
   assert_false(TableUtility:any(negative))
 
-  local is_even = function(key, value, source)
-    return value % 2 == 0
-  end
-
   assert_true(TableUtility:any({0,2,4,6}, is_even))
   assert_false(TableUtility:any({1,3,5,7}, is_even))
 
@@ -338,10 +337,10 @@ function test_any()
 end
 
 function test_swap()
-  local numbers = {"a",4,3,2,1}
+  local swapNumbers = {"a",4,3,2,1}
   local expected = {1,4,3,2,"a"}
-  TableUtility:swap(numbers, 1, 5)
-  assert_true(TableUtility:equivalent(numbers, expected))
+  TableUtility:swap(swapNumbers, 1, 5)
+  assert_true(TableUtility:equivalent(swapNumbers, expected))
 end
 
 function test_clone_table()
@@ -381,14 +380,12 @@ function test_equivalent_set()
 end
 
 function test_reverse()
-  local numbers = {1,2,3,4,5}
   local expected = {5,4,3,2,1}
   local reversed = TableUtility:reverse(numbers)
   assert_true(TableUtility:equivalent(reversed, expected))
 end
 
 function test_join()
-  local numbers = {1,2,3,4,5}
   local contents = TableUtility:join(numbers, ",")
   assert_equal("1,2,3,4,5", contents)
 
@@ -402,27 +399,23 @@ function test_join()
 end
 
 function test_first()
-  local numbers = {1,2,3,4,5}
-  local isEven = function(a) return a % 2 == 0 end
-  local isMoreThanTen = function(a) return a > 10 end
-  local firstEven = TableUtility:first(numbers, isEven)
+  local isMoreThanTen = function(_, a) return a > 10 end
+  local firstEven = TableUtility:first(numbers, is_even)
   assert_equal(2, firstEven)
   local firstMoreThanTen = TableUtility:first(numbers, isMoreThanTen)
   assert_equal(nil, firstMoreThanTen)
 end
 
 function test_keys()
-  local numbers = {1,2,5}
-  local index_keys = TableUtility:keys(numbers)
+  local index_keys = TableUtility:keys(numbers3)
   assert_true(TableUtility:equivalentSet({1,2,3}, index_keys))
 
   local tab_keys = TableUtility:keys(sandwich)
   assert_true(TableUtility:equivalentSet({"top","middle","bottom"}, tab_keys))
 end
 function test_toorderedlist()
-  local numbers = {1,2,5}
-  local ordered_numbers = TableUtility:toOrderedTable(numbers)
-  assert_equal(numbers, ordered_numbers)
+  local ordered_numbers = TableUtility:toOrderedTable(numbers3)
+  assert_equal(numbers3, ordered_numbers)
 
   local expected = {
     {
@@ -443,4 +436,17 @@ function test_toorderedlist()
   end
   local ordered_kids = TableUtility:toOrderedTable(expected)
   assert_true(TableUtility:equivalentSet(expected, ordered_kids, sort_by_name))
+end
+function testContains()
+  assert_true(TableUtility:contains(numbers, 3))
+  assert_false(TableUtility:contains(numbers, 8))
+
+  assert_true(TableUtility:contains(sandwich, "bread"))
+  assert_false(TableUtility:contains(sandwich, "pickles"))
+end
+function testEmpty()
+  assert_false(TableUtility:empty(sandwich))
+  assert_false(TableUtility:empty(numbers))
+
+  assert_true(TableUtility:empty({}))
 end

@@ -4,7 +4,9 @@ These functions work on all tables. If the table is an array the order will be r
 all()
 any()
 clone()
+contains()
 each()
+empty()
 equaivalentSet()
 filter()
 keyCount()
@@ -14,6 +16,7 @@ map()
 pluck()
 size()
 sum()
+
 
 These functions only work on arrays (tables whose keys are integers starting with 1, table is ordered)
 equaivalent()
@@ -50,7 +53,7 @@ function TableUtility:keys(source)
   ]]
 
   local result = {}
-  for key, value in pairs(source) do
+  for key, _ in pairs(source) do
      table.insert(result, key)
   end
 
@@ -67,7 +70,7 @@ function TableUtility:keyCount(source)
   ]]
 
   local count = 0
-  for key, value in pairs(source) do
+  for _, _ in pairs(source) do
      count = count + 1
   end
 
@@ -141,7 +144,7 @@ function TableUtility:pluck(source, key_to_pluck)
   ]]
   --[[ Return a table of values extracted from the source, based on the key.
   ]]
-  local plucker = function(key, value, list)
+  local plucker = function(_, value)
     return value[key_to_pluck]
   end
 
@@ -164,7 +167,7 @@ function TableUtility:sum(source, accumulator, start_value)
     sum = 0
   end
 
-  for key, value in ipairs(source) do
+  for _, value in ipairs(source) do
     if accumulator then
       sum = accumulator(sum, value)
     else
@@ -223,7 +226,7 @@ function TableUtility:all(source, predicate)
     A boolean.
   ]]
 
-  local is_truthy = function(key, value, source)
+  local is_truthy = function(_, value)
     if value then
       return true
     else
@@ -255,7 +258,7 @@ function TableUtility:any(source, predicate)
     A boolean.
   ]]
 
-  local is_truthy = function(key, value, source)
+  local is_truthy = function(_, value)
     if value then
       return true
     else
@@ -295,7 +298,7 @@ function TableUtility:equivalent(left, right)
     return false
   end
 
-  local equivalentComp = function (key, value, source)
+  local equivalentComp = function (key, value)
     -- Get the target value
     local target_value = right[key]
 
@@ -376,16 +379,16 @@ function TableUtility:equivalentSet(left, right)
 
   -- Track all of the right keys that are accounted for
   local right_keys_marked = {}
-  TableUtility:each(right, function(key, value, source) right_keys_marked[key] = false end)
+  TableUtility:each(right, function(key) right_keys_marked[key] = false end)
 
   -- For each key in left
-  for leftKey, leftValue in pairs(left) do
+  for _, leftValue in pairs(left) do
     -- If all right keys have been marked before the left keys were examined, return false.
-    if TableUtility:all(right_keys_marked, function(key, value, source) return value == true end) then
+    if TableUtility:all(right_keys_marked, function(_, value) return value == true end) then
       return false
     end
 
-    for rightKey, markedValue in pairs(right_keys_marked) do
+    for rightKey, _ in pairs(right_keys_marked) do
       -- Only look in unmarked right keys
       if not right_keys_marked[rightKey] then
         local rightValue = right[rightKey]
@@ -409,7 +412,7 @@ function TableUtility:equivalentSet(left, right)
   end
 
   -- See if there are any unmarked right keys. If so, return false
-  if TableUtility:any(right_keys_marked, function(key, value, source) return value == false end) then
+  if TableUtility:any(right_keys_marked, function(_, value) return value == false end) then
     return false
   end
   return true
@@ -494,7 +497,7 @@ function TableUtility:first(source, predicate)
 
   Args:
     source(table): A table with ordered indecies.
-    predicate(function): This function takes the parameters (value).
+    predicate(function): This function takes the parameters (key, value, source).
       It should return true or false.
   Returns:
     An object in the source that satisfies the predicate.
@@ -503,7 +506,7 @@ function TableUtility:first(source, predicate)
   -- Returns the first element that satisfies the predicate.
 
   for key, value in ipairs(source) do
-    if predicate(value) then
+    if predicate(key, value, source) then
       return value
     end
   end
@@ -528,5 +531,39 @@ function TableUtility:toOrderedTable(source)
     table.insert(orderedTable, newPair)
   end
   return orderedTable
+end
+
+function TableUtility:contains(source, target)
+  --[[ Sees if one of the values equals the target.
+  Args:
+    source(table)
+    target(object)
+  Returns:
+    A boolean.
+  ]]
+  return TableUtility:any(
+      source,
+      function(_, value)
+        -- Make sure the values are the same type
+        if type(value) ~= type(target) then return false end
+
+        -- If they are tables, use equivalent to test.
+        if type(value) == 'table' then
+          return TableUtility:equivalent(value, target)
+        else
+          return value == target
+        end
+      end
+  )
+end
+
+function TableUtility:empty(source)
+  --[[ Returns true if the source table is empty.
+  Args:
+    source(table)
+  Returns:
+    boolean
+  ]]
+  return TableUtility:size(source) <= 0
 end
 return TableUtility

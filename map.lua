@@ -170,7 +170,6 @@ function Map:addMapUnit(mapUnit, zoneName)
 
   -- Make sure the zone exists
   if not self.zone_by_id[zoneName] then
-
     error("MapUnit " .. mapUnit.name .. " cannot be added because zone " .. zoneName .. " does not exist.")
   end
 
@@ -203,7 +202,15 @@ function Map:getMapUnitsAtLocation(zoneName)
         table.insert(mapUnitsByZone[zoneID], info.mapUnit)
       end
   )
-  return mapUnitsByZone[zoneName]
+  return mapUnitsByZone[zoneName] or {}
+end
+
+function Map:removeMapUnit(mapUnitID)
+  --[[ Removes the map unit with the given ID.
+  ]]
+  if self.mapUnitsByID[mapUnitID]~= nil then
+    table.remove(self.mapUnitsByID, mapUnitID)
+  end
 end
 
 return Map

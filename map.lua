@@ -33,7 +33,6 @@ function Map:new(args)
   local newMap = {}
   setmetatable(newMap,Map)
   newMap.id = args.id
-  newMap.zones = {}
 
   newMap.zone_by_id = {}
 
@@ -164,14 +163,18 @@ function Map:describeZones()
   end
 end
 
--- should be zone id, not zone name
-function Map:addMapUnit(mapUnit, zoneName)
+function Map:addMapUnit(mapUnit, zoneID)
   --[[ Adds a MapUnit to a given zone.
   ]]
 
+  -- Check against nil MapUnits.
+  if mapUnit == nil then
+    error("nil MapUnit cannot be added.")
+  end
+
   -- Make sure the zone exists
-  if not self.zone_by_id[zoneName] then
-    error("MapUnit " .. mapUnit.name .. " cannot be added because zone " .. zoneName .. " does not exist.")
+  if not self.zone_by_id[zoneID] then
+    error("MapUnit " .. mapUnit.name .. " cannot be added because zone " .. zoneID .. " does not exist.")
   end
 
   -- If the map unit was already added, raise an error
@@ -188,11 +191,11 @@ function Map:addMapUnit(mapUnit, zoneName)
   -- Store in a zone.
   self.mapUnitsByID[mapUnit.id] = {
     mapUnit = mapUnit,
-    zone = zoneName
+    zone = zoneID
   }
 end
 
-function Map:getMapUnitsAtLocation(zoneName)
+function Map:getMapUnitsAtLocation(zoneID)
   --[[ Return a table of active MapUnits in a given zone.
   ]]
 
@@ -200,12 +203,12 @@ function Map:getMapUnitsAtLocation(zoneName)
   TableUtility:each(
       self.mapUnitsByID,
       function(_, info)
-        local zoneID = info.zone
-        if mapUnitsByZone[zoneID] == nil then mapUnitsByZone[zoneID] = {} end
-        table.insert(mapUnitsByZone[zoneID], info.mapUnit)
+        local localZoneID = info.zone
+        if mapUnitsByZone[localZoneID] == nil then mapUnitsByZone[localZoneID] = {} end
+        table.insert(mapUnitsByZone[localZoneID], info.mapUnit)
       end
   )
-  return mapUnitsByZone[zoneName] or {}
+  return mapUnitsByZone[zoneID] or {}
 end
 
 function Map:removeMapUnit(mapUnitID)
@@ -216,13 +219,13 @@ function Map:removeMapUnit(mapUnitID)
   end
 end
 
-function Map:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneName)
+function Map:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID)
   --[[ Indicate if the map unit can move to the nearby zone from its current location.
   ]]
   return true
 end
 
-function Map:mapUnitMoves(mapUnitID, nextZoneName)
+function Map:mapUnitMoves(mapUnitID, nextZoneID)
   --[[ Change the map unit's location to the next zone.
   ]]
 
@@ -231,8 +234,13 @@ function Map:mapUnitMoves(mapUnitID, nextZoneName)
     error("Map:mapUnitMoves no MapUnit named " .. mapUnitID .. " found.")
   end
 
+  -- Make sure the target zone exists
+  if not self.zone_by_id[nextZoneID] then
+    error("MapUnit " .. self.mapUnitsByID[mapUnitID].mapUnit.name ..  " cannot be moved because zone " .. nextZoneID .. " does not exist.")
+  end
+
   -- Change the zone the unit is in.
-  self.mapUnitsByID[mapUnitID]["zone"] = nextZoneName
+  self.mapUnitsByID[mapUnitID]["zone"] = nextZoneID
 end
 
 return Map

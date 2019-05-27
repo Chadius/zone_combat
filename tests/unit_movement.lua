@@ -147,7 +147,29 @@ function testHumanPositiveTravel()
   assert_equal(human, trail3_units[1])
 end
 
+function testIllegalInquiries()
+  -- Can't call MapUnit movement functions with nonexistent zones or mapunit names
+  local bad_unit_add = function()
+    map:addMapUnit(nil, "trail1")
+  end
 
--- Can't call MapUnit movement functions with nonexistent zones or mapunit names
+  assert_error_match(
+      "Added nil to Map as a MapUnit. That's bad.",
+      "nil MapUnit cannot be added.",
+      bad_unit_add
+  )
+
+  map:addMapUnit(human, "trail1")
+  local bad_unit_move = function()
+    map:mapUnitMoves(human.id, "bogus")
+  end
+
+  assert_error_match(
+      "Moved the unit to the middle of nowhere. That's bad.",
+      "MapUnit human cannot be moved because zone bogus does not exist.",
+      bad_unit_move
+  )
+end
+
 -- Human can't move from trail1 to trail3 directly
 -- Human can't move from trail1 to pond

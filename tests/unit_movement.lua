@@ -120,4 +120,14 @@ function testRemoveMapUnit()
   assert_equal(0, #trail1_units)
 end
 
--- Unit ID should not change if it's moved to another zone
+function testMapUnitIDIsConstant()
+  -- Unit ID should not change if it's moved to another zone
+  map:addMapUnit(human, "trail1")
+  local originalID = human.id
+
+  map:removeMapUnit(human.id)
+  assert_equal(originalID, human.id)
+
+  map:addMapUnit(human, "trail2")
+  assert_equal(originalID, human.id)
+end

@@ -178,9 +178,11 @@ function Map:addMapUnit(mapUnit, zoneName)
     error("MapUnit " .. mapUnit.name .. " already exists.")
   end
 
-  -- Give the mapUnit an id.
-  mapUnit.id = self.nextMapUnitID
-  self.nextMapUnitID = self.nextMapUnitID + 1
+  -- Give the mapUnit an id if it needs it.
+  if mapUnit.id == nil then
+    mapUnit.id = self.nextMapUnitID
+    self.nextMapUnitID = self.nextMapUnitID + 1
+  end
 
   -- Store in a zone.
   self.mapUnitsByID[mapUnit.id] = {

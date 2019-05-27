@@ -164,6 +164,7 @@ function Map:describeZones()
   end
 end
 
+-- should be zone id, not zone name
 function Map:addMapUnit(mapUnit, zoneName)
   --[[ Adds a MapUnit to a given zone.
   ]]
@@ -213,6 +214,25 @@ function Map:removeMapUnit(mapUnitID)
   if self.mapUnitsByID[mapUnitID]~= nil then
     table.remove(self.mapUnitsByID, mapUnitID)
   end
+end
+
+function Map:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneName)
+  --[[ Indicate if the map unit can move to the nearby zone from its current location.
+  ]]
+  return true
+end
+
+function Map:mapUnitMoves(mapUnitID, nextZoneName)
+  --[[ Change the map unit's location to the next zone.
+  ]]
+
+  -- Make sure the map unit actually exists
+  if not self.mapUnitsByID[mapUnitID] then
+    error("Map:mapUnitMoves no MapUnit named " .. mapUnitID .. " found.")
+  end
+
+  -- Change the zone the unit is in.
+  self.mapUnitsByID[mapUnitID]["zone"] = nextZoneName
 end
 
 return Map

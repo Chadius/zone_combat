@@ -131,3 +131,23 @@ function testMapUnitIDIsConstant()
   map:addMapUnit(human, "trail2")
   assert_equal(originalID, human.id)
 end
+
+function testHumanPositiveTravel()
+  -- Human can move from trail1 to trail2 to trail3
+  map:addMapUnit(human, "trail1")
+  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail2"))
+  map:mapUnitMoves(human.id, "trail2")
+  local trail2_units = map:getMapUnitsAtLocation("trail2")
+  assert_equal(1, #trail2_units)
+  assert_equal(human, trail2_units[1])
+  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail3"))
+  map:mapUnitMoves(human.id, "trail3")
+  local trail3_units = map:getMapUnitsAtLocation("trail3")
+  assert_equal(1, #trail3_units)
+  assert_equal(human, trail3_units[1])
+end
+
+
+-- Can't call MapUnit movement functions with nonexistent zones or mapunit names
+-- Human can't move from trail1 to trail3 directly
+-- Human can't move from trail1 to pond

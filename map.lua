@@ -222,6 +222,24 @@ end
 function Map:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID)
   --[[ Indicate if the map unit can move to the nearby zone from its current location.
   ]]
+
+  -- I'll make a Depth first search.
+
+  -- Visited: start empty
+
+  -- Working list starts with the mapUnit's current zone and 0 move
+
+  -- While the working list is not empty
+  ---- Pop the end of the list
+  ---- Mark location as visited
+  ---- If the endpoint is the target zone, return true
+  ---- Look at neighboring zones
+  ---- For each neighbor
+  ------ If the location hasn't been visited yet
+  ------ If the unit can travel there
+  ------ If the movement distance is less than or equal to the move dist
+
+  -- Destination is unreachable, return false
   return true
 end
 

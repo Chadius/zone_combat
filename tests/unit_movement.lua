@@ -171,6 +171,12 @@ function testIllegalInquiries()
   )
 end
 
+function testMapUnitKnowsTravelMethods()
+  assert_true(human:hasOneTravelMethod("foot"))
+  assert_true(human:hasOneTravelMethod({"foot", "swim", "fly"}))
+  assert_false(human:hasOneTravelMethod({"swim", "fly"}))
+end
+
 --function testFootlockedMovementLimits()
 --  map:addMapUnit(human, "trail1")
 --

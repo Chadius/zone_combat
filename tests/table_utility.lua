@@ -34,7 +34,7 @@ end
 
 function test_map()
   -- Test the map function to show it transforms the list.
-  local getStringLength = function(index, str, list)
+  local getStringLength = function(_, str)
     return string.len(str)
   end
 
@@ -53,7 +53,7 @@ function test_map()
   assert_equal(1, map_table[3])
   assert_equal(3, map_table[4])
 
-  local square_value = function(key, value, list) return value* value end
+  local square_value = function(_, value) return value* value end
   local numbers = {1,2,3,4,5}
   local squared = TableUtility:map(numbers, square_value)
   assert_true(TableUtility:equivalent({1,4,9,16,25}, squared))
@@ -70,7 +70,7 @@ end
 
 function test_filter()
   -- Test the filter function to show it can split the list.
-  local onlyEvenLength = function(index, str, list)
+  local onlyEvenLength = function(_, str)
     local str_len = string.len(str)
     if str_len % 2 == 0 then
       return true
@@ -97,7 +97,7 @@ function test_filter()
 
   local even_aged_children = TableUtility:filter(
     children,
-    function (k, v)
+    function (_, v)
       return v.age % 2 == 0
     end
   )
@@ -180,14 +180,14 @@ function test_each()
   local sum = 0
   local numbers = {1,2,3,4,5,6,7,-7}
 
-  local addToSum = function(key, val, tab)
+  local addToSum = function(_, val)
     sum = sum + val
   end
   TableUtility:each(numbers, addToSum)
   assert_equal(21, sum)
 
   local totalAge = 0
-  local addToAge = function(key, val, tab)
+  local addToAge = function(_, val)
     totalAge = totalAge + val.age
   end
   TableUtility:each(children, addToAge)
@@ -227,10 +227,10 @@ function test_list_comprehension()
 
   local even_indexed_letters = TableUtility:listcomp(
     alphabet,
-    function (k, v)
+    function (_, v)
       return v["letter"]
     end,
-    function (k, v)
+    function (_, v)
       return v["index"] % 2 == 0
     end
   )
@@ -241,10 +241,10 @@ function test_list_comprehension()
   assert_equal("F", even_indexed_letters[3])
   local even_aged_children = TableUtility:listcomp(
     children,
-    function (k, v)
+    function (k)
       return k
     end,
-    function (k, v)
+    function (_, v)
       return v.age % 2 == 0
     end
   )
@@ -288,7 +288,7 @@ function test_all()
   assert_true(TableUtility:all(positive))
   assert_false(TableUtility:all(negative))
 
-  local is_even = function(key, value, source)
+  local is_even = function(_, value)
     return value % 2 == 0
   end
 
@@ -316,7 +316,7 @@ function test_any()
   assert_true(TableUtility:any(positive))
   assert_false(TableUtility:any(negative))
 
-  local is_even = function(key, value, source)
+  local is_even = function(_, value)
     return value % 2 == 0
   end
 
@@ -444,3 +444,13 @@ function test_toorderedlist()
   local ordered_kids = TableUtility:toOrderedTable(expected)
   assert_true(TableUtility:equivalentSet(expected, ordered_kids, sort_by_name))
 end
+function testContains()
+  local numbers={1,2,3,4,5}
+  assert_true(TableUtility:contains(numbers, 3))
+  assert_false(TableUtility:contains(numbers, 8))
+
+  assert_true(TableUtility:contains(sandwich, "bread"))
+  assert_false(TableUtility:contains(sandwich, "pickles"))
+end
+
+-- Can extract is_even function

@@ -53,7 +53,7 @@ function Map:new(args)
   -- Set an id to track MapUnits.
   newMap.nextMapUnitID = 1
 
-  self.mapUnitsByID = {}
+  self.mapUnitInfoByID = {}
 
   return newMap
 end
@@ -178,7 +178,7 @@ function Map:addMapUnit(mapUnit, zoneID)
   end
 
   -- If the map unit was already added, raise an error
-  if self.mapUnitsByID[mapUnit.id] then
+  if self.mapUnitInfoByID[mapUnit.id] then
     error("MapUnit " .. mapUnit.name .. " already exists.")
   end
 
@@ -189,7 +189,7 @@ function Map:addMapUnit(mapUnit, zoneID)
   end
 
   -- Store in a zone.
-  self.mapUnitsByID[mapUnit.id] = {
+  self.mapUnitInfoByID[mapUnit.id] = {
     mapUnit = mapUnit,
     zone = zoneID
   }
@@ -201,7 +201,7 @@ function Map:getMapUnitsAtLocation(zoneID)
 
   local mapUnitsByZone = {}
   TableUtility:each(
-      self.mapUnitsByID,
+      self.mapUnitInfoByID,
       function(_, info)
         local localZoneID = info.zone
         if mapUnitsByZone[localZoneID] == nil then mapUnitsByZone[localZoneID] = {} end
@@ -214,8 +214,8 @@ end
 function Map:removeMapUnit(mapUnitID)
   --[[ Removes the map unit with the given ID.
   ]]
-  if self.mapUnitsByID[mapUnitID]~= nil then
-    table.remove(self.mapUnitsByID, mapUnitID)
+  if self.mapUnitInfoByID[mapUnitID]~= nil then
+    table.remove(self.mapUnitInfoByID, mapUnitID)
   end
 end
 
@@ -224,14 +224,14 @@ function Map:canMapUnitMoveToAdjacentZone(mapUnitID, desiredZoneID)
   ]]
 
   -- Make sure the map unit and zone exist
-  if not self.mapUnitsByID[mapUnitID] then
+  if not self.mapUnitInfoByID[mapUnitID] then
     error("Map:canMapUnitMoveToAdjacentZone no MapUnit named " .. mapUnitID .. " found.")
   end
 
   if not self.zone_by_id[desiredZoneID] then
-    error("MapUnit " .. self.mapUnitsByID[mapUnitID].mapUnit.name ..  " cannot check for movement because zone " .. desiredZoneID .. " does not exist.")
+    error("MapUnit " .. self.mapUnitInfoByID[mapUnitID].mapUnit.name ..  " cannot check for movement because zone " .. desiredZoneID .. " does not exist.")
   end
-  local mapUnit = self.mapUnitsByID[mapUnitID].mapUnit
+  local mapUnit = self.mapUnitInfoByID[mapUnitID].mapUnit
 
   -- I'll make a Depth first search.
 
@@ -239,7 +239,7 @@ function Map:canMapUnitMoveToAdjacentZone(mapUnitID, desiredZoneID)
   local visitedZones = {}
 
   -- Working list starts with the mapUnit's current zone and 0 move
-  local workingZones = { { zoneID=self.mapUnitsByID[mapUnitID].zone, distance=0 }}
+  local workingZones = { { zoneID=self.mapUnitInfoByID[mapUnitID].zone, distance=0 }}
   -- While the working list is not empty
   while TableUtility:size(workingZones) > 0 do
     local thisZoneInfo = table.remove(workingZones, 1)
@@ -280,22 +280,22 @@ function Map:mapUnitMoves(mapUnitID, nextZoneID)
   ]]
 
   -- Make sure the map unit actually exists
-  if not self.mapUnitsByID[mapUnitID] then
+  if not self.mapUnitInfoByID[mapUnitID] then
     error("Map:mapUnitMoves no MapUnit named " .. mapUnitID .. " found.")
   end
 
   -- Make sure the target zone exists
   if not self.zone_by_id[nextZoneID] then
-    error("MapUnit " .. self.mapUnitsByID[mapUnitID].mapUnit.name ..  " cannot be moved because zone " .. nextZoneID .. " does not exist.")
+    error("MapUnit " .. self.mapUnitInfoByID[mapUnitID].mapUnit.name ..  " cannot be moved because zone " .. nextZoneID .. " does not exist.")
   end
 
   -- Make sure the unit can actually travel to that zone in a single move
   if not self:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID) then
-    error("MapUnit " .. self.mapUnitsByID[mapUnitID].mapUnit.name ..  " cannot reach zone " .. nextZoneID .. " in a single move.")
+    error("MapUnit " .. self.mapUnitInfoByID[mapUnitID].mapUnit.name ..  " cannot reach zone " .. nextZoneID .. " in a single move.")
   end
 
   -- Change the zone the unit is in.
-  self.mapUnitsByID[mapUnitID]["zone"] = nextZoneID
+  self.mapUnitInfoByID[mapUnitID]["zone"] = nextZoneID
 end
 
 return Map

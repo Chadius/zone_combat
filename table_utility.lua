@@ -495,7 +495,7 @@ function TableUtility:first(source, predicate)
 
   Args:
     source(table): A table with ordered indecies.
-    predicate(function): This function takes the parameters (value).
+    predicate(function): This function takes the parameters (key, value, source).
       It should return true or false.
   Returns:
     An object in the source that satisfies the predicate.
@@ -503,8 +503,8 @@ function TableUtility:first(source, predicate)
   ]]
   -- Returns the first element that satisfies the predicate.
 
-  for _, value in ipairs(source) do
-    if predicate(value) then
+  for key, value in ipairs(source) do
+    if predicate(key, value, source) then
       return value
     end
   end

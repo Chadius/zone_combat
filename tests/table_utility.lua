@@ -9,6 +9,15 @@ end
 
 local children = {}
 local sandwich = {}
+
+local is_even = function(_, value)
+  return value % 2 == 0
+end
+
+local has_even_age = function (_, v)
+  return v.age % 2 == 0
+end
+
 function setup()
   children = {
     billi = { age=5, color="red" },
@@ -91,15 +100,12 @@ function test_filter()
   assert_equal("am", map_table[1])
 
   local numbers = {1,2,3,4,5}
-  local isEven = function(a) return a % 2 == 0 end
-  local onlyEvenNumbers = TableUtility:filter(numbers, isEven)
+  local onlyEvenNumbers = TableUtility:filter(numbers, is_even)
   assert_true(TableUtility:equivalent({2,4}, onlyEvenNumbers))
 
   local even_aged_children = TableUtility:filter(
     children,
-    function (_, v)
-      return v.age % 2 == 0
-    end
+    has_even_age
   )
   assert_true(TableUtility:equivalent(
       {
@@ -244,9 +250,7 @@ function test_list_comprehension()
     function (k)
       return k
     end,
-    function (_, v)
-      return v.age % 2 == 0
-    end
+    has_even_age
   )
   assert_true(TableUtility:equivalent({sydney = "sydney", alex = "alex"}, even_aged_children))
 end
@@ -288,10 +292,6 @@ function test_all()
   assert_true(TableUtility:all(positive))
   assert_false(TableUtility:all(negative))
 
-  local is_even = function(_, value)
-    return value % 2 == 0
-  end
-
   assert_true(TableUtility:all({0,2,4,6}, is_even))
   assert_false(TableUtility:all({0,2,4,7}, is_even))
 
@@ -315,10 +315,6 @@ function test_any()
 
   assert_true(TableUtility:any(positive))
   assert_false(TableUtility:any(negative))
-
-  local is_even = function(_, value)
-    return value % 2 == 0
-  end
 
   assert_true(TableUtility:any({0,2,4,6}, is_even))
   assert_false(TableUtility:any({1,3,5,7}, is_even))
@@ -403,9 +399,8 @@ end
 
 function test_first()
   local numbers = {1,2,3,4,5}
-  local isEven = function(a) return a % 2 == 0 end
-  local isMoreThanTen = function(a) return a > 10 end
-  local firstEven = TableUtility:first(numbers, isEven)
+  local isMoreThanTen = function(_, a) return a > 10 end
+  local firstEven = TableUtility:first(numbers, is_even)
   assert_equal(2, firstEven)
   local firstMoreThanTen = TableUtility:first(numbers, isMoreThanTen)
   assert_equal(nil, firstMoreThanTen)
@@ -452,5 +447,3 @@ function testContains()
   assert_true(TableUtility:contains(sandwich, "bread"))
   assert_false(TableUtility:contains(sandwich, "pickles"))
 end
-
--- Can extract is_even function

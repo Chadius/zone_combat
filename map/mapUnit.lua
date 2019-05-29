@@ -29,6 +29,7 @@ function MapUnit:new(args)
   else
     newMapUnit.travelMethods = {"foot"}
   end
+  newMapUnit.distancePerTurn = args.distancePerTurn or 1
   newMapUnit.id = nil
   return newMapUnit
 end

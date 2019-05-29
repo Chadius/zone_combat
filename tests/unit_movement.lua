@@ -132,20 +132,20 @@ function testMapUnitIDIsConstant()
   assert_equal(originalID, human.id)
 end
 
-function testHumanPositiveTravel()
-  -- Human can move from trail1 to trail2 to trail3
-  map:addMapUnit(human, "trail1")
-  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail2"))
-  map:mapUnitMoves(human.id, "trail2")
-  local trail2_units = map:getMapUnitsAtLocation("trail2")
-  assert_equal(1, #trail2_units)
-  assert_equal(human, trail2_units[1])
-  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail3"))
-  map:mapUnitMoves(human.id, "trail3")
-  local trail3_units = map:getMapUnitsAtLocation("trail3")
-  assert_equal(1, #trail3_units)
-  assert_equal(human, trail3_units[1])
-end
+--function testHumanPositiveTravel()
+--  -- Human can move from trail1 to trail2 to trail3
+--  map:addMapUnit(human, "trail1")
+--  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail2"))
+--  map:mapUnitMoves(human.id, "trail2")
+--  local trail2_units = map:getMapUnitsAtLocation("trail2")
+--  assert_equal(1, #trail2_units)
+--  assert_equal(human, trail2_units[1])
+--  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail3"))
+--  map:mapUnitMoves(human.id, "trail3")
+--  local trail3_units = map:getMapUnitsAtLocation("trail3")
+--  assert_equal(1, #trail3_units)
+--  assert_equal(human, trail3_units[1])
+--end
 
 function testIllegalInquiries()
   -- Can't call MapUnit movement functions with nonexistent zones or mapunit names
@@ -177,29 +177,29 @@ function testMapUnitKnowsTravelMethods()
   assert_false(human:hasOneTravelMethod({"swim", "fly"}))
 end
 
---function testFootlockedMovementLimits()
---  map:addMapUnit(human, "trail1")
---
---  -- Human can't move from trail1 to trail3 directly
---  assert_false(map:canMapUnitMoveToAdjacentZone(human.id, "trail2"))
---  assert_error_match(
---      "Unit should not be able to move that far. That's bad.",
---      "MapUnit human cannot reach trail3 in a single move.",
---      function()
---        map:addMapUnit(human, "trail3")
---      end
---  )
---
---  -- Human can't move from trail1 to pond
---  assert_false(map:canMapUnitMoveToAdjacentZone(human.id, "pond"))
---  assert_error_match(
---      "Unit should not be able to move that far. That's bad.",
---      "MapUnit human cannot reach pond in a single move.",
---      function()
---        map:addMapUnit(human, "pond")
---      end
---  )
---end
+function testFootlockedMovementLimits()
+  map:addMapUnit(human, "trail1")
+
+  -- Human can't move from trail1 to trail3 directly
+  assert_false(map:canMapUnitMoveToAdjacentZone(human.id, "trail3"))
+  assert_error_match(
+      "Unit should not be able to move that far. That's bad.",
+      "MapUnit human cannot reach zone trail3 in a single move.",
+      function()
+        map:mapUnitMoves(human.id, "trail3")
+      end
+  )
+
+  -- Human can't move from trail1 to pond
+  assert_false(map:canMapUnitMoveToAdjacentZone(human.id, "pond"))
+  assert_error_match(
+      "Unit should not be able to move that far. That's bad.",
+      "MapUnit human cannot reach zone pond in a single move.",
+      function()
+        map:mapUnitMoves(human.id, "pond")
+      end
+  )
+end
 
 -- Tests MapUnit knows its travel methods
 -- MapUnit class has a list of known move methods

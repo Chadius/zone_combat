@@ -219,33 +219,60 @@ function Map:removeMapUnit(mapUnitID)
   end
 end
 
-function Map:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID)
+function Map:canMapUnitMoveToAdjacentZone(mapUnitID, desiredZoneID)
   --[[ Indicate if the map unit can move to the nearby zone from its current location.
   ]]
+
+  -- Make sure the map unit and zone exist
+  if not self.mapUnitsByID[mapUnitID] then
+    error("Map:canMapUnitMoveToAdjacentZone no MapUnit named " .. mapUnitID .. " found.")
+  end
+
+  if not self.zone_by_id[desiredZoneID] then
+    error("MapUnit " .. self.mapUnitsByID[mapUnitID].mapUnit.name ..  " cannot check for movement because zone " .. desiredZoneID .. " does not exist.")
+  end
+  local mapUnit = self.mapUnitsByID[mapUnitID].mapUnit
 
   -- I'll make a Depth first search.
 
   -- Visited: start empty
-  --local visitedZones = {}
+  local visitedZones = {}
 
   -- Working list starts with the mapUnit's current zone and 0 move
-  --local workingZones = {nextZoneID}
-
+  local workingZones = { { zoneID=self.mapUnitsByID[mapUnitID].zone, distance=0 }}
   -- While the working list is not empty
-  --while TableUtility:size(workingZones) do
+  while TableUtility:size(workingZones) > 0 do
+    local thisZoneInfo = table.remove(workingZones, 1)
+    local thisZoneID = thisZoneInfo.zoneID
+    visitedZones[thisZoneID] = true
 
-  --end
-  ---- Pop the end of the list
-  ---- Mark location as visited
-  ---- If the endpoint is the target zone, return true
-  ---- Look at neighboring zones
-  ---- For each neighbor
-  ------ If the location hasn't been visited yet
-  ------ If the unit can travel there
-  ------ If the movement distance is less than or equal to the move dist
+    -- If the endpoint is the target zone, return true
+    if thisZoneID == desiredZoneID then return true end
+
+    TableUtility:each(
+      self.zone_by_id[thisZoneID].neighbors,
+      function(toZoneID, zoneNeighborInfo)
+        local notVisitedYet = visitedZones[toZoneID] ~= true
+        local mapUnitHasTravelMethod = mapUnit:hasOneTravelMethod(
+          zoneNeighborInfo.travelMethods
+        )
+        local withinMapUnitMovement = thisZoneInfo.distance + 1 < mapUnit.distancePerTurn
+        -- Add the neighbor if the unit can reach and hasn't visited it already
+        if notVisitedYet and mapUnitHasTravelMethod and withinMapUnitMovement then
+          table.insert(
+            workingZones,
+            {
+              zoneID = toZoneID,
+              distance = thisZoneInfo.distance + 1
+            }
+          )
+        end
+      end
+    )
+    end
 
   -- Destination is unreachable, return false
-  return true
+  return false
 end
 
 function Map:mapUnitMoves(mapUnitID, nextZoneID)
@@ -260,6 +287,11 @@ function Map:mapUnitMoves(mapUnitID, nextZoneID)
   -- Make sure the target zone exists
   if not self.zone_by_id[nextZoneID] then
     error("MapUnit " .. self.mapUnitsByID[mapUnitID].mapUnit.name ..  " cannot be moved because zone " .. nextZoneID .. " does not exist.")
+  end
+
+  -- Make sure the unit can actually travel to that zone in a single move
+  if not self:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID) then
+    error("MapUnit " .. self.mapUnitsByID[mapUnitID].mapUnit.name ..  " cannot reach zone " .. nextZoneID .. " in a single move.")
   end
 
   -- Change the zone the unit is in.

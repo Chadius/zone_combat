@@ -4,7 +4,9 @@ These functions work on all tables. If the table is an array the order will be r
 all()
 any()
 clone()
+contains()
 each()
+empty()
 equaivalentSet()
 filter()
 keyCount()
@@ -14,7 +16,7 @@ map()
 pluck()
 size()
 sum()
-contains()
+
 
 These functions only work on arrays (tables whose keys are integers starting with 1, table is ordered)
 equaivalent()
@@ -553,5 +555,15 @@ function TableUtility:contains(source, target)
         end
       end
   )
+end
+
+function TableUtility:empty(source)
+  --[[ Returns true if the source table is empty.
+  Args:
+    source(table)
+  Returns:
+    boolean
+  ]]
+  return TableUtility:size(source) <= 0
 end
 return TableUtility

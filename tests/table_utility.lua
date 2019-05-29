@@ -447,3 +447,10 @@ function testContains()
   assert_true(TableUtility:contains(sandwich, "bread"))
   assert_false(TableUtility:contains(sandwich, "pickles"))
 end
+function testEmpty()
+  local numbers = {1,2,3,4,5}
+  assert_false(TableUtility:empty(sandwich))
+  assert_false(TableUtility:empty(numbers))
+
+  assert_true(TableUtility:empty({}))
+end

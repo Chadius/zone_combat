@@ -226,10 +226,15 @@ function Map:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID)
   -- I'll make a Depth first search.
 
   -- Visited: start empty
+  --local visitedZones = {}
 
   -- Working list starts with the mapUnit's current zone and 0 move
+  --local workingZones = {nextZoneID}
 
   -- While the working list is not empty
+  --while TableUtility:size(workingZones) do
+
+  --end
   ---- Pop the end of the list
   ---- Mark location as visited
   ---- If the endpoint is the target zone, return true

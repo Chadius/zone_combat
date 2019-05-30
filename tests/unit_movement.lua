@@ -11,6 +11,9 @@ end
 local map = {}
 local human
 local bunny
+local turtle
+local bird
+local stone
 
 function setup()
   --[[Set up a forest glade, with a pond surrounded by 3 trails.
@@ -62,6 +65,20 @@ function setup()
     distancePerTurn = 2
   })
 
+  turtle = MapUnit:new({
+    displayName = "turtle",
+    travelMethods = {"foot", "swim"}
+  })
+
+  bird = MapUnit:new({
+    displayName = "bird",
+    travelMethods = {"foot", "fly"}
+  })
+
+  stone = MapUnit:new({
+    displayName = "stone",
+    travelMethods = {"none"}
+  })
 end
 
 function teardown()
@@ -232,4 +249,24 @@ function testFootMovementIncreasedCanReachFurther()
       map:mapUnitMoves(bunny.id, "pond")
     end
   )
+end
+
+function testMovemethods()
+  -- Turtles can walk to trail2 and swim to the pond but they aren't fast enough to get to trail3
+  map:addMapUnit(turtle, "trail1")
+  assert_true(map:canMapUnitMoveToAdjacentZone(turtle.id, "trail2"))
+  assert_true(map:canMapUnitMoveToAdjacentZone(turtle.id, "pond"))
+  assert_false(map:canMapUnitMoveToAdjacentZone(turtle.id, "trail3"))
+
+  -- Birds can fly to trail2 and trail3 but they can't land in the pond
+  map:addMapUnit(bird, "trail1")
+  assert_true(map:canMapUnitMoveToAdjacentZone(bird.id, "trail2"))
+  assert_false(map:canMapUnitMoveToAdjacentZone(bird.id, "pond"))
+  assert_true(map:canMapUnitMoveToAdjacentZone(bird.id, "trail3"))
+
+  -- Stones can't move at all
+  map:addMapUnit(stone, "trail1")
+  assert_false(map:canMapUnitMoveToAdjacentZone(stone.id, "trail2"))
+  assert_false(map:canMapUnitMoveToAdjacentZone(stone.id, "pond"))
+  assert_false(map:canMapUnitMoveToAdjacentZone(stone.id, "trail3"))
 end

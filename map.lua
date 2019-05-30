@@ -9,7 +9,8 @@ local Map={}
 Map.__index = Map
 
 local function AddZoneNeighbor(self, from, to, cost, travelMethods)
-  --- Set the other info
+  --[[ Create a new zone neighbor and add it to the map's zone information
+  ]]
   local newNeighbor = ZoneNeighbor:new({
     from = from,
     to = to,
@@ -60,7 +61,16 @@ end
 
 function Map:addZone(zone_info)
   --[[ Add the new zone to the list.
-  --]]
+  Args:
+    zone_info(table)
+      id(string)
+      zone(nil or table): If nil, a default zone information table is created.
+      neighbors(nil or array): Each array holds a table.
+        to(string): Another zone id.
+        travelMethods(array): A table of strings, each containing a travel method
+  Returns:
+    nil
+  ]]
 
   -- Create a new zone from the info
   local zone_id = zone_info.id
@@ -113,6 +123,10 @@ end
 
 function Map:VerifyZone()
   --[[ Deletes all invalid Zones
+  Args:
+    none
+  Returns:
+    nil
   ]]
 
   -- Delete any zones without a zone object
@@ -125,6 +139,10 @@ end
 
 function Map:VerifyZoneNeighbor()
   --[[ Deletes all invalid Zone Neighbors
+  Args:
+    none
+  Returns:
+    nil
   ]]
   for _, zone_info in pairs(self.zone_by_id) do
     for to, neighbor_info in pairs(zone_info.neighbors) do
@@ -153,6 +171,10 @@ end
 
 function Map:describeZones()
   --[[ Returns a list of strings to describe all of the zones.
+  Args:
+    none
+  Returns:
+    nil
   --]]
   for _, zone_info in pairs(self.zone_by_id) do
     print(tostring(zone_info.zone))
@@ -165,6 +187,11 @@ end
 
 function Map:addMapUnit(mapUnit, zoneID)
   --[[ Adds a MapUnit to a given zone.
+  Args:
+    mapUnit.
+    zoneID(string): Name of the zone
+  Returns:
+    nil
   ]]
 
   -- Check against nil MapUnits.
@@ -197,6 +224,10 @@ end
 
 function Map:getMapUnitsAtLocation(zoneID)
   --[[ Return a table of active MapUnits in a given zone.
+  Args:
+    zoneID(string): Name of the zone to inspect
+  Returns:
+    A table array
   ]]
 
   local mapUnitsByZone = {}
@@ -213,6 +244,10 @@ end
 
 function Map:removeMapUnit(mapUnitID)
   --[[ Removes the map unit with the given ID.
+  Args:
+    mapUnitID(integer): MapUnit.id
+  Returns:
+    nil
   ]]
   if self.mapUnitInfoByID[mapUnitID]~= nil then
     table.remove(self.mapUnitInfoByID, mapUnitID)
@@ -221,6 +256,11 @@ end
 
 function Map:canMapUnitMoveToAdjacentZone(mapUnitID, desiredZoneID)
   --[[ Indicate if the map unit can move to the nearby zone from its current location.
+  Args:
+    mapUnitID(integer): MapUnit.id
+    desiredZoneID(string): Name of the zone
+  Returns:
+    true if the desired zone can be reached, false otherwise.
   ]]
 
   -- Make sure the map unit and zone exist
@@ -232,8 +272,6 @@ function Map:canMapUnitMoveToAdjacentZone(mapUnitID, desiredZoneID)
     error("MapUnit " .. self.mapUnitInfoByID[mapUnitID].mapUnit.name ..  " cannot check for movement because zone " .. desiredZoneID .. " does not exist.")
   end
   local mapUnit = self.mapUnitInfoByID[mapUnitID].mapUnit
-
-  -- I'll make a Depth first search.
 
   -- Visited: start empty
   local visitedZones = {}

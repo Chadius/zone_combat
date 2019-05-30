@@ -1,4 +1,4 @@
---[[ Unit's presence on the map.
+--[[ Unit's presence on a given map.
 ]]
 local TableUtility = require "table_utility"
 
@@ -16,21 +16,24 @@ MapUnit.definedTravelMethods = {
 function MapUnit:new(args)
   local newMapUnit = {}
   setmetatable(newMapUnit,MapUnit)
-
+  newMapUnit.id = nil
   newMapUnit.name = args.displayName or "No name"
+
+  -- travelMethods must match one of the definedTravelMethods.
   newMapUnit.travelMethods = {}
   if args.travelMethods then
     newMapUnit.travelMethods = TableUtility:filter(
-        args.travelMethods,
+      args.travelMethods,
         function(_, possibleMethod)
-          return ( MapUnit.definedTravelMethods[possibleMethod] )
-        end
+        return TableUtility:contains( MapUnit.definedTravelMethods, possibleMethod)
+      end
     )
   else
+    -- By default the Map Unit can travel on foot.
     newMapUnit.travelMethods = {"foot"}
   end
   newMapUnit.distancePerTurn = args.distancePerTurn or 1
-  newMapUnit.id = nil
+
   return newMapUnit
 end
 
@@ -46,10 +49,10 @@ function MapUnit:hasOneTravelMethod(methods)
   ]]
   if type(methods) == "table" then
     return TableUtility:any(
-        methods,
-        function( _, thisMethod)
-          return TableUtility:contains(self.travelMethods, thisMethod)
-        end
+      methods,
+      function( _, thisMethod)
+        return TableUtility:contains(self.travelMethods, thisMethod)
+      end
     )
   end
 

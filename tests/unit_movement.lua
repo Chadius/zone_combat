@@ -10,6 +10,7 @@ end
 
 local map = {}
 local human
+local bunny
 
 function setup()
   --[[Set up a forest glade, with a pond surrounded by 3 trails.
@@ -55,6 +56,12 @@ function setup()
   human = MapUnit:new({
     displayName = "human"
   })
+
+  bunny = MapUnit:new({
+    displayName = "bunny",
+    distancePerTurn = 2
+  })
+
 end
 
 function teardown()
@@ -201,28 +208,28 @@ function testFootlockedMovementLimits()
   )
 end
 
----- Footlocked unit with more movement
---function testFootMovementIncreasedCanReachFurther()
---  map:addMapUnit(bunny, "trail1")
---
---  -- bunny has more movement than a human
---  assert_true(bunny.distancePerTurn > human.distancePerTurn)
---
---  -- bunny can move from trail1 to trail3 directly
---  assert_true(map:canMapUnitMoveToAdjacentZone(bunny.id, "trail3"))
---  map:mapUnitMoves(bunny.id, "trail3")
---  local trail3_units = map:getMapUnitsAtLocation("trail3")
---  assert_equal(1, #trail3_units)
---  assert_equal(bunny, trail3_units[1])
---
---  -- Bunny can't move from trail3 to pond
---  map:mapUnitMoves(bunny.id, "trail1")
---  assert_false(map:canMapUnitMoveToAdjacentZone(bunny.id, "pond"))
---  assert_error_match(
---    "Unit should not be able to move that far. That's bad.",
---    "MapUnit bunny cannot reach zone pond in a single move.",
---    function()
---      map:mapUnitMoves(bunny.id, "pond")
---    end
---  )
---end
+function testFootMovementIncreasedCanReachFurther()
+  map:addMapUnit(bunny, "trail1")
+
+  -- bunny has more movement than a human
+  assert_true(bunny.distancePerTurn > human.distancePerTurn)
+
+  -- bunny can move from trail1 to trail3 directly
+  assert_true(map:canMapUnitMoveToAdjacentZone(bunny.id, "trail3"))
+  map:mapUnitMoves(bunny.id, "trail3")
+  local trail3_units = map:getMapUnitsAtLocation("trail3")
+  assert_equal(1, #trail3_units)
+  assert_equal(bunny, trail3_units[1])
+
+  map:warpMapUnit(bunny.id, "trail1")
+
+  -- Bunny can't move from trail3 to pond
+  assert_false(map:canMapUnitMoveToAdjacentZone(bunny.id, "pond"))
+  assert_error_match(
+    "Unit should not be able to move that far. That's bad.",
+    "MapUnit bunny cannot reach zone pond in a single move.",
+    function()
+      map:mapUnitMoves(bunny.id, "pond")
+    end
+  )
+end

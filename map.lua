@@ -275,8 +275,14 @@ function Map:canMapUnitMoveToAdjacentZone(mapUnitID, desiredZoneID)
   return false
 end
 
-function Map:mapUnitMoves(mapUnitID, nextZoneID)
+function Map:mapUnitMoves(mapUnitID, nextZoneID, warpUnit)
   --[[ Change the map unit's location to the next zone.
+  Args:
+    mapUnitID(integer): MapUnit.id
+    nextZoneID(string): Name of the zone
+    warpUnit(boolean): If true, ignore movement and method limits, and do not consume the map unit's movement.
+  Returns:
+    nil
   ]]
 
   -- Make sure the map unit actually exists
@@ -289,13 +295,28 @@ function Map:mapUnitMoves(mapUnitID, nextZoneID)
     error("MapUnit " .. self.mapUnitInfoByID[mapUnitID].mapUnit.name ..  " cannot be moved because zone " .. nextZoneID .. " does not exist.")
   end
 
-  -- Make sure the unit can actually travel to that zone in a single move
-  if not self:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID) then
-    error("MapUnit " .. self.mapUnitInfoByID[mapUnitID].mapUnit.name ..  " cannot reach zone " .. nextZoneID .. " in a single move.")
+
+  if not warpUnit then
+    -- Make sure the unit can actually travel to that zone in a single move
+    if not self:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID) then
+      error("MapUnit " .. self.mapUnitInfoByID[mapUnitID].mapUnit.name ..  " cannot reach zone " .. nextZoneID .. " in a single move.")
+    end
   end
 
   -- Change the zone the unit is in.
   self.mapUnitInfoByID[mapUnitID]["zone"] = nextZoneID
+end
+
+function Map:warpMapUnit(mapUnitID, nextZoneID)
+  --[[ Move the Map Unit directly to the nextZoneID.
+    This does not spend the Map Unit's resources nor does it take terrain into account.
+  Args:
+    mapUnitID(integer): MapUnit.id
+    nextZoneID(string): Name of the zone
+  Returns:
+    nil
+  ]]
+  return self:mapUnitMoves(mapUnitID, nextZoneID, true)
 end
 
 return Map

@@ -256,7 +256,7 @@ function Map:canMapUnitMoveToAdjacentZone(mapUnitID, desiredZoneID)
         local mapUnitHasTravelMethod = mapUnit:hasOneTravelMethod(
           zoneNeighborInfo.travelMethods
         )
-        local withinMapUnitMovement = thisZoneInfo.distance + 1 < mapUnit.distancePerTurn
+        local withinMapUnitMovement = thisZoneInfo.distance + 1 <= mapUnit.distancePerTurn
         -- Add the neighbor if the unit can reach and hasn't visited it already
         if notVisitedYet and mapUnitHasTravelMethod and withinMapUnitMovement then
           table.insert(

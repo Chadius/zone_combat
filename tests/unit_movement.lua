@@ -132,20 +132,20 @@ function testMapUnitIDIsConstant()
   assert_equal(originalID, human.id)
 end
 
---function testHumanPositiveTravel()
---  -- Human can move from trail1 to trail2 to trail3
---  map:addMapUnit(human, "trail1")
---  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail2"))
---  map:mapUnitMoves(human.id, "trail2")
---  local trail2_units = map:getMapUnitsAtLocation("trail2")
---  assert_equal(1, #trail2_units)
---  assert_equal(human, trail2_units[1])
---  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail3"))
---  map:mapUnitMoves(human.id, "trail3")
---  local trail3_units = map:getMapUnitsAtLocation("trail3")
---  assert_equal(1, #trail3_units)
---  assert_equal(human, trail3_units[1])
---end
+function testHumanPositiveTravel()
+  -- Human can move from trail1 to trail2 to trail3
+  map:addMapUnit(human, "trail1")
+  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail2"))
+  map:mapUnitMoves(human.id, "trail2")
+  local trail2_units = map:getMapUnitsAtLocation("trail2")
+  assert_equal(1, #trail2_units)
+  assert_equal(human, trail2_units[1])
+  assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail3"))
+  map:mapUnitMoves(human.id, "trail3")
+  local trail3_units = map:getMapUnitsAtLocation("trail3")
+  assert_equal(1, #trail3_units)
+  assert_equal(human, trail3_units[1])
+end
 
 function testIllegalInquiries()
   -- Can't call MapUnit movement functions with nonexistent zones or mapunit names
@@ -201,5 +201,28 @@ function testFootlockedMovementLimits()
   )
 end
 
--- Tests MapUnit knows its travel methods
--- MapUnit class has a list of known move methods
+---- Footlocked unit with more movement
+--function testFootMovementIncreasedCanReachFurther()
+--  map:addMapUnit(bunny, "trail1")
+--
+--  -- bunny has more movement than a human
+--  assert_true(bunny.distancePerTurn > human.distancePerTurn)
+--
+--  -- bunny can move from trail1 to trail3 directly
+--  assert_true(map:canMapUnitMoveToAdjacentZone(bunny.id, "trail3"))
+--  map:mapUnitMoves(bunny.id, "trail3")
+--  local trail3_units = map:getMapUnitsAtLocation("trail3")
+--  assert_equal(1, #trail3_units)
+--  assert_equal(bunny, trail3_units[1])
+--
+--  -- Bunny can't move from trail3 to pond
+--  map:mapUnitMoves(bunny.id, "trail1")
+--  assert_false(map:canMapUnitMoveToAdjacentZone(bunny.id, "pond"))
+--  assert_error_match(
+--    "Unit should not be able to move that far. That's bad.",
+--    "MapUnit bunny cannot reach zone pond in a single move.",
+--    function()
+--      map:mapUnitMoves(bunny.id, "pond")
+--    end
+--  )
+--end

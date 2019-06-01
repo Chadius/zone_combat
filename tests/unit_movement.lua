@@ -165,6 +165,8 @@ function testHumanPositiveTravel()
   assert_equal(1, #trail2_units)
   assert_equal(human, trail2_units[1])
   assert_true(map:canMapUnitMoveToAdjacentZone(human.id, "trail3"))
+
+  map:resetMapUnitTurn(human.id)
   map:mapUnitMoves(human.id, "trail3")
   local trail3_units = map:getMapUnitsAtLocation("trail3")
   assert_equal(1, #trail3_units)
@@ -238,6 +240,7 @@ function testFootMovementIncreasedCanReachFurther()
   assert_equal(1, #trail3_units)
   assert_equal(bunny, trail3_units[1])
 
+  map:resetMapUnitTurn(bunny.id)
   map:warpMapUnit(bunny.id, "trail1")
 
   -- Bunny can't move from trail3 to pond

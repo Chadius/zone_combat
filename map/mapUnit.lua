@@ -33,6 +33,12 @@ function MapUnit:new(args)
     newMapUnit.travelMethods = {"foot"}
   end
   newMapUnit.distancePerTurn = args.distancePerTurn or 1
+  newMapUnit.recordForLastTurn = {
+    movement={}
+  }
+  newMapUnit.turnParts = {
+    move = true
+  }
 
   return newMapUnit
 end
@@ -57,6 +63,40 @@ function MapUnit:hasOneTravelMethod(methods)
   end
 
   return TableUtility:contains(self.travelMethods, methods)
+end
+
+function MapUnit:isTurnReady()
+  return self.turnParts["move"]
+end
+
+function MapUnit:hasTurnPartAvailable(partName)
+  return self.turnParts[partName]
+end
+
+function MapUnit:turnPartCompleted(partName)
+  if not self.turnParts[partName] then
+    error("MapUnit:TurnPartCompleted can't complete " .. partName .. " because it does not exist.")
+  end
+  self.turnParts[partName] = false
+end
+
+function MapUnit:currentTurnPart()
+  return "move"
+end
+
+function MapUnit:getLastTurnMovement()
+  return self.recordForLastTurn.movement
+end
+
+function MapUnit:recordMovement(fromZoneID, toZoneID)
+  table.insert(
+    self.recordForLastTurn.movement,
+    fromZoneID
+  )
+  table.insert(
+      self.recordForLastTurn.movement,
+      toZoneID
+  )
 end
 
 return MapUnit

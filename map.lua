@@ -333,7 +333,6 @@ function Map:mapUnitMoves(mapUnitID, nextZoneID, warpUnit)
     error("MapUnit " .. self.mapUnitInfoByID[mapUnitID].mapUnit.name ..  " cannot be moved because zone " .. nextZoneID .. " does not exist.")
   end
 
-
   if not warpUnit then
     -- Make sure the unit can actually travel to that zone in a single move
     if not self:canMapUnitMoveToAdjacentZone(mapUnitID, nextZoneID) then
@@ -341,8 +340,16 @@ function Map:mapUnitMoves(mapUnitID, nextZoneID, warpUnit)
     end
   end
 
+  -- Tell the map unit to remember where it's moving.
+  local unitInfo = self.mapUnitInfoByID[mapUnitID]
+  unitInfo.mapUnit:recordMovement(unitInfo["zone"], nextZoneID)
+  if not warpUnit then
+    -- Tell the unit it completed its movement
+    unitInfo.mapUnit:turnPartCompleted("move")
+  end
+
   -- Change the zone the unit is in.
-  self.mapUnitInfoByID[mapUnitID]["zone"] = nextZoneID
+  unitInfo["zone"] = nextZoneID
 end
 
 function Map:warpMapUnit(mapUnitID, nextZoneID)

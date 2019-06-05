@@ -13,6 +13,21 @@ MapUnit.definedTravelMethods = {
   "shadow",
 }
 
+local function startNewMapUnitTurn(self)
+  --[[ Resets the unit's turn as if it was the start of a new phase.
+    Args:
+      nil
+    Returns:
+      nil
+  ]]
+  self.turnParts["move"] = true
+
+  -- Clear history
+  self.recordForLastTurn = {
+    movement={}
+  }
+end
+
 function MapUnit:new(args)
   local newMapUnit = {}
   setmetatable(newMapUnit,MapUnit)
@@ -33,12 +48,10 @@ function MapUnit:new(args)
     newMapUnit.travelMethods = {"foot"}
   end
   newMapUnit.distancePerTurn = args.distancePerTurn or 1
-  newMapUnit.recordForLastTurn = {
-    movement={}
-  }
-  newMapUnit.turnParts = {
-    move = true
-  }
+  newMapUnit.turnParts = {}
+  newMapUnit.recordForLastTurn = {}
+
+  startNewMapUnitTurn(newMapUnit)
 
   return newMapUnit
 end
@@ -66,14 +79,33 @@ function MapUnit:hasOneTravelMethod(methods)
 end
 
 function MapUnit:isTurnReady()
+  --[[ Checks the MapUnit to see if it is ready to take its turn.
+  Args:
+    None
+  Returns:
+    A boolean
+  ]]
   return self.turnParts["move"]
 end
 
 function MapUnit:hasTurnPartAvailable(partName)
+  --[[ Checks to see if a part of a turn has completed.
+  Args:
+    partName(string): The name of the turn part (example: "move")
+  Returns:
+    A boolean (or nil if the partName isn't one of the turn parts.)
+  ]]
   return self.turnParts[partName]
 end
 
 function MapUnit:turnPartCompleted(partName)
+  --[[ Note that part of a unit's turn has completed.
+  Args:
+    partName(string): The name of the turn part (example: "move")
+  Returns:
+    nil
+    Throws an error if the partName doesn't match an expected turn part.
+  ]]
   if self.turnParts[partName] == nil then
     error("MapUnit:TurnPartCompleted can't complete " .. partName .. " because it does not exist.")
   end
@@ -81,14 +113,33 @@ function MapUnit:turnPartCompleted(partName)
 end
 
 function MapUnit:currentTurnPart()
+  --[[ Returns a string explaining which part of the turn is next for this unit.
+  Args:
+    None
+  Returns:
+    A string.
+  ]]
   return "move"
 end
 
 function MapUnit:getLastTurnMovement()
+  --[[ Returns the record of the unit's movement last turn.
+  Args:
+    None
+  Returns:
+    An array of strings
+  ]]
   return self.recordForLastTurn.movement
 end
 
 function MapUnit:recordMovement(fromZoneID, toZoneID)
+  --[[ Note the unit's movement from one zone to the next.
+  Args:
+    fromZoneID(string): The name of the starting zone.
+    toZoneID(string): The name of the ending zone.
+  Returns:
+      nil
+  ]]
   table.insert(
     self.recordForLastTurn.movement,
     fromZoneID
@@ -100,7 +151,13 @@ function MapUnit:recordMovement(fromZoneID, toZoneID)
 end
 
 function MapUnit:startNewTurn()
-  self.turnParts["move"] = true
+  --[[ Resets the unit's turn as if it was the start of a new phase.
+    Args:
+      nil
+    Returns:
+      nil
+  ]]
+  startNewMapUnitTurn(self)
 end
 
 return MapUnit

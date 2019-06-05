@@ -321,6 +321,9 @@ function Map:mapUnitMoves(mapUnitID, nextZoneID, warpUnit)
     warpUnit(boolean): If true, ignore movement and method limits, and do not consume the map unit's movement.
   Returns:
     nil
+    Throws an error if there is no zone with the given nextZoneID.
+    Throws an error if there is no MapUnit with the given mapUnitID.
+    Throws an error if warpUnit is falsy and the MapUnit cannot reach the next zone.
   ]]
 
   -- Make sure the map unit actually exists
@@ -370,6 +373,14 @@ function Map:warpMapUnit(mapUnitID, nextZoneID)
 end
 
 function Map:resetMapUnitTurn(mapUnitID)
+  --[[ Passthrough function that resets the unit's turn as if it was the start of a new phase.
+  Args:
+    mapUnitID(integer): MapUnit.id
+  Returns:
+    nil
+    Throws an error if there is no MapUnit with that ID.
+  ]]
+
   -- Get Map Unit
   if not self.mapUnitInfoByID[mapUnitID] then
     error("Map:resetMapUnitTurn no MapUnit named " .. mapUnitID .. " found.")

@@ -10,8 +10,11 @@ end
 local hero
 local sidekick
 local villain
+local henchman
+local mayor
 local citizen
 local trashbag
+local moneybag
 
 function setup()
   hero = MapUnit:new({
@@ -29,6 +32,16 @@ function setup()
     affiliation = "enemy"
   })
 
+  henchman = MapUnit:new({
+    displayName = "henchman",
+    affiliation = "enemy"
+  })
+
+  mayor = MapUnit:new({
+    displayName = "mayor",
+    affiliation = "ally"
+  })
+
   citizen = MapUnit:new({
     displayName = "citizen",
     affiliation = "ally"
@@ -38,12 +51,24 @@ function setup()
     displayName = "trashbag",
     affiliation = "other"
   })
+
+  moneybag = MapUnit:new({
+    displayName = "moneybag",
+    affiliation = "other"
+  })
 end
 
 -- hero identifies itself on the player affiliation
 -- If you make a MapUnit on an unknown affiliation, it raises an error
--- hero considers player and ally units to be friends
--- hero doesn't consider villain a friend
+
+-- hero considers other players and allies friends
+-- hero doesn't consider villain or moneybag a friend
+-- hero considers hero a friend
+
 -- villain doesn't consider trashbag a friend
+-- villain considers henchman a friend
+-- villain doesn't consider mayor a friend
+
+-- trashbag doesn't consider anyone a friend, not even moneybag
 
 -- units on the playerTeam know the name of their team

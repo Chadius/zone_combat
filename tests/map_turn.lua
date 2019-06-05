@@ -127,11 +127,23 @@ function testResetUnitTurn()
   map:mapUnitMoves(bunny.id, "trail2")
   map:resetMapUnitTurn(bunny.id)
 
+  -- Turn history should be cleared
+  assert_true(TableUtility:equivalent(
+      {},
+      bunny:getLastTurnMovement()
+  ))
+
   -- With a new turn, Bunny can move to trail3
   map:mapUnitMoves(bunny.id, "trail3")
 
   local trail3_units = map:getMapUnitsAtLocation("trail3")
   assert_equal(1, #trail3_units)
   assert_equal(bunny, trail3_units[1])
+
+  -- History should have been reset
+  assert_true(TableUtility:equivalent(
+      {"trail2", "trail3"},
+      bunny:getLastTurnMovement()
+  ))
 end
 

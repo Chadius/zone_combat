@@ -102,6 +102,36 @@ function testTurnIsOver()
   assert_false(bunny:isTurnReady())
 end
 
+function testCannotMoveTwiceInOneTurn()
+  -- Units cannot move twice per turn
+  map:addMapUnit(bunny, "trail1")
+  map:mapUnitMoves(bunny.id, "trail2")
+  assert_false(map:canMapUnitMoveToAdjacentZone(bunny.id, "pond"))
+  assert_error_match(
+      "Unit doesn't have a move action, trying to move should have thrown an error.",
+      "MapUnit bunny does not have a move action and cannot reach zone trail3 this turn.",
+      function()
+        map:mapUnitMoves(bunny.id, "trail3")
+      end
+  )
 
--- Turns can be reset
--- Units cannot move twice per turn
+  -- Bunny is still in trail2
+  local trail2_units = map:getMapUnitsAtLocation("trail2")
+  assert_equal(1, #trail2_units)
+  assert_equal(bunny, trail2_units[1])
+end
+
+function testResetUnitTurn()
+  -- Turns can be reset
+  map:addMapUnit(bunny, "trail1")
+  map:mapUnitMoves(bunny.id, "trail2")
+  map:resetMapUnitTurn(bunny.id)
+
+  -- With a new turn, Bunny can move to trail3
+  map:mapUnitMoves(bunny.id, "trail3")
+
+  local trail3_units = map:getMapUnitsAtLocation("trail3")
+  assert_equal(1, #trail3_units)
+  assert_equal(bunny, trail3_units[1])
+end
+

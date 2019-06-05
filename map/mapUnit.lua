@@ -74,7 +74,7 @@ function MapUnit:hasTurnPartAvailable(partName)
 end
 
 function MapUnit:turnPartCompleted(partName)
-  if not self.turnParts[partName] then
+  if self.turnParts[partName] == nil then
     error("MapUnit:TurnPartCompleted can't complete " .. partName .. " because it does not exist.")
   end
   self.turnParts[partName] = false
@@ -97,6 +97,10 @@ function MapUnit:recordMovement(fromZoneID, toZoneID)
       self.recordForLastTurn.movement,
       toZoneID
   )
+end
+
+function MapUnit:startNewTurn()
+  self.turnParts["move"] = true
 end
 
 return MapUnit

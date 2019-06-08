@@ -109,3 +109,17 @@ function testOtherFriends()
   -- But trashbag considers itself a friend
   assert_true(trashbag:isFriendUnit(trashbag))
 end
+
+function testAllyFriends()
+  assert_true(mayor:isFriendUnit(mayor))
+  assert_true(mayor:isFriendUnit(citizen))
+
+  assert_true(mayor:isFriendUnit(hero))
+  assert_true(mayor:isFriendUnit(sidekick))
+
+  assert_false(mayor:isFriendUnit(villain))
+  assert_false(mayor:isFriendUnit(henchman))
+
+  assert_false(mayor:isFriendUnit(trashbag))
+  assert_false(mayor:isFriendUnit(moneybag))
+end

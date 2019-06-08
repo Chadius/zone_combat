@@ -76,14 +76,38 @@ function testHeroIdentifyAffiliation ()
   )
 end
 
--- hero considers other players and allies friends
--- hero doesn't consider villain or moneybag a friend
--- hero considers hero a friend
+function testPlayerFriends()
+  -- hero considers other players and allies friends
+  assert_true(hero:isFriendUnit(sidekick))
+  assert_true(hero:isFriendUnit(mayor))
+  -- hero doesn't consider villain or moneybag a friend
+  assert_false(hero:isFriendUnit(villain))
+  assert_false(hero:isFriendUnit(moneybag))
+  -- hero considers hero a friend
+  assert_true(hero:isFriendUnit(hero))
+end
 
--- villain doesn't consider trashbag a friend
--- villain considers henchman a friend
--- villain doesn't consider mayor a friend
+function testVillainFriends()
+  -- villain doesn't consider trashbag a friend
+  assert_false(villain:isFriendUnit(trashbag))
+  -- villain considers henchman a friend
+  assert_true(villain:isFriendUnit(henchman))
+  -- villain doesn't consider mayor a friend
+  assert_false(villain:isFriendUnit(mayor))
+end
 
--- trashbag doesn't consider anyone a friend, not even moneybag
+function testOtherFriends()
+  -- trashbag doesn't consider anyone a friend, not even moneybag
+  assert_false(trashbag:isFriendUnit(hero))
+  assert_false(trashbag:isFriendUnit(sidekick))
+  assert_false(trashbag:isFriendUnit(villain))
+  assert_false(trashbag:isFriendUnit(henchman))
+  assert_false(trashbag:isFriendUnit(mayor))
+  assert_false(trashbag:isFriendUnit(citizen))
+  assert_false(trashbag:isFriendUnit(moneybag))
+
+  -- But trashbag considers itself a friend
+  assert_true(trashbag:isFriendUnit(trashbag))
+end
 
 -- units on the playerTeam know the name of their team

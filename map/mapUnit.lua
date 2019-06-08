@@ -202,4 +202,27 @@ function MapUnit:getAffilation()
   return self.affiliation
 end
 
+function MapUnit:isFriendUnit(otherMapUnit)
+  --[[ Sees if the other MapUnit is considered friendly.
+  Args:
+    otherMapUnit(MapUnit)
+  Returns:
+    boolean
+  ]]
+
+  -- A MapUnit is always its own friend.
+  if self == otherMapUnit then
+    return true
+  end
+
+  local friendlyAffiliations = {
+    player={"player", "ally"},
+    ally={"player", "ally"},
+    enemy={"enemy",},
+    other={}
+  }
+
+  return TableUtility:contains(friendlyAffiliations[self.affiliation], otherMapUnit.affiliation)
+end
+
 return MapUnit

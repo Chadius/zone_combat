@@ -58,8 +58,23 @@ function setup()
   })
 end
 
--- hero identifies itself on the player affiliation
--- If you make a MapUnit on an unknown affiliation, it raises an error
+function testHeroIdentifyAffiliation ()
+  -- hero identifies itself on the player affiliation
+  assert_equal("player", hero:getAffilation())
+  -- If you make a MapUnit on an unknown affiliation, it raises an error
+  local badAffiliation = function()
+    MapUnit:new({
+      displayName = "badAffiliation",
+      affiliation = "bogus"
+    })
+  end
+
+  assert_error_match(
+      "Made a MapUnit with a bad affiliation. That's bad.",
+      "Affiliation bogus does not exist. Valid affiliations are player, ally, enemy, other",
+      badAffiliation
+  )
+end
 
 -- hero considers other players and allies friends
 -- hero doesn't consider villain or moneybag a friend

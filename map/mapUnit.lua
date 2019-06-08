@@ -13,6 +13,13 @@ MapUnit.definedTravelMethods = {
   "shadow",
 }
 
+MapUnit.definedAffiliations = {
+  "player",
+  "ally",
+  "enemy",
+  "other",
+}
+
 local function startNewMapUnitTurn(self)
   --[[ Resets the unit's turn as if it was the start of a new phase.
     Args:
@@ -27,6 +34,30 @@ local function startNewMapUnitTurn(self)
     movement={}
   }
 end
+
+local function setAffiliation(newMapUnit, affiliation)
+  --[[ Set the MapUnit's affiliation.
+  Throws an error if an invalid affiliation is passed.
+    Args:
+      newMapUnit(object)
+      affiliation(string) Should be one of the MapUnit.definedAffiliations values.
+    Returns:
+      nil
+  ]]
+  if not TableUtility:contains(MapUnit.definedAffiliations, affiliation) then
+    error("Affiliation "
+        .. affiliation
+        .. " does not exist. Valid affiliations are "
+        .. TableUtility:join(
+        MapUnit.definedAffiliations,
+        ", "
+    )
+    )
+  else
+    newMapUnit.affiliation = affiliation
+  end
+end
+
 
 function MapUnit:new(args)
   local newMapUnit = {}
@@ -52,6 +83,7 @@ function MapUnit:new(args)
   newMapUnit.recordForLastTurn = {}
 
   startNewMapUnitTurn(newMapUnit)
+  setAffiliation(newMapUnit, args.affiliation or "other")
 
   return newMapUnit
 end
@@ -158,6 +190,16 @@ function MapUnit:startNewTurn()
       nil
   ]]
   startNewMapUnitTurn(self)
+end
+
+function MapUnit:getAffilation()
+  --[[ Returns the MapUnit's affiliation.
+  Args:
+    nil
+  Returns:
+    A string
+  ]]
+  return self.affiliation
 end
 
 return MapUnit

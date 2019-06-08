@@ -109,5 +109,3 @@ function testOtherFriends()
   -- But trashbag considers itself a friend
   assert_true(trashbag:isFriendUnit(trashbag))
 end
-
--- units on the playerTeam know the name of their team

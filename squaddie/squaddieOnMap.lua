@@ -2,10 +2,10 @@
 ]]
 local TableUtility = require "table_utility"
 
-local MapUnit={}
-MapUnit.__index = MapUnit
+local SquaddieOnMap={}
+SquaddieOnMap.__index = SquaddieOnMap
 
-MapUnit.definedTravelMethods = {
+SquaddieOnMap.definedTravelMethods = {
   "none",
   "foot",
   "swim",
@@ -13,14 +13,14 @@ MapUnit.definedTravelMethods = {
   "shadow",
 }
 
-MapUnit.definedAffiliations = {
+SquaddieOnMap.definedAffiliations = {
   "player",
   "ally",
   "enemy",
   "other",
 }
 
-local function startNewMapUnitTurn(self)
+local function startNewSquaddieOnMapTurn(self)
   --[[ Resets the unit's turn as if it was the start of a new phase.
     Args:
       nil
@@ -35,67 +35,67 @@ local function startNewMapUnitTurn(self)
   }
 end
 
-local function setAffiliation(newMapUnit, affiliation)
-  --[[ Set the MapUnit's affiliation.
+local function setAffiliation(newSquaddieOnMap, affiliation)
+  --[[ Set the SquaddieOnMap's affiliation.
   Throws an error if an invalid affiliation is passed.
     Args:
-      newMapUnit(object)
-      affiliation(string) Should be one of the MapUnit.definedAffiliations values.
+      newSquaddieOnMap(object)
+      affiliation(string) Should be one of the SquaddieOnMap.definedAffiliations values.
     Returns:
       nil
   ]]
-  if not TableUtility:contains(MapUnit.definedAffiliations, affiliation) then
+  if not TableUtility:contains(SquaddieOnMap.definedAffiliations, affiliation) then
     error("Affiliation "
         .. affiliation
         .. " does not exist. Valid affiliations are "
         .. TableUtility:join(
-        MapUnit.definedAffiliations,
+        SquaddieOnMap.definedAffiliations,
         ", "
     )
     )
   else
-    newMapUnit.affiliation = affiliation
+    newSquaddieOnMap.affiliation = affiliation
   end
 end
 
 
-function MapUnit:new(args)
-  local newMapUnit = {}
-  setmetatable(newMapUnit,MapUnit)
-  newMapUnit.id = nil
-  newMapUnit.name = args.displayName or "No name"
+function SquaddieOnMap:new(args)
+  local newSquaddieOnMap = {}
+  setmetatable(newSquaddieOnMap,SquaddieOnMap)
+  newSquaddieOnMap.id = nil
+  newSquaddieOnMap.name = args.displayName or "No name"
 
   -- travelMethods must match one of the definedTravelMethods.
-  newMapUnit.travelMethods = {}
+  newSquaddieOnMap.travelMethods = {}
   if args.travelMethods then
-    newMapUnit.travelMethods = TableUtility:filter(
+    newSquaddieOnMap.travelMethods = TableUtility:filter(
       args.travelMethods,
         function(_, possibleMethod)
-        return TableUtility:contains( MapUnit.definedTravelMethods, possibleMethod)
+        return TableUtility:contains( SquaddieOnMap.definedTravelMethods, possibleMethod)
       end
     )
   else
     -- By default the Map Unit can travel on foot.
-    newMapUnit.travelMethods = {"foot"}
+    newSquaddieOnMap.travelMethods = {"foot"}
   end
-  newMapUnit.distancePerTurn = args.distancePerTurn or 1
-  newMapUnit.turnParts = {}
-  newMapUnit.recordForLastTurn = {}
+  newSquaddieOnMap.distancePerTurn = args.distancePerTurn or 1
+  newSquaddieOnMap.turnParts = {}
+  newSquaddieOnMap.recordForLastTurn = {}
 
-  startNewMapUnitTurn(newMapUnit)
-  setAffiliation(newMapUnit, args.affiliation or "other")
+  startNewSquaddieOnMapTurn(newSquaddieOnMap)
+  setAffiliation(newSquaddieOnMap, args.affiliation or "other")
 
-  return newMapUnit
+  return newSquaddieOnMap
 end
 
-function MapUnit:hasOneTravelMethod(methods)
-  --[[ Sees if this MapUnit has at least one of the given travel methods.
+function SquaddieOnMap:hasOneTravelMethod(methods)
+  --[[ Sees if this SquaddieOnMap has at least one of the given travel methods.
   Args:
     methods(string OR table)
       (string): The method to check for.
       (table): An array of strings, each string representing a method to look for.
   Returns:
-    Return true if the MapUnit has any of the methods.
+    Return true if the SquaddieOnMap has any of the methods.
     Return false otherwise.
   ]]
   if type(methods) == "table" then
@@ -110,8 +110,8 @@ function MapUnit:hasOneTravelMethod(methods)
   return TableUtility:contains(self.travelMethods, methods)
 end
 
-function MapUnit:isTurnReady()
-  --[[ Checks the MapUnit to see if it is ready to take its turn.
+function SquaddieOnMap:isTurnReady()
+  --[[ Checks the SquaddieOnMap to see if it is ready to take its turn.
   Args:
     None
   Returns:
@@ -120,7 +120,7 @@ function MapUnit:isTurnReady()
   return self.turnParts["move"]
 end
 
-function MapUnit:hasTurnPartAvailable(partName)
+function SquaddieOnMap:hasTurnPartAvailable(partName)
   --[[ Checks to see if a part of a turn has completed.
   Args:
     partName(string): The name of the turn part (example: "move")
@@ -130,7 +130,7 @@ function MapUnit:hasTurnPartAvailable(partName)
   return self.turnParts[partName]
 end
 
-function MapUnit:turnPartCompleted(partName)
+function SquaddieOnMap:turnPartCompleted(partName)
   --[[ Note that part of a unit's turn has completed.
   Args:
     partName(string): The name of the turn part (example: "move")
@@ -139,12 +139,12 @@ function MapUnit:turnPartCompleted(partName)
     Throws an error if the partName doesn't match an expected turn part.
   ]]
   if self.turnParts[partName] == nil then
-    error("MapUnit:TurnPartCompleted can't complete " .. partName .. " because it does not exist.")
+    error("SquaddieOnMap:TurnPartCompleted can't complete " .. partName .. " because it does not exist.")
   end
   self.turnParts[partName] = false
 end
 
-function MapUnit:currentTurnPart()
+function SquaddieOnMap:currentTurnPart()
   --[[ Returns a string explaining which part of the turn is next for this unit.
   Args:
     None
@@ -154,7 +154,7 @@ function MapUnit:currentTurnPart()
   return "move"
 end
 
-function MapUnit:getLastTurnMovement()
+function SquaddieOnMap:getLastTurnMovement()
   --[[ Returns the record of the unit's movement last turn.
   Args:
     None
@@ -164,7 +164,7 @@ function MapUnit:getLastTurnMovement()
   return self.recordForLastTurn.movement
 end
 
-function MapUnit:recordMovement(fromZoneID, toZoneID)
+function SquaddieOnMap:recordMovement(fromZoneID, toZoneID)
   --[[ Note the unit's movement from one zone to the next.
   Args:
     fromZoneID(string): The name of the starting zone.
@@ -182,18 +182,18 @@ function MapUnit:recordMovement(fromZoneID, toZoneID)
   )
 end
 
-function MapUnit:startNewTurn()
+function SquaddieOnMap:startNewTurn()
   --[[ Resets the unit's turn as if it was the start of a new phase.
     Args:
       nil
     Returns:
       nil
   ]]
-  startNewMapUnitTurn(self)
+  startNewSquaddieOnMapTurn(self)
 end
 
-function MapUnit:getAffilation()
-  --[[ Returns the MapUnit's affiliation.
+function SquaddieOnMap:getAffilation()
+  --[[ Returns the SquaddieOnMap's affiliation.
   Args:
     nil
   Returns:
@@ -202,16 +202,16 @@ function MapUnit:getAffilation()
   return self.affiliation
 end
 
-function MapUnit:isFriendUnit(otherMapUnit)
-  --[[ Sees if the other MapUnit is considered friendly.
+function SquaddieOnMap:isFriendUnit(otherSquaddieOnMap)
+  --[[ Sees if the other SquaddieOnMap is considered friendly.
   Args:
-    otherMapUnit(MapUnit)
+    otherSquaddieOnMap(SquaddieOnMap)
   Returns:
     boolean
   ]]
 
-  -- A MapUnit is always its own friend.
-  if self == otherMapUnit then
+  -- A SquaddieOnMap is always its own friend.
+  if self == otherSquaddieOnMap then
     return true
   end
 
@@ -222,7 +222,7 @@ function MapUnit:isFriendUnit(otherMapUnit)
     other={}
   }
 
-  return TableUtility:contains(friendlyAffiliations[self.affiliation], otherMapUnit.affiliation)
+  return TableUtility:contains(friendlyAffiliations[self.affiliation], otherSquaddieOnMap.affiliation)
 end
 
-return MapUnit
+return SquaddieOnMap

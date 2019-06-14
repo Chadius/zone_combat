@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require "map"
-local MapUnit = require "map/mapUnit"
+local SquaddieOnMap = require "squaddie/squaddieOnMap"
 local TableUtility = require "table_utility"
 
 if _VERSION >= 'Lua 5.2' then
@@ -51,7 +51,7 @@ function setup()
     }
   })
 
-  bunny = MapUnit:new({
+  bunny = SquaddieOnMap:new({
     displayName = "bunny",
     distancePerTurn = 2
   })
@@ -60,9 +60,9 @@ end
 function teardown()
 end
 
-function testMapUnitHasTurn()
+function testSquaddieOnMapHasTurn()
   -- Units have turns and can report on what they want to do this turn.
-  map:addMapUnit(bunny, "trail1")
+  map:addSquaddieOnMap(bunny, "trail1")
 
   -- Map Unit's turn is ready
   assert_true(bunny:isTurnReady())
@@ -76,14 +76,14 @@ end
 
 function testTurnRemembersLastMove()
   -- Turn can leave a record of what it did
-  map:addMapUnit(bunny, "trail1")
+  map:addSquaddieOnMap(bunny, "trail1")
 
   assert_true(TableUtility:equivalent(
       {},
       bunny:getLastTurnMovement()
   ))
 
-  map:mapUnitMoves(bunny.id, "trail3")
+  map:SquaddieOnMapMoves(bunny.id, "trail3")
 
   assert_true(TableUtility:equivalent(
       {"trail1", "trail3"},
@@ -93,39 +93,39 @@ end
 
 function testTurnIsOver()
   -- Turn knows when it's over
-  map:addMapUnit(bunny, "trail1")
+  map:addSquaddieOnMap(bunny, "trail1")
   assert_true(bunny:isTurnReady())
   assert_true(bunny:hasTurnPartAvailable("move"))
 
-  map:mapUnitMoves(bunny.id, "trail3")
+  map:SquaddieOnMapMoves(bunny.id, "trail3")
   assert_false(bunny:hasTurnPartAvailable("move"))
   assert_false(bunny:isTurnReady())
 end
 
 function testCannotMoveTwiceInOneTurn()
   -- Units cannot move twice per turn
-  map:addMapUnit(bunny, "trail1")
-  map:mapUnitMoves(bunny.id, "trail2")
-  assert_false(map:canMapUnitMoveToAdjacentZone(bunny.id, "pond"))
+  map:addSquaddieOnMap(bunny, "trail1")
+  map:SquaddieOnMapMoves(bunny.id, "trail2")
+  assert_false(map:canSquaddieOnMapMoveToAdjacentZone(bunny.id, "pond"))
   assert_error_match(
       "Unit doesn't have a move action, trying to move should have thrown an error.",
-      "MapUnit bunny does not have a move action and cannot reach zone trail3 this turn.",
+      "SquaddieOnMap bunny does not have a move action and cannot reach zone trail3 this turn.",
       function()
-        map:mapUnitMoves(bunny.id, "trail3")
+        map:SquaddieOnMapMoves(bunny.id, "trail3")
       end
   )
 
   -- Bunny is still in trail2
-  local trail2_units = map:getMapUnitsAtLocation("trail2")
+  local trail2_units = map:getSquaddieOnMapsAtLocation("trail2")
   assert_equal(1, #trail2_units)
   assert_equal(bunny, trail2_units[1])
 end
 
 function testResetUnitTurn()
   -- Turns can be reset
-  map:addMapUnit(bunny, "trail1")
-  map:mapUnitMoves(bunny.id, "trail2")
-  map:resetMapUnitTurn(bunny.id)
+  map:addSquaddieOnMap(bunny, "trail1")
+  map:SquaddieOnMapMoves(bunny.id, "trail2")
+  map:resetSquaddieOnMapTurn(bunny.id)
 
   -- Turn history should be cleared
   assert_true(TableUtility:equivalent(
@@ -134,9 +134,9 @@ function testResetUnitTurn()
   ))
 
   -- With a new turn, Bunny can move to trail3
-  map:mapUnitMoves(bunny.id, "trail3")
+  map:SquaddieOnMapMoves(bunny.id, "trail3")
 
-  local trail3_units = map:getMapUnitsAtLocation("trail3")
+  local trail3_units = map:getSquaddieOnMapsAtLocation("trail3")
   assert_equal(1, #trail3_units)
   assert_equal(bunny, trail3_units[1])
 

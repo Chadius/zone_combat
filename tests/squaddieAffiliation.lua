@@ -1,5 +1,5 @@
 lunit = require "libraries/unitTesting/lunitx"
-local SquaddieOnMap = require "squaddie/squaddieOnMap"
+local Squaddie = require "squaddie/squaddie"
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -17,42 +17,42 @@ local trashbag
 local moneybag
 
 function setup()
-  hero = SquaddieOnMap:new({
+  hero = Squaddie:new({
     displayName = "hero",
     affiliation = "player"
   })
 
-  sidekick = SquaddieOnMap:new({
+  sidekick = Squaddie:new({
     displayName = "sidekick",
     affiliation = "player"
   })
 
-  villain = SquaddieOnMap:new({
+  villain = Squaddie:new({
     displayName = "villain",
     affiliation = "enemy"
   })
 
-  henchman = SquaddieOnMap:new({
+  henchman = Squaddie:new({
     displayName = "henchman",
     affiliation = "enemy"
   })
 
-  mayor = SquaddieOnMap:new({
+  mayor = Squaddie:new({
     displayName = "mayor",
     affiliation = "ally"
   })
 
-  citizen = SquaddieOnMap:new({
+  citizen = Squaddie:new({
     displayName = "citizen",
     affiliation = "ally"
   })
 
-  trashbag = SquaddieOnMap:new({
+  trashbag = Squaddie:new({
     displayName = "trashbag",
     affiliation = "other"
   })
 
-  moneybag = SquaddieOnMap:new({
+  moneybag = Squaddie:new({
     displayName = "moneybag",
     affiliation = "other"
   })
@@ -63,7 +63,7 @@ function testHeroIdentifyAffiliation ()
   assert_equal("player", hero:getAffilation())
   -- If you make a SquaddieOnMap on an unknown affiliation, it raises an error
   local badAffiliation = function()
-    SquaddieOnMap:new({
+    Squaddie:new({
       displayName = "badAffiliation",
       affiliation = "bogus"
     })

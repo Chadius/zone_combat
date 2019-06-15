@@ -1,6 +1,6 @@
---[[ Unit's presence on a given map.
+--[[ Squaddie's presence on a given map.
 ]]
-local TableUtility = require "table_utility"
+local TableUtility = require "tableUtility"
 
 local SquaddieOnMap={}
 SquaddieOnMap.__index = SquaddieOnMap
@@ -11,13 +11,6 @@ SquaddieOnMap.definedTravelMethods = {
   "swim",
   "fly",
   "shadow",
-}
-
-SquaddieOnMap.definedAffiliations = {
-  "player",
-  "ally",
-  "enemy",
-  "other",
 }
 
 local function startNewSquaddieOnMapTurn(self)
@@ -34,30 +27,6 @@ local function startNewSquaddieOnMapTurn(self)
     movement={}
   }
 end
-
-local function setAffiliation(newSquaddieOnMap, affiliation)
-  --[[ Set the SquaddieOnMap's affiliation.
-  Throws an error if an invalid affiliation is passed.
-    Args:
-      newSquaddieOnMap(object)
-      affiliation(string) Should be one of the SquaddieOnMap.definedAffiliations values.
-    Returns:
-      nil
-  ]]
-  if not TableUtility:contains(SquaddieOnMap.definedAffiliations, affiliation) then
-    error("Affiliation "
-        .. affiliation
-        .. " does not exist. Valid affiliations are "
-        .. TableUtility:join(
-        SquaddieOnMap.definedAffiliations,
-        ", "
-    )
-    )
-  else
-    newSquaddieOnMap.affiliation = affiliation
-  end
-end
-
 
 function SquaddieOnMap:new(args)
   local newSquaddieOnMap = {}
@@ -83,7 +52,6 @@ function SquaddieOnMap:new(args)
   newSquaddieOnMap.recordForLastTurn = {}
 
   startNewSquaddieOnMapTurn(newSquaddieOnMap)
-  setAffiliation(newSquaddieOnMap, args.affiliation or "other")
 
   return newSquaddieOnMap
 end
@@ -190,39 +158,6 @@ function SquaddieOnMap:startNewTurn()
       nil
   ]]
   startNewSquaddieOnMapTurn(self)
-end
-
-function SquaddieOnMap:getAffilation()
-  --[[ Returns the SquaddieOnMap's affiliation.
-  Args:
-    nil
-  Returns:
-    A string
-  ]]
-  return self.affiliation
-end
-
-function SquaddieOnMap:isFriendUnit(otherSquaddieOnMap)
-  --[[ Sees if the other SquaddieOnMap is considered friendly.
-  Args:
-    otherSquaddieOnMap(SquaddieOnMap)
-  Returns:
-    boolean
-  ]]
-
-  -- A SquaddieOnMap is always its own friend.
-  if self == otherSquaddieOnMap then
-    return true
-  end
-
-  local friendlyAffiliations = {
-    player={"player", "ally"},
-    ally={"player", "ally"},
-    enemy={"enemy",},
-    other={}
-  }
-
-  return TableUtility:contains(friendlyAffiliations[self.affiliation], otherSquaddieOnMap.affiliation)
 end
 
 return SquaddieOnMap

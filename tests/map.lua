@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require "map"
-local TableUtility = require "table_utility"
+local TableUtility = require "tableUtility"
 
 if _VERSION >= 'Lua 5.2' then
     _ENV = lunit.module('enhanced','seeall')
@@ -34,7 +34,7 @@ end
 function test_map_no_id_makes_error()
   -- Try to make a map with no ID, expect an error
   local make_bad_map = function()
-    local map = Map:new({
+    Map:new({
       zones = {
         {
           id="test_zone",
@@ -50,7 +50,7 @@ end
 function test_map_no_zone_id_makes_error()
   -- Make a map with 1 zone without an ID, expect an error
   local make_bad_map = function()
-    local map = Map:new({
+    map = Map:new({
       id = "test map",
       zones = {
         {

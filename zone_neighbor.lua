@@ -1,7 +1,7 @@
 --[[Zone neighbors link two zones together.
 --]]
 
-local TableUtility = require "table_utility"
+local TableUtility = require "tableUtility"
 
 local ZoneNeighbor={}
 ZoneNeighbor.__index = ZoneNeighbor
@@ -35,7 +35,7 @@ end
 
 function ZoneNeighbor:__tostring()
    local allTravelMethods = ""
-   for i, method in ipairs(self.travelMethods) do
+   for _, method in ipairs(self.travelMethods) do
       allTravelMethods = allTravelMethods .. method .. ", "
    end
    return string.format("%s to %s. Cost %d, Methods %s", self.fromZoneID, self.toZoneID, self.moveCost, allTravelMethods)

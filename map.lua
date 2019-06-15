@@ -3,7 +3,7 @@
 
 local Zone = require "zone"
 local ZoneNeighbor = require "zone_neighbor"
-local TableUtility = require "table_utility"
+local TableUtility = require "tableUtility"
 
 local Map={}
 Map.__index = Map

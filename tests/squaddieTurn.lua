@@ -83,7 +83,7 @@ function testTurnRemembersLastMove()
       bunny:getLastTurnMovement()
   ))
 
-  map:SquaddieOnMapMoves(bunny.id, "trail3")
+  map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
 
   assert_true(TableUtility:equivalent(
       {"trail1", "trail3"},
@@ -97,7 +97,7 @@ function testTurnIsOver()
   assert_true(bunny:isTurnReady())
   assert_true(bunny:hasTurnPartAvailable("move"))
 
-  map:SquaddieOnMapMoves(bunny.id, "trail3")
+  map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
   assert_false(bunny:hasTurnPartAvailable("move"))
   assert_false(bunny:isTurnReady())
 end
@@ -105,13 +105,13 @@ end
 function testCannotMoveTwiceInOneTurn()
   -- Units cannot move twice per turn
   map:addSquaddieOnMap(bunny, "trail1")
-  map:SquaddieOnMapMoves(bunny.id, "trail2")
+  map:moveSquaddieAndSpendTurn(bunny.id, "trail2")
   assert_false(map:canSquaddieOnMapMoveToAdjacentZone(bunny.id, "pond"))
   assert_error_match(
       "Unit doesn't have a move action, trying to move should have thrown an error.",
-      "SquaddieOnMap bunny does not have a move action and cannot reach zone trail3 this turn.",
+      "Map:spendSquaddieMoveAction with bunny: squaddie does not have a move action available.",
       function()
-        map:SquaddieOnMapMoves(bunny.id, "trail3")
+        map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
       end
   )
 
@@ -124,7 +124,7 @@ end
 function testResetUnitTurn()
   -- Turns can be reset
   map:addSquaddieOnMap(bunny, "trail1")
-  map:SquaddieOnMapMoves(bunny.id, "trail2")
+  map:moveSquaddieAndSpendTurn(bunny.id, "trail2")
   map:resetSquaddieOnMapTurn(bunny.id)
 
   -- Turn history should be cleared
@@ -134,7 +134,7 @@ function testResetUnitTurn()
   ))
 
   -- With a new turn, Bunny can move to trail3
-  map:SquaddieOnMapMoves(bunny.id, "trail3")
+  map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
 
   local trail3_units = map:getSquaddieOnMapsAtLocation("trail3")
   assert_equal(1, #trail3_units)

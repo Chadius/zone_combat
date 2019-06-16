@@ -306,56 +306,69 @@ function Map:canSquaddieOnMapMoveToAdjacentZone(squaddieOnMapID, desiredZoneID)
   return false
 end
 
-function Map:SquaddieOnMapMoves(squaddieOnMapID, nextZoneID, warpUnit)
-  --[[ Change the map unit's location to the next zone.
+function Map:spendSquaddieMoveAction(squaddieOnMapID)
+  -- Tell the squaddie it completed its movement
+  self:assertSquaddieIsOnMap(squaddieOnMapID, "Map:spendSquaddieMoveAction")
+  local squaddieOnMap = self.SquaddieOnMapInfoByID[squaddieOnMapID]
+  squaddieOnMap.SquaddieOnMap:turnPartCompleted("move")
+end
+
+function Map:assertSquaddieCanMoveToZoneThisTurn(squaddieID, destinationZoneID)
+  self:assertSquaddieIsOnMap(squaddieID, "Map:moveSquaddieAndSpendTurn")
+  self:assertZoneExists(destinationZoneID, "Map:moveSquaddieAndSpendTurn")
+
+  local unitInfo = self.SquaddieOnMapInfoByID[squaddieID]
+
+  -- Can the unit still move this turn?
+  unitInfo.SquaddieOnMap:assertHasTurnPartAvailable("move", "Map:spendSquaddieMoveAction with " .. unitInfo.SquaddieOnMap.name )
+
+  -- Make sure the unit can actually travel to that zone in a single move
+  if not self:canSquaddieOnMapMoveToAdjacentZone(squaddieID, destinationZoneID) then
+    error("SquaddieOnMap " .. unitInfo.SquaddieOnMap.name ..  " cannot reach zone " .. destinationZoneID .. " in a single move.")
+  end
+end
+
+function Map:moveSquaddieAndSpendTurn(squaddieOnMapID, nextZoneID)
+  --[[ Squaddie will spend its turn to move to the next zone.
   Args:
     squaddieOnMapID(integer): SquaddieOnMap.id
     nextZoneID(string): Name of the zone
-    warpUnit(boolean): If true, ignore movement and method limits, and do not consume the map unit's movement.
   Returns:
     nil
-    Throws an error if there is no zone with the given nextZoneID.
-    Throws an error if there is no SquaddieOnMap with the given squaddieOnMapID.
-    Throws an error if warpUnit is falsy and the SquaddieOnMap cannot reach the next zone.
   ]]
 
-  self:assertSquaddieIsOnMap(squaddieOnMapID, "Map:SquaddieOnMapMoves")
-  self:assertZoneExists(nextZoneID, "Map:squaddieOnMapMoves")
+  self:assertSquaddieIsOnMap(squaddieOnMapID, "Map:moveSquaddieAndSpendTurn")
+  self:assertZoneExists(nextZoneID, "Map:moveSquaddieAndSpendTurn")
 
   local unitInfo = self.SquaddieOnMapInfoByID[squaddieOnMapID]
 
-  if not warpUnit then
-    -- Can the unit still move this turn?
-    if not (unitInfo.SquaddieOnMap:hasTurnPartAvailable("move")) then
-      error("SquaddieOnMap " .. self.SquaddieOnMapInfoByID[squaddieOnMapID].SquaddieOnMap.name ..  " does not have a move action and cannot reach zone " .. nextZoneID .. " this turn.")
-    end
-    -- Make sure the unit can actually travel to that zone in a single move
-    if not self:canSquaddieOnMapMoveToAdjacentZone(squaddieOnMapID, nextZoneID) then
-      error("SquaddieOnMap " .. self.SquaddieOnMapInfoByID[squaddieOnMapID].SquaddieOnMap.name ..  " cannot reach zone " .. nextZoneID .. " in a single move.")
-    end
-  end
-
-  -- Tell the map unit to remember where it's moving.
+  self:assertSquaddieCanMoveToZoneThisTurn(squaddieOnMapID, nextZoneID)
   unitInfo.SquaddieOnMap:recordMovement(unitInfo["zone"], nextZoneID)
-  if not warpUnit then
-    -- Tell the unit it completed its movement
-    unitInfo.SquaddieOnMap:turnPartCompleted("move")
-  end
+  self:spendSquaddieMoveAction(squaddieOnMapID)
 
   -- Change the zone the unit is in.
   unitInfo["zone"] = nextZoneID
 end
 
-function Map:warpSquaddieOnMap(squaddieOnMapID, nextZoneID)
-  --[[ Move the Map Unit directly to the nextZoneID.
-    This does not spend the Map Unit's resources nor does it take terrain into account.
+function Map:placeSquaddieInZone(squaddieOnMapID, nextZoneID)
+  --[[ Move the squaddie to the next zone at no cost.
   Args:
     squaddieOnMapID(integer): SquaddieOnMap.id
     nextZoneID(string): Name of the zone
   Returns:
     nil
   ]]
-  return self:SquaddieOnMapMoves(squaddieOnMapID, nextZoneID, true)
+
+  self:assertSquaddieIsOnMap(squaddieOnMapID, "Map:moveSquaddieAndSpendTurn")
+  self:assertZoneExists(nextZoneID, "Map:moveSquaddieAndSpendTurn")
+
+  local unitInfo = self.SquaddieOnMapInfoByID[squaddieOnMapID]
+
+  -- Tell the map unit to remember where it's moving.
+  unitInfo.SquaddieOnMap:recordMovement(unitInfo["zone"], nextZoneID)
+
+  -- Change the zone the unit is in.
+  unitInfo["zone"] = nextZoneID
 end
 
 function Map:resetSquaddieOnMapTurn(squaddieOnMapID)

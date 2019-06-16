@@ -160,14 +160,14 @@ function testHumanPositiveTravel()
   -- Human can move from trail1 to trail2 to trail3
   map:addSquaddieOnMap(human, "trail1")
   assert_true(map:canSquaddieOnMapMoveToAdjacentZone(human.id, "trail2"))
-  map:SquaddieOnMapMoves(human.id, "trail2")
+  map:moveSquaddieAndSpendTurn(human.id, "trail2")
   local trail2_units = map:getSquaddieOnMapsAtLocation("trail2")
   assert_equal(1, #trail2_units)
   assert_equal(human, trail2_units[1])
   assert_true(map:canSquaddieOnMapMoveToAdjacentZone(human.id, "trail3"))
 
   map:resetSquaddieOnMapTurn(human.id)
-  map:SquaddieOnMapMoves(human.id, "trail3")
+  map:moveSquaddieAndSpendTurn(human.id, "trail3")
   local trail3_units = map:getSquaddieOnMapsAtLocation("trail3")
   assert_equal(1, #trail3_units)
   assert_equal(human, trail3_units[1])
@@ -187,12 +187,12 @@ function testIllegalInquiries()
 
   map:addSquaddieOnMap(human, "trail1")
   local bad_unit_move = function()
-    map:SquaddieOnMapMoves(human.id, "bogus")
+    map:moveSquaddieAndSpendTurn(human.id, "bogus")
   end
 
   assert_error_match(
       "Moved the unit to the middle of nowhere. That's bad.",
-      " Map:squaddieOnMapMoves: zone does not exist: bogus",
+      " Map:moveSquaddieAndSpendTurn: zone does not exist: bogus",
       bad_unit_move
   )
 end
@@ -212,7 +212,7 @@ function testFootlockedMovementLimits()
       "Unit should not be able to move that far. That's bad.",
       "SquaddieOnMap human cannot reach zone trail3 in a single move.",
       function()
-        map:SquaddieOnMapMoves(human.id, "trail3")
+        map:moveSquaddieAndSpendTurn(human.id, "trail3")
       end
   )
 
@@ -222,7 +222,7 @@ function testFootlockedMovementLimits()
       "Unit should not be able to move that far. That's bad.",
       "SquaddieOnMap human cannot reach zone pond in a single move.",
       function()
-        map:SquaddieOnMapMoves(human.id, "pond")
+        map:moveSquaddieAndSpendTurn(human.id, "pond")
       end
   )
 end
@@ -235,13 +235,13 @@ function testFootMovementIncreasedCanReachFurther()
 
   -- bunny can move from trail1 to trail3 directly
   assert_true(map:canSquaddieOnMapMoveToAdjacentZone(bunny.id, "trail3"))
-  map:SquaddieOnMapMoves(bunny.id, "trail3")
+  map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
   local trail3_units = map:getSquaddieOnMapsAtLocation("trail3")
   assert_equal(1, #trail3_units)
   assert_equal(bunny, trail3_units[1])
 
   map:resetSquaddieOnMapTurn(bunny.id)
-  map:warpSquaddieOnMap(bunny.id, "trail1")
+  map:placeSquaddieInZone(bunny.id, "trail1")
 
   -- Bunny can't move from trail3 to pond
   assert_false(map:canSquaddieOnMapMoveToAdjacentZone(bunny.id, "pond"))
@@ -249,7 +249,7 @@ function testFootMovementIncreasedCanReachFurther()
     "Unit should not be able to move that far. That's bad.",
     "SquaddieOnMap bunny cannot reach zone pond in a single move.",
     function()
-      map:SquaddieOnMapMoves(bunny.id, "pond")
+      map:moveSquaddieAndSpendTurn(bunny.id, "pond")
     end
   )
 end

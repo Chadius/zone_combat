@@ -88,6 +88,12 @@ function SquaddieOnMap:isTurnReady()
   return self.turnParts["move"]
 end
 
+function SquaddieOnMap:assertHasTurnPartAvailable(partName, nameOfCaller)
+  if not self:hasTurnPartAvailable(partName) then
+    error(nameOfCaller .. ": squaddie does not have a " .. partName .. " action available.")
+  end
+end
+
 function SquaddieOnMap:hasTurnPartAvailable(partName)
   --[[ Checks to see if a part of a turn has completed.
   Args:

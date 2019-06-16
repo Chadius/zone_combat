@@ -71,6 +71,10 @@ function Squaddie:hasTurnPartAvailable(partName)
   return self.mapPresence:hasTurnPartAvailable(partName)
 end
 
+function Squaddie:assertHasTurnPartAvailable(partName)
+  return self.mapPresence:assertHasTurnPartAvailable(partName)
+end
+
 function Squaddie:turnPartCompleted(partName)
   return self.mapPresence:turnPartCompleted(partName)
 end

@@ -109,7 +109,7 @@ function test_one_SquaddieOnMap_location()
 
   assert_error_match(
       "Added human to trail2 without error. That's bad.",
-      "SquaddieOnMap human already exists.",
+      "Map:addSquaddieOnMap: human already exists.",
       bad_unit_add
   )
   local trail1_units = map:getSquaddieOnMapsAtLocation("trail1")
@@ -125,7 +125,7 @@ function testNonexistentZoneAdd()
 
   assert_error_match(
       "Added human to trail that doesn't exist without error. That's bad.",
-      "SquaddieOnMap human cannot be added because zone bogus does not exist.",
+      " Map:addSquaddieOnMap: zone does not exist: bogus",
       bad_unit_add
   )
 end
@@ -192,7 +192,7 @@ function testIllegalInquiries()
 
   assert_error_match(
       "Moved the unit to the middle of nowhere. That's bad.",
-      "SquaddieOnMap human cannot be moved because zone bogus does not exist.",
+      " Map:squaddieOnMapMoves: zone does not exist: bogus",
       bad_unit_move
   )
 end

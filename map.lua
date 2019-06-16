@@ -52,7 +52,7 @@ function Map:new(args)
   newMap:VerifyZoneNeighbor()
 
   -- Set an id to track SquaddieOnMaps.
-  newMap.nextSquaddieOnMapID = 1
+  newMap.nextsquaddieOnMapID = 1
 
   self.SquaddieOnMapInfoByID = {}
 
@@ -200,19 +200,17 @@ function Map:addSquaddieOnMap(SquaddieOnMap, zoneID)
   end
 
   -- Make sure the zone exists
-  if not self.zone_by_id[zoneID] then
-    error("SquaddieOnMap " .. SquaddieOnMap.name .. " cannot be added because zone " .. zoneID .. " does not exist.")
-  end
+  self:assertZoneExists(zoneID, "Map:addSquaddieOnMap")
 
   -- If the map unit was already added, raise an error
-  if self.SquaddieOnMapInfoByID[SquaddieOnMap.id] then
-    error("SquaddieOnMap " .. SquaddieOnMap.name .. " already exists.")
+  if self:isSquaddieOnMap(SquaddieOnMap.id) then
+    error("Map:addSquaddieOnMap: " .. SquaddieOnMap.name .. " already exists.")
   end
 
   -- Give the SquaddieOnMap an id if it needs it.
   if SquaddieOnMap.id == nil then
-    SquaddieOnMap.id = self.nextSquaddieOnMapID
-    self.nextSquaddieOnMapID = self.nextSquaddieOnMapID + 1
+    SquaddieOnMap.id = self.nextsquaddieOnMapID
+    self.nextsquaddieOnMapID = self.nextsquaddieOnMapID + 1
   end
 
   -- Store in a zone.
@@ -242,42 +240,37 @@ function Map:getSquaddieOnMapsAtLocation(zoneID)
   return SquaddieOnMapsByZone[zoneID] or {}
 end
 
-function Map:removeSquaddieOnMap(SquaddieOnMapID)
+function Map:removeSquaddieOnMap(squaddieOnMapID)
   --[[ Removes the map unit with the given ID.
   Args:
-    SquaddieOnMapID(integer): SquaddieOnMap.id
+    squaddieOnMapID(integer): SquaddieOnMap.id
   Returns:
     nil
   ]]
-  if self.SquaddieOnMapInfoByID[SquaddieOnMapID]~= nil then
-    table.remove(self.SquaddieOnMapInfoByID, SquaddieOnMapID)
+  if self.SquaddieOnMapInfoByID[squaddieOnMapID]~= nil then
+    table.remove(self.SquaddieOnMapInfoByID, squaddieOnMapID)
   end
 end
 
-function Map:canSquaddieOnMapMoveToAdjacentZone(SquaddieOnMapID, desiredZoneID)
+function Map:canSquaddieOnMapMoveToAdjacentZone(squaddieOnMapID, desiredZoneID)
   --[[ Indicate if the map unit can move to the nearby zone from its current location.
   Args:
-    SquaddieOnMapID(integer): SquaddieOnMap.id
+    squaddieOnMapID(integer): SquaddieOnMap.id
     desiredZoneID(string): Name of the zone
   Returns:
     true if the desired zone can be reached, false otherwise.
   ]]
 
-  -- Make sure the map unit and zone exist
-  if not self.SquaddieOnMapInfoByID[SquaddieOnMapID] then
-    error("Map:canSquaddieOnMapMoveToAdjacentZone no SquaddieOnMap named " .. SquaddieOnMapID .. " found.")
-  end
+  self:assertSquaddieIsOnMap(squaddieOnMapID, "Map:canSquaddieOnMapMoveToAdjacentZone")
+  self:assertZoneExists(desiredZoneID, "Map:canSquaddieOnMapMoveToAdjacentZone")
 
-  if not self.zone_by_id[desiredZoneID] then
-    error("SquaddieOnMap " .. self.SquaddieOnMapInfoByID[SquaddieOnMapID].SquaddieOnMap.name ..  " cannot check for movement because zone " .. desiredZoneID .. " does not exist.")
-  end
-  local SquaddieOnMap = self.SquaddieOnMapInfoByID[SquaddieOnMapID].SquaddieOnMap
+  local SquaddieOnMap = self.SquaddieOnMapInfoByID[squaddieOnMapID].SquaddieOnMap
 
   -- Visited: start empty
   local visitedZones = {}
 
   -- Working list starts with the SquaddieOnMap's current zone and 0 move
-  local workingZones = { { zoneID=self.SquaddieOnMapInfoByID[SquaddieOnMapID].zone, distance=0 }}
+  local workingZones = { { zoneID=self.SquaddieOnMapInfoByID[squaddieOnMapID].zone, distance=0 }}
   -- While the working list is not empty
   while TableUtility:size(workingZones) > 0 do
     local thisZoneInfo = table.remove(workingZones, 1)
@@ -313,39 +306,32 @@ function Map:canSquaddieOnMapMoveToAdjacentZone(SquaddieOnMapID, desiredZoneID)
   return false
 end
 
-function Map:SquaddieOnMapMoves(SquaddieOnMapID, nextZoneID, warpUnit)
+function Map:SquaddieOnMapMoves(squaddieOnMapID, nextZoneID, warpUnit)
   --[[ Change the map unit's location to the next zone.
   Args:
-    SquaddieOnMapID(integer): SquaddieOnMap.id
+    squaddieOnMapID(integer): SquaddieOnMap.id
     nextZoneID(string): Name of the zone
     warpUnit(boolean): If true, ignore movement and method limits, and do not consume the map unit's movement.
   Returns:
     nil
     Throws an error if there is no zone with the given nextZoneID.
-    Throws an error if there is no SquaddieOnMap with the given SquaddieOnMapID.
+    Throws an error if there is no SquaddieOnMap with the given squaddieOnMapID.
     Throws an error if warpUnit is falsy and the SquaddieOnMap cannot reach the next zone.
   ]]
 
-  -- Make sure the map unit actually exists
-  if not self.SquaddieOnMapInfoByID[SquaddieOnMapID] then
-    error("Map:SquaddieOnMapMoves no SquaddieOnMap named " .. SquaddieOnMapID .. " found.")
-  end
+  self:assertSquaddieIsOnMap(squaddieOnMapID, "Map:SquaddieOnMapMoves")
+  self:assertZoneExists(nextZoneID, "Map:squaddieOnMapMoves")
 
-  -- Make sure the target zone exists
-  if not self.zone_by_id[nextZoneID] then
-    error("SquaddieOnMap " .. self.SquaddieOnMapInfoByID[SquaddieOnMapID].SquaddieOnMap.name ..  " cannot be moved because zone " .. nextZoneID .. " does not exist.")
-  end
-
-  local unitInfo = self.SquaddieOnMapInfoByID[SquaddieOnMapID]
+  local unitInfo = self.SquaddieOnMapInfoByID[squaddieOnMapID]
 
   if not warpUnit then
     -- Can the unit still move this turn?
     if not (unitInfo.SquaddieOnMap:hasTurnPartAvailable("move")) then
-      error("SquaddieOnMap " .. self.SquaddieOnMapInfoByID[SquaddieOnMapID].SquaddieOnMap.name ..  " does not have a move action and cannot reach zone " .. nextZoneID .. " this turn.")
+      error("SquaddieOnMap " .. self.SquaddieOnMapInfoByID[squaddieOnMapID].SquaddieOnMap.name ..  " does not have a move action and cannot reach zone " .. nextZoneID .. " this turn.")
     end
     -- Make sure the unit can actually travel to that zone in a single move
-    if not self:canSquaddieOnMapMoveToAdjacentZone(SquaddieOnMapID, nextZoneID) then
-      error("SquaddieOnMap " .. self.SquaddieOnMapInfoByID[SquaddieOnMapID].SquaddieOnMap.name ..  " cannot reach zone " .. nextZoneID .. " in a single move.")
+    if not self:canSquaddieOnMapMoveToAdjacentZone(squaddieOnMapID, nextZoneID) then
+      error("SquaddieOnMap " .. self.SquaddieOnMapInfoByID[squaddieOnMapID].SquaddieOnMap.name ..  " cannot reach zone " .. nextZoneID .. " in a single move.")
     end
   end
 
@@ -360,33 +346,48 @@ function Map:SquaddieOnMapMoves(SquaddieOnMapID, nextZoneID, warpUnit)
   unitInfo["zone"] = nextZoneID
 end
 
-function Map:warpSquaddieOnMap(SquaddieOnMapID, nextZoneID)
+function Map:warpSquaddieOnMap(squaddieOnMapID, nextZoneID)
   --[[ Move the Map Unit directly to the nextZoneID.
     This does not spend the Map Unit's resources nor does it take terrain into account.
   Args:
-    SquaddieOnMapID(integer): SquaddieOnMap.id
+    squaddieOnMapID(integer): SquaddieOnMap.id
     nextZoneID(string): Name of the zone
   Returns:
     nil
   ]]
-  return self:SquaddieOnMapMoves(SquaddieOnMapID, nextZoneID, true)
+  return self:SquaddieOnMapMoves(squaddieOnMapID, nextZoneID, true)
 end
 
-function Map:resetSquaddieOnMapTurn(SquaddieOnMapID)
+function Map:resetSquaddieOnMapTurn(squaddieOnMapID)
   --[[ Passthrough function that resets the unit's turn as if it was the start of a new phase.
   Args:
-    SquaddieOnMapID(integer): SquaddieOnMap.id
+    squaddieOnMapID(integer): SquaddieOnMap.id
   Returns:
     nil
-    Throws an error if there is no SquaddieOnMap with that ID.
   ]]
-
-  -- Get Map Unit
-  if not self.SquaddieOnMapInfoByID[SquaddieOnMapID] then
-    error("Map:resetSquaddieOnMapTurn no SquaddieOnMap named " .. SquaddieOnMapID .. " found.")
-  end
+  self:assertSquaddieIsOnMap(squaddieOnMapID, "Map:resetSquaddieOnMapTurn")
 
   -- Tell it a new turn has started
-  self.SquaddieOnMapInfoByID[SquaddieOnMapID].SquaddieOnMap:startNewTurn()
+  self.SquaddieOnMapInfoByID[squaddieOnMapID].SquaddieOnMap:startNewTurn()
+end
+
+function Map:isSquaddieOnMap(squaddieOnMapID)
+  return self.SquaddieOnMapInfoByID[squaddieOnMapID]
+end
+
+function Map:assertSquaddieIsOnMap(squaddieOnMapID, nameOfCaller)
+  if not self:isSquaddieOnMap(squaddieOnMapID) then
+    error(nameOfCaller .. ": SquaddieOnMap not found: " .. squaddieOnMapID )
+  end
+end
+
+function Map:doesZoneExist(zoneID)
+  return self.zone_by_id[zoneID]
+end
+
+function Map:assertZoneExists(zoneID, nameOfCaller)
+  if not self:doesZoneExist(zoneID) then
+    error(nameOfCaller .. ": zone does not exist: " .. zoneID)
+  end
 end
 return Map

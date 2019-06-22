@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require "map"
-local SquaddieOnMap = require "squaddie/squaddieOnMap"
+local Squaddie= require "squaddie/squaddie"
 local TableUtility = require "tableUtility"
 
 if _VERSION >= 'Lua 5.2' then
@@ -51,7 +51,7 @@ function setup()
     }
   })
 
-  bunny = SquaddieOnMap:new({
+  bunny = Squaddie:new({
     displayName = "bunny",
     distancePerTurn = 2
   })
@@ -109,7 +109,7 @@ function testCannotMoveTwiceInOneTurn()
   assert_false(map:canSquaddieMoveToAdjacentZone(bunny.id, "pond"))
   assert_error_match(
       "Unit doesn't have a move action, trying to move should have thrown an error.",
-      "Map:spendSquaddieMoveAction with bunny: squaddie does not have a move action available.",
+      "Map:moveSquaddieAndSpendTurn with bunny: squaddie does not have a move action available.",
       function()
         map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
       end

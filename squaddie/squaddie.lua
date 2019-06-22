@@ -4,6 +4,7 @@ The entity can take actions and may be destroyed.
 
 local SquaddieOnMap = require "squaddie/squaddieOnMap"
 local TableUtility = require "tableUtility"
+local uuid = require("libraries/uuid")
 
 local Squaddie={}
 Squaddie.__index = Squaddie
@@ -49,7 +50,7 @@ Squaddie.definedAffiliations = {
 function Squaddie:new(args)
   local newSquaddie = {}
   setmetatable(newSquaddie, Squaddie)
-  newSquaddie.id = nil
+  newSquaddie.id = uuid()
   newSquaddie.name = args.displayName or "No name"
 
   newSquaddie.mapPresence = SquaddieOnMap:new(args)
@@ -71,8 +72,8 @@ function Squaddie:hasTurnPartAvailable(partName)
   return self.mapPresence:hasTurnPartAvailable(partName)
 end
 
-function Squaddie:assertHasTurnPartAvailable(partName)
-  return self.mapPresence:assertHasTurnPartAvailable(partName)
+function Squaddie:assertHasTurnPartAvailable(partName, nameOfCaller)
+  return self.mapPresence:assertHasTurnPartAvailable(partName, nameOfCaller)
 end
 
 function Squaddie:turnPartCompleted(partName)

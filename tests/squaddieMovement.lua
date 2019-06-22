@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require "map"
-local SquaddieOnMap = require "squaddie/squaddieOnMap"
+local Squaddie = require "squaddie/squaddie"
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -56,26 +56,26 @@ function setup()
     }
   })
 
-  human = SquaddieOnMap:new({
+  human = Squaddie:new({
     displayName = "human"
   })
 
-  bunny = SquaddieOnMap:new({
+  bunny = Squaddie:new({
     displayName = "bunny",
     distancePerTurn = 2
   })
 
-  turtle = SquaddieOnMap:new({
+  turtle = Squaddie:new({
     displayName = "turtle",
     travelMethods = {"foot", "swim"}
   })
 
-  bird = SquaddieOnMap:new({
+  bird = Squaddie:new({
     displayName = "bird",
     travelMethods = {"foot", "fly"}
   })
 
-  stone = SquaddieOnMap:new({
+  stone = Squaddie:new({
     displayName = "stone",
     travelMethods = {"none"}
   })
@@ -88,9 +88,9 @@ function test_place_unit_on_map()
   --[[ You can create units with given movement types.
   ]]
 
-  -- Human has a name, but no id since it's not on the map.
+  -- Human has a name, and an id
   assert_equal("human", human.name)
-  assert_equal(nil, human.id)
+  assert_not_equal(nil, human.id)
 
   -- Place human on the map, map knows its location
   map:addSquaddie(human, "trail1")
@@ -169,7 +169,7 @@ function testHumanPositiveTravel()
   map:resetSquaddieTurn(human.id)
   map:moveSquaddieAndSpendTurn(human.id, "trail3")
   local trail3_units = map:getSquaddiesInZone("trail3")
-  assert_equal(1, #trail3_units)
+  assert_equal(1,   #trail3_units)
   assert_equal(human, trail3_units[1])
 end
 
@@ -231,7 +231,7 @@ function testFootMovementIncreasedCanReachFurther()
   map:addSquaddie(bunny, "trail1")
 
   -- bunny has more movement than a human
-  assert_true(bunny.distancePerTurn > human.distancePerTurn)
+  assert_true(bunny.mapPresence.distancePerTurn > human.mapPresence.distancePerTurn)
 
   -- bunny can move from trail1 to trail3 directly
   assert_true(map:canSquaddieMoveToAdjacentZone(bunny.id, "trail3"))

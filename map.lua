@@ -51,9 +51,6 @@ function Map:new(args)
   newMap:VerifyZone()
   newMap:VerifyZoneNeighbor()
 
-  -- Set an id to track SquaddieOnMaps.
-  newMap.nextSquaddieID = 1
-
   self.squaddieInfoByID = {}
 
   return newMap
@@ -207,12 +204,6 @@ function Map:addSquaddie(squaddie, zoneID)
     error("Map:addSquaddie: " .. squaddie.name .. " already exists.")
   end
 
-  -- Give the squaddie an id if it needs it.
-  if squaddie.id == nil then
-    squaddie.id = self.nextSquaddieID
-    self.nextSquaddieID = self.nextSquaddieID + 1
-  end
-
   -- Store in a zone.
   self.squaddieInfoByID[squaddie.id] = {
     squaddie = squaddie,
@@ -248,7 +239,7 @@ function Map:removeSquaddie(squaddieID)
     nil
   ]]
   if self:isSquaddieOnMap(squaddieID) then
-    table.remove(self.squaddieInfoByID, squaddieID)
+    self.squaddieInfoByID[squaddieID] = nil
   end
 end
 
@@ -287,7 +278,7 @@ function Map:canSquaddieMoveToAdjacentZone(squaddieID, desiredZoneID)
         local squaddieHasTravelMethod = squaddie:hasOneTravelMethod(
           zoneNeighborInfo.travelMethods
         )
-        local withinSquaddieMovement = thisZoneInfo.distance + 1 <= squaddie.distancePerTurn
+        local withinSquaddieMovement = thisZoneInfo.distance + 1 <= squaddie.mapPresence.distancePerTurn
         -- Add the neighbor if the unit can reach and hasn't visited it already
         if notVisitedYet and squaddieHasTravelMethod and withinSquaddieMovement then
           table.insert(
@@ -320,7 +311,7 @@ function Map:assertSquaddieCanMoveToZoneThisTurn(squaddieID, destinationZoneID)
   local unitInfo = self.squaddieInfoByID[squaddieID]
 
   -- Can the unit still move this turn?
-  unitInfo.squaddie:assertHasTurnPartAvailable("move", "Map:spendSquaddieMoveAction with " .. unitInfo.squaddie.name )
+  unitInfo.squaddie:assertHasTurnPartAvailable("move", "Map:moveSquaddieAndSpendTurn with " .. unitInfo.squaddie.name )
 
   -- Make sure the unit can actually travel to that zone in a single move
   if not self:canSquaddieMoveToAdjacentZone(squaddieID, destinationZoneID) then

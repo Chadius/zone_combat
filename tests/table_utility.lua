@@ -450,3 +450,16 @@ function testEmpty()
 
   assert_true(TableUtility:empty({}))
 end
+function testDeepCopy()
+  local cloned_children = TableUtility:deepClone(children)
+  assert_false(children == cloned_children)
+  assert_true(TableUtility:equivalent(children, cloned_children))
+  assert_false(children.sydney == cloned_children.sydney)
+  assert_true(TableUtility:equivalent(children.sydney, cloned_children.sydney))
+
+  local cloned_sandwich = TableUtility:deepClone(sandwich)
+  assert_true(TableUtility:equivalent(sandwich, cloned_sandwich))
+
+  local cloned_numbers = TableUtility:deepClone(numbers)
+  assert_true(TableUtility:equivalent(numbers, cloned_numbers))
+end

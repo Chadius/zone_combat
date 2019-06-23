@@ -5,6 +5,7 @@ all()
 any()
 clone()
 contains()
+deepClone()
 each()
 empty()
 equaivalentSet()
@@ -349,6 +350,28 @@ function TableUtility:clone(source)
   local iterator = TableUtility:getIterator(source)
   for key, value in iterator(source) do
     newTable[key] = value
+  end
+
+  return newTable
+end
+
+function TableUtility:deepClone(source)
+  --[[ Makes a deep copy of the source table.
+
+  Args:
+    source(table): If this is an indexed table, the clone's order of the mapped table is preserved.
+  Returns:
+    A table.
+  ]]
+
+  local newTable = {}
+  local iterator = TableUtility:getIterator(source)
+  for key, value in iterator(source) do
+    if type(value) == "table" then
+      newTable[key] = TableUtility:deepClone(value)
+    else
+      newTable[key] = value
+    end
   end
 
   return newTable

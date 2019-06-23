@@ -126,7 +126,6 @@ function testResetUnitTurn()
   map:addSquaddie(bunny, "trail1")
   map:moveSquaddieAndSpendTurn(bunny.id, "trail2")
   map:resetSquaddieTurn(bunny.id)
-
   -- Turn history should be cleared
   assert_true(TableUtility:equivalent(
       {},

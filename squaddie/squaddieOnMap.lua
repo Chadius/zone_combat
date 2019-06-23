@@ -14,20 +14,6 @@ SquaddieOnMap.definedTravelMethods = {
   "shadow",
 }
 
-local function startNewSquaddieOnMapTurn(self)
-  --[[ Resets the unit's turn as if it was the start of a new phase.
-    Args:
-      nil
-    Returns:
-      nil
-  ]]
-
-  -- Clear history
-  self.recordForLastTurn = {
-    movement={}
-  }
-end
-
 function SquaddieOnMap:new(args)
   local newSquaddieOnMap = {}
   setmetatable(newSquaddieOnMap,SquaddieOnMap)
@@ -53,9 +39,6 @@ function SquaddieOnMap:new(args)
   })
 
   newSquaddieOnMap.distancePerTurn = args.distancePerTurn or 1
-  newSquaddieOnMap.recordForLastTurn = {}
-
-  startNewSquaddieOnMapTurn(newSquaddieOnMap)
 
   return newSquaddieOnMap
 end
@@ -82,34 +65,6 @@ function SquaddieOnMap:hasOneTravelMethod(methods)
   return TableUtility:contains(self.travelMethods, methods)
 end
 
-function SquaddieOnMap:getLastTurnMovement()
-  --[[ Returns the record of the unit's movement last turn.
-  Args:
-    None
-  Returns:
-    An array of strings
-  ]]
-  return self.recordForLastTurn.movement
-end
-
-function SquaddieOnMap:recordMovement(fromZoneID, toZoneID)
-  --[[ Note the unit's movement from one zone to the next.
-  Args:
-    fromZoneID(string): The name of the starting zone.
-    toZoneID(string): The name of the ending zone.
-  Returns:
-      nil
-  ]]
-  table.insert(
-    self.recordForLastTurn.movement,
-    fromZoneID
-  )
-  table.insert(
-      self.recordForLastTurn.movement,
-      toZoneID
-  )
-end
-
 function SquaddieOnMap:hasTurnPartAvailable(partName)
   return self.mapTurn:hasTurnPartAvailable(partName)
 end
@@ -126,7 +81,6 @@ end
 function SquaddieOnMap:startNewTurn()
   local newMapTurn = self.mapTurn:startNewTurn()
   self.mapTurn = newMapTurn
-  startNewSquaddieOnMapTurn(self)
 end
 
 function SquaddieOnMap:isTurnReady()

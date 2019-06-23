@@ -334,7 +334,6 @@ function Map:moveSquaddieAndSpendTurn(squaddieID, nextZoneID)
   local unitInfo = self.squaddieInfoByID[squaddieID]
 
   self:assertSquaddieCanMoveToZoneThisTurn(squaddieID, nextZoneID)
-  unitInfo.squaddie:recordMovement(unitInfo["zone"], nextZoneID)
   self:spendSquaddieMoveAction(squaddieID)
 
   -- Change the zone the unit is in.
@@ -354,9 +353,6 @@ function Map:placeSquaddieInZone(squaddieID, nextZoneID)
   self:assertZoneExists(nextZoneID, "Map:moveSquaddieAndSpendTurn")
 
   local unitInfo = self.squaddieInfoByID[squaddieID]
-
-  -- Tell the map unit to remember where it's moving.
-  unitInfo.squaddie:recordMovement(unitInfo["zone"], nextZoneID)
 
   -- Change the zone the unit is in.
   unitInfo["zone"] = nextZoneID

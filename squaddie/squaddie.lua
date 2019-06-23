@@ -84,14 +84,6 @@ function Squaddie:currentTurnPart()
   return self.mapPresence:currentTurnPart()
 end
 
-function Squaddie:getLastTurnMovement()
-  return self.mapPresence:getLastTurnMovement()
-end
-
-function Squaddie:recordMovement(fromZoneID, toZoneID)
-  return self.mapPresence:recordMovement(fromZoneID, toZoneID)
-end
-
 function Squaddie:startNewTurn()
   return self.mapPresence:startNewTurn()
 end

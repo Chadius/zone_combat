@@ -1,7 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require "map"
 local Squaddie= require "squaddie/squaddie"
-local TableUtility = require "tableUtility"
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -74,23 +73,6 @@ function testSquaddieOnMapHasTurn()
   assert_equal("move", bunny:currentTurnPart())
 end
 
-function testTurnRemembersLastMove()
-  -- Turn can leave a record of what it did
-  map:addSquaddie(bunny, "trail1")
-
-  assert_true(TableUtility:equivalent(
-      {},
-      bunny:getLastTurnMovement()
-  ))
-
-  map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
-
-  assert_true(TableUtility:equivalent(
-      {"trail1", "trail3"},
-      bunny:getLastTurnMovement()
-  ))
-end
-
 function testTurnIsOver()
   -- Turn knows when it's over
   map:addSquaddie(bunny, "trail1")
@@ -126,11 +108,6 @@ function testResetUnitTurn()
   map:addSquaddie(bunny, "trail1")
   map:moveSquaddieAndSpendTurn(bunny.id, "trail2")
   map:resetSquaddieTurn(bunny.id)
-  -- Turn history should be cleared
-  assert_true(TableUtility:equivalent(
-      {},
-      bunny:getLastTurnMovement()
-  ))
 
   -- With a new turn, Bunny can move to trail3
   map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
@@ -138,11 +115,5 @@ function testResetUnitTurn()
   local trail3_units = map:getSquaddiesInZone("trail3")
   assert_equal(1, #trail3_units)
   assert_equal(bunny, trail3_units[1])
-
-  -- History should have been reset
-  assert_true(TableUtility:equivalent(
-      {"trail2", "trail3"},
-      bunny:getLastTurnMovement()
-  ))
 end
 

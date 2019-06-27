@@ -231,7 +231,7 @@ function testFootMovementIncreasedCanReachFurther()
   map:addSquaddie(bunny, "trail1")
 
   -- bunny has more movement than a human
-  assert_true(bunny.mapPresence.distancePerTurn > human.mapPresence.distancePerTurn)
+  assert_true(bunny.mapPresence:getDistancePerTurn() > human.mapPresence:getDistancePerTurn())
 
   -- bunny can move from trail1 to trail3 directly
   assert_true(map:canSquaddieMoveToAdjacentZone(bunny.id, "trail3"))

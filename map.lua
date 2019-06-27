@@ -278,7 +278,7 @@ function Map:canSquaddieMoveToAdjacentZone(squaddieID, desiredZoneID)
         local squaddieHasTravelMethod = squaddie:hasOneTravelMethod(
           zoneNeighborInfo.travelMethods
         )
-        local withinSquaddieMovement = thisZoneInfo.distance + 1 <= squaddie.mapPresence.distancePerTurn
+        local withinSquaddieMovement = thisZoneInfo.distance + 1 <= squaddie.mapPresence:getDistancePerTurn()
         -- Add the neighbor if the unit can reach and hasn't visited it already
         if notVisitedYet and squaddieHasTravelMethod and withinSquaddieMovement then
           table.insert(

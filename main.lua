@@ -10,14 +10,8 @@ Zone 2: Gu1 Gu2 Gu3 Gu4
 My graphical displays took too much time and effort to start, so we're going to use a text display.
 
 Movement lets you move between Zones unless an enemy is in the way. It's kind of like American football.
-
-TODO LIST:
-ZONES
- Zones have neighbors
 --]]
 
-local Zone = require "zone"
-local ZoneNeighbor = require "zone_neighbor"
 local Map = require "map"
 
 function main()

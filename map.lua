@@ -1,8 +1,8 @@
 --[[ Maps hold multiple Zones.
 --]]
 
-local Zone = require "zone"
-local ZoneNeighbor = require "zone_neighbor"
+local Zone = require "map/zone"
+local ZoneNeighbor = require "map/zoneNeighbor"
 local TableUtility = require "tableUtility"
 
 local Map={}

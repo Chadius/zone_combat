@@ -1,5 +1,6 @@
---[[Zone neighbors link two zones together.
---]]
+--[[ Value Object that marks the path between 2 Zones.
+]]
+
 
 local TableUtility = require "tableUtility"
 

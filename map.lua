@@ -2,7 +2,6 @@
 --]]
 
 local Zone = require "map/zone"
-local ZoneNeighbor = require "map/zoneNeighbor"
 local TableUtility = require "tableUtility"
 
 local Map={}
@@ -11,21 +10,9 @@ Map.__index = Map
 local function AddZoneNeighbor(self, from, to, cost, travelMethods)
   --[[ Create a new zone neighbor and add it to the map's zone information
   ]]
-  local newNeighbor = ZoneNeighbor:new({
-    from = from,
-    to = to,
-    cost = cost,
-    travelMethods = travelMethods,
-  })
-
   -- Add to this zone
-  if self.zone_by_id[from] == nil then
-    self.zone_by_id[from] = {
-      zone=nil,
-      neighbors={},
-    }
-  end
-  self.zone_by_id[from]["neighbors"][to] = newNeighbor
+  local newZone = self.zone_by_id[from]:addNeighbor(to, cost, travelMethods)
+  self.zone_by_id[from] = newZone
 end
 
 function Map:new(args)
@@ -38,17 +25,27 @@ function Map:new(args)
   newMap.zone_by_id = {}
 
   if newMap.id == nil then
-     error("Map needs an id")
+    error("Map needs an id")
   end
 
   if args.zones and args.zones ~= nil then
-     for _, zone_info in ipairs(args.zones) do
-	      newMap:addZone(zone_info)
-     end
+    -- Add the zones
+    TableUtility:each(
+        args.zones,
+        function(_, zone, _)
+          newMap:addZone(zone)
+        end
+    )
+
+    TableUtility:each(
+        args.zones,
+        function(_, zone, _)
+          newMap:addZoneNeighbors(zone)
+        end
+    )
   end
 
-  -- Delete any non existant zones and invalid neighbors.
-  newMap:VerifyZone()
+  -- Delete any invalid neighbors.
   newMap:VerifyZoneNeighbor()
 
   self.squaddieInfoByID = {}
@@ -81,25 +78,21 @@ function Map:addZone(zone_info)
   })
 
   -- Add the zone to the info.
-  if self.zone_by_id[newZone.id] == nil then
-    self.zone_by_id[newZone.id] = {
-      zone=newZone,
-      neighbors={},
-    }
-  end
+  self.zone_by_id[newZone.id] = newZone
+end
 
-  if self.zone_by_id[newZone.id]["zone"] == nil then
-    self.zone_by_id[newZone.id]["zone"] = newZone
-  end
+function Map:addZoneNeighbors(zone)
+  --[[ All zones have been added. Time to add neighbors.
+  ]]
 
-  -- If there are zone neighbors
-  for _, neighbor_info in ipairs(zone_info.neighbors or {}) do
-    -- Create a new neighbor.
-    --- This zone is the from point
-    --- Set the other info
+  for _, neighbor_info in ipairs(zone.neighbors or {}) do
+    if self.zone_by_id[neighbor_info.to] == nil then
+      error("Map:addZoneNeighbors: Zone " .. neighbor_info.to .. " does not exist")
+    end
+
     AddZoneNeighbor(
       self,
-      newZone.id,
+      zone.id,
       neighbor_info.to,
       neighbor_info.cost,
       neighbor_info.travelMethods
@@ -110,26 +103,10 @@ function Map:addZone(zone_info)
       AddZoneNeighbor(
         self,
         neighbor_info.to,
-        newZone.id,
+        zone.id,
         neighbor_info.cost,
         neighbor_info.travelMethods
       )
-    end
-  end
-end
-
-function Map:VerifyZone()
-  --[[ Deletes all invalid Zones
-  Args:
-    none
-  Returns:
-    nil
-  ]]
-
-  -- Delete any zones without a zone object
-  for zone_id, zone_info in pairs(self.zone_by_id) do
-    if zone_info.zone == nil then
-      self.zone_by_id[zone_id] = nil
     end
   end
 end
@@ -141,45 +118,14 @@ function Map:VerifyZoneNeighbor()
   Returns:
     nil
   ]]
-  for _, zone_info in pairs(self.zone_by_id) do
-    for to, neighbor_info in pairs(zone_info.neighbors) do
-      local delete_neighbor = false
-      -- If the to points to nowhere, mark to delete
-      if self.zone_by_id[neighbor_info.toZoneID] == nil then
-        delete_neighbor = true
-      end
-
-      -- If the from and to to the same ID, mark to delete
-      if neighbor_info.toZoneID == neighbor_info.fromZoneID then
-        delete_neighbor = true
-      end
-
-      -- If marked to delete, remove this neighbor
-      if delete_neighbor then
-        zone_info.neighbors[to] = nil
-      end
-    end
+  for key, zone in pairs(self.zone_by_id) do
+    local verifiedZone = zone:filterInvalidZones()
+    self.zone_by_id[key] = verifiedZone
   end
 end
 
 function Map:__tostring()
    return string.format("Map ID: %s", self.id)
-end
-
-function Map:describeZones()
-  --[[ Returns a list of strings to describe all of the zones.
-  Args:
-    none
-  Returns:
-    nil
-  --]]
-  for _, zone_info in pairs(self.zone_by_id) do
-    print(tostring(zone_info.zone))
-    for _, neighbor in pairs(zone_info["neighbors"]) do
-      print(tostring(neighbor))
-    end
-    print("")
-  end
 end
 
 function Map:addSquaddie(squaddie, zoneID)
@@ -273,7 +219,8 @@ function Map:canSquaddieMoveToAdjacentZone(squaddieID, desiredZoneID)
 
     TableUtility:each(
       self.zone_by_id[thisZoneID].neighbors,
-      function(toZoneID, zoneNeighborInfo)
+      function(_, zoneNeighborInfo)
+        local toZoneID = zoneNeighborInfo.toZoneID
         local notVisitedYet = visitedZones[toZoneID] ~= true
         local squaddieHasTravelMethod = squaddie:hasOneTravelMethod(
           zoneNeighborInfo.travelMethods
@@ -359,7 +306,7 @@ function Map:placeSquaddieInZone(squaddieID, nextZoneID)
 end
 
 function Map:resetSquaddieTurn(squaddieID)
-  --[[ Passthrough function that resets the unit's turn as if it was the start of a new phase.
+  --[[ Pass through function that resets the unit's turn as if it was the start of a new phase.
   Args:
     squaddieID(integer): squaddie.id
   Returns:

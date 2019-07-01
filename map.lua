@@ -3,6 +3,7 @@
 
 local Zone = require "map/zone"
 local TableUtility = require "tableUtility"
+local MoveSquaddieOnMapService = require "combatLogic/MoveSquaddieOnMapService"
 
 local Map={}
 Map.__index = Map
@@ -190,119 +191,22 @@ function Map:removeSquaddie(squaddieID)
 end
 
 function Map:canSquaddieMoveToAdjacentZone(squaddieID, desiredZoneID)
-  --[[ Indicate if the map unit can move to the nearby zone from its current location.
-  Args:
-    squaddieID(integer): squaddie.id
-    desiredZoneID(string): Name of the zone
-  Returns:
-    true if the desired zone can be reached, false otherwise.
-  ]]
-
-  self:assertSquaddieIsOnMap(squaddieID, "Map:canSquaddieMoveToAdjacentZone")
-  self:assertZoneExists(desiredZoneID, "Map:canSquaddieMoveToAdjacentZone")
-
-  local squaddie = self.squaddieInfoByID[squaddieID].squaddie
-
-  -- Visited: start empty
-  local visitedZones = {}
-
-  -- Working list starts with the squaddie's current zone and 0 move
-  local workingZones = { { zoneID=self.squaddieInfoByID[squaddieID].zone, distance=0 }}
-  -- While the working list is not empty
-  while TableUtility:size(workingZones) > 0 do
-    local thisZoneInfo = table.remove(workingZones, 1)
-    local thisZoneID = thisZoneInfo.zoneID
-    visitedZones[thisZoneID] = true
-
-    -- If the endpoint is the target zone, return true
-    if thisZoneID == desiredZoneID then return true end
-
-    TableUtility:each(
-      self.zone_by_id[thisZoneID].neighbors,
-      function(_, zoneNeighborInfo)
-        local toZoneID = zoneNeighborInfo.toZoneID
-        local notVisitedYet = visitedZones[toZoneID] ~= true
-        local squaddieHasTravelMethod = squaddie:hasOneTravelMethod(
-          zoneNeighborInfo.travelMethods
-        )
-        local withinSquaddieMovement = thisZoneInfo.distance + 1 <= squaddie.mapPresence:getDistancePerTurn()
-        -- Add the neighbor if the unit can reach and hasn't visited it already
-        if notVisitedYet and squaddieHasTravelMethod and withinSquaddieMovement then
-          table.insert(
-            workingZones,
-            {
-              zoneID = toZoneID,
-              distance = thisZoneInfo.distance + 1
-            }
-          )
-        end
-      end
-    )
-    end
-
-  -- Destination is unreachable, return false
-  return false
+  return MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(self, squaddieID, desiredZoneID)
 end
-
+-- TODO Move
 function Map:spendSquaddieMoveAction(squaddieID)
   -- Tell the squaddie it completed its movement
   self:assertSquaddieIsOnMap(squaddieID, "Map:spendSquaddieMoveAction")
   local squaddie = self.squaddieInfoByID[squaddieID]
-  squaddie.squaddie:turnPartCompleted("move")
+  MoveSquaddieOnMapService:spendSquaddieMoveAction(self, squaddie.squaddie)
 end
-
+-- TODO Move
 function Map:assertSquaddieCanMoveToZoneThisTurn(squaddieID, destinationZoneID)
-  self:assertSquaddieIsOnMap(squaddieID, "Map:moveSquaddieAndSpendTurn")
-  self:assertZoneExists(destinationZoneID, "Map:moveSquaddieAndSpendTurn")
-
-  local unitInfo = self.squaddieInfoByID[squaddieID]
-
-  -- Can the unit still move this turn?
-  unitInfo.squaddie:assertHasTurnPartAvailable("move", "Map:moveSquaddieAndSpendTurn with " .. unitInfo.squaddie.name )
-
-  -- Make sure the unit can actually travel to that zone in a single move
-  if not self:canSquaddieMoveToAdjacentZone(squaddieID, destinationZoneID) then
-    error("squaddie " .. unitInfo.squaddie.name ..  " cannot reach zone " .. destinationZoneID .. " in a single move.")
-  end
+  MoveSquaddieOnMapService:assertSquaddieCanMoveToZoneThisTurn(self, squaddieID, destinationZoneID)
 end
-
+-- TODO Move
 function Map:moveSquaddieAndSpendTurn(squaddieID, nextZoneID)
-  --[[ Squaddie will spend its turn to move to the next zone.
-  Args:
-    squaddieID(integer): squaddie.id
-    nextZoneID(string): Name of the zone
-  Returns:
-    nil
-  ]]
-
-  self:assertSquaddieIsOnMap(squaddieID, "Map:moveSquaddieAndSpendTurn")
-  self:assertZoneExists(nextZoneID, "Map:moveSquaddieAndSpendTurn")
-
-  local unitInfo = self.squaddieInfoByID[squaddieID]
-
-  self:assertSquaddieCanMoveToZoneThisTurn(squaddieID, nextZoneID)
-  self:spendSquaddieMoveAction(squaddieID)
-
-  -- Change the zone the unit is in.
-  unitInfo["zone"] = nextZoneID
-end
-
-function Map:placeSquaddieInZone(squaddieID, nextZoneID)
-  --[[ Move the squaddie to the next zone at no cost.
-  Args:
-    squaddieID(integer): squaddie.id
-    nextZoneID(string): Name of the zone
-  Returns:
-    nil
-  ]]
-
-  self:assertSquaddieIsOnMap(squaddieID, "Map:moveSquaddieAndSpendTurn")
-  self:assertZoneExists(nextZoneID, "Map:moveSquaddieAndSpendTurn")
-
-  local unitInfo = self.squaddieInfoByID[squaddieID]
-
-  -- Change the zone the unit is in.
-  unitInfo["zone"] = nextZoneID
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(self, squaddieID, nextZoneID)
 end
 
 function Map:resetSquaddieTurn(squaddieID)
@@ -337,4 +241,23 @@ function Map:assertZoneExists(zoneID, nameOfCaller)
     error(nameOfCaller .. ": zone does not exist: " .. zoneID)
   end
 end
+
+function Map:changeSquaddieZone(squaddie, zone)
+  squaddie["zone"] = zone.id
+end
+
+function Map:getSquaddieByID(squaddieID)
+  self:assertSquaddieIsOnMap(squaddieID, "Map:getSquaddieByID")
+  return self.squaddieInfoByID[squaddieID].squaddie
+end
+
+function Map:getZoneByID(zoneID)
+  self:assertZoneExists(zoneID, "Map:getZoneByID")
+  return self.zone_by_id[zoneID]
+end
+
+function Map:getSquaddieCurrentZone(squaddie)
+  return self:getZoneByID( self.squaddieInfoByID[squaddie.id].zone )
+end
+
 return Map

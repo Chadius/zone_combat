@@ -9,6 +9,12 @@ else
 end
 
 local map = {}
+local trail1
+local trail2
+local trail3
+local pond
+local bunny
+
 function setup()
   --[[Set up a forest glade, with a pond surrounded by 3 trails.
   You can walk between the trails, swim across the pond,
@@ -54,6 +60,11 @@ function setup()
     displayName = "bunny",
     distancePerTurn = 2
   })
+
+  trail1 = map:getZoneByID("trail1")
+  trail2 = map:getZoneByID("trail2")
+  trail3 = map:getZoneByID("trail3")
+  pond = map:getZoneByID("pond")
 end
 
 function teardown()
@@ -79,7 +90,7 @@ function testTurnIsOver()
   assert_true(bunny:isTurnReady())
   assert_true(bunny:hasTurnPartAvailable("move"))
 
-  map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
+  map:moveSquaddieAndSpendTurn(bunny, trail3)
   assert_false(bunny:hasTurnPartAvailable("move"))
   assert_false(bunny:isTurnReady())
 end
@@ -87,13 +98,13 @@ end
 function testCannotMoveTwiceInOneTurn()
   -- Units cannot move twice per turn
   map:addSquaddie(bunny, "trail1")
-  map:moveSquaddieAndSpendTurn(bunny.id, "trail2")
-  assert_false(map:canSquaddieMoveToAdjacentZone(bunny.id, "pond"))
+  map:moveSquaddieAndSpendTurn(bunny, trail2)
+  assert_false(map:canSquaddieMoveToAdjacentZone(bunny, pond))
   assert_error_match(
-      "Unit doesn't have a move action, trying to move should have thrown an error.",
-      "Map:moveSquaddieAndSpendTurn with bunny: squaddie does not have a move action available.",
+      "Looking for an error because the bunny does not have a move action.",
+    ": squaddie does not have a move action available.",
       function()
-        map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
+        map:moveSquaddieAndSpendTurn(bunny, trail3)
       end
   )
 
@@ -106,11 +117,11 @@ end
 function testResetUnitTurn()
   -- Turns can be reset
   map:addSquaddie(bunny, "trail1")
-  map:moveSquaddieAndSpendTurn(bunny.id, "trail2")
-  map:resetSquaddieTurn(bunny.id)
+  map:moveSquaddieAndSpendTurn(bunny, trail2)
+  map:resetSquaddieTurn(bunny)
 
   -- With a new turn, Bunny can move to trail3
-  map:moveSquaddieAndSpendTurn(bunny.id, "trail3")
+  map:moveSquaddieAndSpendTurn(bunny, trail3)
 
   local trail3_units = map:getSquaddiesInZone("trail3")
   assert_equal(1, #trail3_units)

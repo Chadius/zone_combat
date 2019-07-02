@@ -19,7 +19,6 @@ function MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, squaddie, d
   while TableUtility:size(workingZones) > 0 do
     local thisZoneInfo = table.remove(workingZones, 1)
     local thisZoneID = thisZoneInfo.zone.id
-    print(thisZoneID)
     visitedZones[thisZoneID] = true
 
     -- If the endpoint is the target zone, return true
@@ -62,19 +61,17 @@ end
 
 function MoveSquaddieOnMapService:assertSquaddieCanMoveToZoneThisTurn(map, squaddie, zone)
   -- Can the unit still move this turn?
-  squaddie:assertHasTurnPartAvailable("move", "MoveSquaddieOnMapService:assertSquaddieCanMoveToZoneThisTurn with " .. squaddie.name )
+  squaddie:assertHasTurnPartAvailable("move", "MoveSquaddieOnMapService:assertSquaddieCanMoveToZoneThisTurn with " .. squaddie.id )
 
   -- Make sure the unit can actually travel to that zone in a single move
   if not MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, squaddie, zone) then
-    error("squaddie " .. squaddie.name ..  " cannot reach zone " .. destinationZoneID .. " in a single move.")
+    error("squaddie " .. squaddie.name ..  " cannot reach zone " .. zone.id .. " in a single move.")
   end
 end
 
-function MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, squaddieID, nextZoneID)
+function MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, squaddie, zone)
   --[[ Squaddie will spend its turn to move to the next zone.
   ]]
-  local squaddie = map:getSquaddieByID(squaddieID)
-  local zone = map:getZoneByID(nextZoneID)
 
   MoveSquaddieOnMapService:assertSquaddieCanMoveToZoneThisTurn(map, squaddie, zone)
   MoveSquaddieOnMapService:spendSquaddieMoveAction(map, squaddie)
@@ -86,12 +83,12 @@ function MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, squaddieID, next
   )
 end
 
-function MoveSquaddieOnMapService:placeSquaddieInZone(map, squaddieID, nextZoneID)
+function MoveSquaddieOnMapService:placeSquaddieInZone(map, squaddie, nextZone)
   --[[ Move the squaddie to the next zone at no cost.
   ]]
   map:changeSquaddieZone(
-      map:getSquaddieByID(squaddieID),
-      map:getZoneByID(nextZoneID)
+      squaddie,
+      nextZone
   )
 end
 

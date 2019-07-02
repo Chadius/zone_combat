@@ -190,36 +190,33 @@ function Map:removeSquaddie(squaddieID)
   end
 end
 
-function Map:canSquaddieMoveToAdjacentZone(squaddieID, desiredZoneID)
-  return MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(self, squaddieID, desiredZoneID)
+function Map:canSquaddieMoveToAdjacentZone(squaddie, desiredZone)
+  return MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(self, squaddie, desiredZone)
 end
 -- TODO Move
-function Map:spendSquaddieMoveAction(squaddieID)
+function Map:spendSquaddieMoveAction(squaddie)
   -- Tell the squaddie it completed its movement
-  self:assertSquaddieIsOnMap(squaddieID, "Map:spendSquaddieMoveAction")
-  local squaddie = self.squaddieInfoByID[squaddieID]
   MoveSquaddieOnMapService:spendSquaddieMoveAction(self, squaddie.squaddie)
 end
 -- TODO Move
-function Map:assertSquaddieCanMoveToZoneThisTurn(squaddieID, destinationZoneID)
-  MoveSquaddieOnMapService:assertSquaddieCanMoveToZoneThisTurn(self, squaddieID, destinationZoneID)
+function Map:assertSquaddieCanMoveToZoneThisTurn(squaddie, destinationZone)
+  MoveSquaddieOnMapService:assertSquaddieCanMoveToZoneThisTurn(self, squaddie, destinationZone)
 end
 -- TODO Move
-function Map:moveSquaddieAndSpendTurn(squaddieID, nextZoneID)
-  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(self, squaddieID, nextZoneID)
+function Map:moveSquaddieAndSpendTurn(squaddie, nextZone)
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(self, squaddie, nextZone)
 end
 
-function Map:resetSquaddieTurn(squaddieID)
+function Map:resetSquaddieTurn(squaddie)
   --[[ Pass through function that resets the unit's turn as if it was the start of a new phase.
   Args:
     squaddieID(integer): squaddie.id
   Returns:
     nil
   ]]
-  self:assertSquaddieIsOnMap(squaddieID, "Map:resetSquaddieTurn")
 
   -- Tell it a new turn has started
-  self.squaddieInfoByID[squaddieID].squaddie:startNewTurn()
+  self.squaddieInfoByID[squaddie.id].squaddie:startNewTurn()
 end
 
 function Map:isSquaddieOnMap(squaddieID)
@@ -243,7 +240,7 @@ function Map:assertZoneExists(zoneID, nameOfCaller)
 end
 
 function Map:changeSquaddieZone(squaddie, zone)
-  squaddie["zone"] = zone.id
+  self.squaddieInfoByID[squaddie.id].zone = zone.id
 end
 
 function Map:getSquaddieByID(squaddieID)

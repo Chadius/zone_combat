@@ -3,7 +3,6 @@
 
 local Zone = require "map/zone"
 local TableUtility = require "tableUtility"
-local MoveSquaddieOnMapService = require "combatLogic/MoveSquaddieOnMapService"
 
 local Map={}
 Map.__index = Map
@@ -188,35 +187,6 @@ function Map:removeSquaddie(squaddieID)
   if self:isSquaddieOnMap(squaddieID) then
     self.squaddieInfoByID[squaddieID] = nil
   end
-end
-
-function Map:canSquaddieMoveToAdjacentZone(squaddie, desiredZone)
-  return MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(self, squaddie, desiredZone)
-end
--- TODO Move
-function Map:spendSquaddieMoveAction(squaddie)
-  -- Tell the squaddie it completed its movement
-  MoveSquaddieOnMapService:spendSquaddieMoveAction(self, squaddie.squaddie)
-end
--- TODO Move
-function Map:assertSquaddieCanMoveToZoneThisTurn(squaddie, destinationZone)
-  MoveSquaddieOnMapService:assertSquaddieCanMoveToZoneThisTurn(self, squaddie, destinationZone)
-end
--- TODO Move
-function Map:moveSquaddieAndSpendTurn(squaddie, nextZone)
-  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(self, squaddie, nextZone)
-end
-
-function Map:resetSquaddieTurn(squaddie)
-  --[[ Pass through function that resets the unit's turn as if it was the start of a new phase.
-  Args:
-    squaddieID(integer): squaddie.id
-  Returns:
-    nil
-  ]]
-
-  -- Tell it a new turn has started
-  self.squaddieInfoByID[squaddie.id].squaddie:startNewTurn()
 end
 
 function Map:isSquaddieOnMap(squaddieID)

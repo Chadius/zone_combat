@@ -1,6 +1,7 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require "map"
 local Squaddie= require "squaddie/squaddie"
+local MoveSquaddieOnMapService = require "combatLogic/MoveSquaddieOnMapService"
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -90,7 +91,7 @@ function testTurnIsOver()
   assert_true(bunny:isTurnReady())
   assert_true(bunny:hasTurnPartAvailable("move"))
 
-  map:moveSquaddieAndSpendTurn(bunny, trail3)
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail3)
   assert_false(bunny:hasTurnPartAvailable("move"))
   assert_false(bunny:isTurnReady())
 end
@@ -98,13 +99,13 @@ end
 function testCannotMoveTwiceInOneTurn()
   -- Units cannot move twice per turn
   map:addSquaddie(bunny, "trail1")
-  map:moveSquaddieAndSpendTurn(bunny, trail2)
-  assert_false(map:canSquaddieMoveToAdjacentZone(bunny, pond))
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail2)
+  assert_false(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, bunny, pond))
   assert_error_match(
       "Looking for an error because the bunny does not have a move action.",
     ": squaddie does not have a move action available.",
       function()
-        map:moveSquaddieAndSpendTurn(bunny, trail3)
+        MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail3)
       end
   )
 
@@ -117,11 +118,11 @@ end
 function testResetUnitTurn()
   -- Turns can be reset
   map:addSquaddie(bunny, "trail1")
-  map:moveSquaddieAndSpendTurn(bunny, trail2)
-  map:resetSquaddieTurn(bunny)
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail2)
+  bunny:startNewTurn()
 
   -- With a new turn, Bunny can move to trail3
-  map:moveSquaddieAndSpendTurn(bunny, trail3)
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail3)
 
   local trail3_units = map:getSquaddiesInZone("trail3")
   assert_equal(1, #trail3_units)

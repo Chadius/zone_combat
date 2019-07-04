@@ -98,7 +98,6 @@ end
 function test_place_unit_on_map()
   --[[ You can create units with given movement types.
   ]]
-
   -- Human has a name, and an id
   assert_equal("human", human.name)
   assert_not_equal(nil, human.id)

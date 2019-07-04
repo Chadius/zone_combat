@@ -21,7 +21,7 @@ function test_map()
     zones = {
       {
         id="test_zone",
-        neighbors={}
+        links={}
       }
     }
   })
@@ -38,7 +38,7 @@ function test_map_no_id_makes_error()
       zones = {
         {
           id="test_zone",
-          neighbors={}
+          links={}
         }
       }
     })
@@ -54,7 +54,7 @@ function test_map_no_zone_id_makes_error()
       id = "test map",
       zones = {
         {
-          neighbors={}
+          links={}
         }
       }
     })
@@ -68,26 +68,26 @@ local function sub_assert_map(map)
   assert_equal("test map", map.id)
   assert_equal(2, #TableUtility:keys(map.zone_by_id))
 
-  -- peanut_street has a neighbor, jelly_avenue
+  -- peanut_street has a link, jelly_avenue
   assert_not_equal(nil, map.zone_by_id["peanut_street"])
-  assert_equal(1, TableUtility:keyCount(map.zone_by_id["peanut_street"].neighbors))
-  assert_true(map.zone_by_id["peanut_street"]:hasNeighborWithDestination("jelly_avenue"))
-  assert_false(map.zone_by_id["peanut_street"]:hasNeighborWithDestination("peanut_street"))
+  assert_equal(1, TableUtility:keyCount(map.zone_by_id["peanut_street"].links))
+  assert_true(map.zone_by_id["peanut_street"]:haslinkWithDestination("jelly_avenue"))
+  assert_false(map.zone_by_id["peanut_street"]:haslinkWithDestination("peanut_street"))
 
   assert_not_equal(nil, map.zone_by_id["jelly_avenue"])
-  assert_equal(1, TableUtility:keyCount(map.zone_by_id["jelly_avenue"].neighbors))
-  assert_true(map.zone_by_id["jelly_avenue"]:hasNeighborWithDestination("peanut_street"))
-  assert_false(map.zone_by_id["jelly_avenue"]:hasNeighborWithDestination("jelly_avenue"))
+  assert_equal(1, TableUtility:keyCount(map.zone_by_id["jelly_avenue"].links))
+  assert_true(map.zone_by_id["jelly_avenue"]:haslinkWithDestination("peanut_street"))
+  assert_false(map.zone_by_id["jelly_avenue"]:haslinkWithDestination("jelly_avenue"))
 end
 
 function test_map_connected_zones()
-  -- Make a map with 2 zones and neighbors connecting them
+  -- Make a map with 2 zones and links connecting them
   local map = Map:new({
     id = "test map",
     zones = {
       {
         id="peanut_street",
-        neighbors={
+        links={
           {
             to="jelly_avenue"
           }
@@ -95,7 +95,7 @@ function test_map_connected_zones()
       },
       {
         id="jelly_avenue",
-        neighbors={
+        links={
           {
             to="peanut_street"
           }
@@ -108,13 +108,13 @@ function test_map_connected_zones()
 end
 
 function test_map_connected_zones_bidirectional()
-  -- Make a map with 2 zones and 1 bidirectional neighbor connecting them
+  -- Make a map with 2 zones and 1 bidirectional link connecting them
   local map = Map:new({
     id = "test map",
     zones = {
       {
         id="peanut_street",
-        neighbors={
+        links={
           {
             to="jelly_avenue",
             bidirectional=true,
@@ -127,26 +127,26 @@ function test_map_connected_zones_bidirectional()
     }
   })
 
-  -- The bidirectional flag should make a jelly_avenue -> peanut_street neighbor, so this map is the same as the previous test.
+  -- The bidirectional flag should make a jelly_avenue -> peanut_street link, so this map is the same as the previous test.
   sub_assert_map(map)
 end
 
-local function assert_no_neighbors(map)
-  -- Asserts the map has a zone with no neighbors.
+local function assert_no_links(map)
+  -- Asserts the map has a zone with no links.
   assert_equal("test map", map.id)
   assert_equal(1, #TableUtility:keys(map.zone_by_id))
   assert_not_equal(nil, map.zone_by_id["test_zone"])
-  assert_equal(0, TableUtility:keyCount(map.zone_by_id["test_zone"].neighbors))
+  assert_equal(0, TableUtility:keyCount(map.zone_by_id["test_zone"].links))
 end
 
-function test_map_no_circular_neighbor()
-  -- Make a map with 1 zone and 1 neighbor pointing to itself, there should be no neighbor
+function test_map_no_circular_link()
+  -- Make a map with 1 zone and 1 link pointing to itself, there should be no link
   local map = Map:new({
     id = "test map",
     zones = {
       {
         id="test_zone",
-        neighbors={
+        links={
           {
             to="test_zone"
           }
@@ -155,17 +155,17 @@ function test_map_no_circular_neighbor()
     }
   })
 
-  assert_no_neighbors(map)
+  assert_no_links(map)
 end
 
-function test_map_neighbor_points_to_zone()
+function test_map_link_points_to_zone()
   local make_bad_map = function()
     Map:new({
       id = "test map",
       zones = {
         {
           id="test_zone",
-          neighbors={
+          links={
             {
               to="nowheresville"
             }
@@ -176,8 +176,8 @@ function test_map_neighbor_points_to_zone()
   end
 
   assert_error_match(
-      "Do not make zone neighbors that point to nonexistent zones",
-      "Map:addZoneNeighbors: Zone nowheresville does not exist",
+      "Do not make zone links that point to nonexistent zones",
+      "Map:addZoneLinks: Zone nowheresville does not exist",
       make_bad_map
   )
 end

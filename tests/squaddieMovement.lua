@@ -31,7 +31,7 @@ function setup()
     zones = {
       {
         id="trail1",
-        neighbors={
+        links={
           { to="trail2" },
           {
             to="trail3",
@@ -45,13 +45,13 @@ function setup()
       },
       {
         id="trail2",
-        neighbors={
+        links={
           { to="trail3" }
         }
       },
       {
         id="trail3",
-        neighbors={
+        links={
           {
             to="pond",
             travelMethods={"swim"}

@@ -2,7 +2,7 @@
 --]]
 
 local TableUtility = require "tableUtility"
-local ZoneNeighbor = require "map/zoneNeighbor"
+local ZoneLink = require "map/zoneLink"
 
 local Zone={}
 Zone.__index = Zone
@@ -18,10 +18,10 @@ function Zone:new(args)
     error("Zone needs an id")
   end
 
-  if args.neighbors then
-    newZone.neighbors = TableUtility:clone(args.neighbors)
+  if args.links then
+    newZone.links = TableUtility:clone(args.links)
   else
-    newZone.neighbors = {}
+    newZone.links = {}
   end
 
   return newZone
@@ -34,12 +34,12 @@ end
 function Zone:clone()
   return Zone:new({
     id = self.id,
-    neighbors = self.neighbors
+    links = self.links
   })
 end
 
-function Zone:addNeighbor(toZoneID, movementCost, travelMethods)
-  local newNeighbor = ZoneNeighbor:new({
+function Zone:addlink(toZoneID, movementCost, travelMethods)
+  local newLink = ZoneLink:new({
     from = self.id,
     to = toZoneID,
     cost = movementCost,
@@ -47,28 +47,28 @@ function Zone:addNeighbor(toZoneID, movementCost, travelMethods)
   })
 
   local newZone = self:clone()
-  table.insert(newZone.neighbors, newNeighbor)
+  table.insert(newZone.links, newLink)
   return newZone
 end
 
 function Zone:filterInvalidZones()
   local newZone = self:clone()
 
-  newZone.neighbors = TableUtility:filter(
-      newZone.neighbors,
-      function (_, neighbor, _)
-        return neighbor:hasValidDestination()
+  newZone.links = TableUtility:filter(
+      newZone.links,
+      function (_, link, _)
+        return link:hasValidDestination()
       end
   )
 
   return newZone
 end
 
-function Zone:hasNeighborWithDestination(toZoneID)
+function Zone:haslinkWithDestination(toZoneID)
   return TableUtility:any(
-      self.neighbors,
-      function (_, neighbor, _)
-        return neighbor.toZoneID == toZoneID
+      self.links,
+      function (_, link, _)
+        return link.toZoneID == toZoneID
       end
   )
 end

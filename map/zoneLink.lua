@@ -3,14 +3,14 @@
 
 local TableUtility = require "tableUtility"
 
-local ZoneNeighbor={}
-ZoneNeighbor.__index = ZoneNeighbor
+local ZoneLink={}
+ZoneLink.__index = ZoneLink
 
-function ZoneNeighbor:new(args)
-  --[[ Create a new Zone Neighbor.
+function ZoneLink:new(args)
+  --[[ Create a new Zone link.
   --]]
   local newZN = {}
-  setmetatable(newZN,ZoneNeighbor)
+  setmetatable(newZN,ZoneLink)
 
   newZN.fromZoneID = args.fromZoneID or args.from
   newZN.toZoneID = args.toZoneID or args.to
@@ -20,20 +20,20 @@ function ZoneNeighbor:new(args)
   return newZN
 end
 
-function ZoneNeighbor:createBiDirectionalZoneNeighbor()
-   --[[ Returns a new zone neighbor with flipped from/to directions.
+function ZoneLink:createBiDirectionalZoneLink()
+   --[[ Returns a new zone link with flipped from/to directions.
    --]]
-   local newZoneNeighbor = ZoneNeighbor:new({
+   local newZoneLink = ZoneLink:new({
      fromZoneID = self.toZoneID,
      toZoneID = self.fromZoneID,
      moveCost = self.moveCost,
      travelMethods = TableUtility.cloneTable(self.travelMethods)
    })
 
-   return newZoneNeighbor
+   return newZoneLink
 end
 
-function ZoneNeighbor:hasValidDestination()
+function ZoneLink:hasValidDestination()
   if self.toZoneID == nil then
     return false
   end
@@ -45,4 +45,4 @@ function ZoneNeighbor:hasValidDestination()
   return true
 end
 
-return ZoneNeighbor
+return ZoneLink

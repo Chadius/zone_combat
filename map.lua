@@ -7,11 +7,11 @@ local TableUtility = require "tableUtility"
 local Map={}
 Map.__index = Map
 
-local function AddZoneNeighbor(self, from, to, cost, travelMethods)
-  --[[ Create a new zone neighbor and add it to the map's zone information
+local function AddZoneLink(self, from, to, cost, travelMethods)
+  --[[ Create a new zone link and add it to the map's zone information
   ]]
   -- Add to this zone
-  local newZone = self.zone_by_id[from]:addNeighbor(to, cost, travelMethods)
+  local newZone = self.zone_by_id[from]:addlink(to, cost, travelMethods)
   self.zone_by_id[from] = newZone
 end
 
@@ -40,13 +40,13 @@ function Map:new(args)
     TableUtility:each(
         args.zones,
         function(_, zone, _)
-          newMap:addZoneNeighbors(zone)
+          newMap:addZoneLinks(zone)
         end
     )
   end
 
-  -- Delete any invalid neighbors.
-  newMap:VerifyZoneNeighbor()
+  -- Delete any invalid links.
+  newMap:VerifyZoneLink()
 
   self.squaddieInfoByID = {}
 
@@ -59,7 +59,7 @@ function Map:addZone(zone_info)
     zone_info(table)
       id(string)
       zone(nil or table): If nil, a default zone information table is created.
-      neighbors(nil or array): Each array holds a table.
+      links(nil or array): Each array holds a table.
         to(string): Another zone id.
         travelMethods(array): A table of strings, each containing a travel method
   Returns:
@@ -81,38 +81,38 @@ function Map:addZone(zone_info)
   self.zone_by_id[newZone.id] = newZone
 end
 
-function Map:addZoneNeighbors(zone)
-  --[[ All zones have been added. Time to add neighbors.
+function Map:addZoneLinks(zone)
+  --[[ All zones have been added. Time to add links.
   ]]
 
-  for _, neighbor_info in ipairs(zone.neighbors or {}) do
-    if self.zone_by_id[neighbor_info.to] == nil then
-      error("Map:addZoneNeighbors: Zone " .. neighbor_info.to .. " does not exist")
+  for _, link_info in ipairs(zone.links or {}) do
+    if self.zone_by_id[link_info.to] == nil then
+      error("Map:addZoneLinks: Zone " .. link_info.to .. " does not exist")
     end
 
-    AddZoneNeighbor(
+    AddZoneLink(
       self,
       zone.id,
-      neighbor_info.to,
-      neighbor_info.cost,
-      neighbor_info.travelMethods
+      link_info.to,
+      link_info.cost,
+      link_info.travelMethods
     )
 
-    -- If the neighbor is bidirectional, add a neighbor with reversed direction.
-    if neighbor_info.bidirectional then
-      AddZoneNeighbor(
+    -- If the link is bidirectional, add a link with reversed direction.
+    if link_info.bidirectional then
+      AddZoneLink(
         self,
-        neighbor_info.to,
+        link_info.to,
         zone.id,
-        neighbor_info.cost,
-        neighbor_info.travelMethods
+        link_info.cost,
+        link_info.travelMethods
       )
     end
   end
 end
 
-function Map:VerifyZoneNeighbor()
-  --[[ Deletes all invalid Zone Neighbors
+function Map:VerifyZoneLink()
+  --[[ Deletes all invalid Zone links
   Args:
     none
   Returns:

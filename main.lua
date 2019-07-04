@@ -22,14 +22,14 @@ function main()
     zones = {
       {
         id="A",
-        neighbors={{
+        links={{
           to="B",
           bidirectional=true,
         }}
       },
       {
          id="B",
-         neighbors={
+         links={
            {
              to="B",
            },
@@ -55,7 +55,7 @@ function main()
     end
 
     if keyboard_input == "n" then
-      print("Printing Zone Neighbors:")
+      print("Printing Zone links:")
       map:describeZones()
     end
 

@@ -27,15 +27,15 @@ function MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, squaddie, d
     local visitingZone = map:getZoneByID(thisZoneID)
 
     TableUtility:each(
-        visitingZone.neighbors,
-        function(_, zoneNeighborInfo)
-          local toZoneID = zoneNeighborInfo.toZoneID
+        visitingZone.links,
+        function(_, ZoneLinkInfo)
+          local toZoneID = ZoneLinkInfo.toZoneID
           local notVisitedYet = visitedZones[toZoneID] ~= true
           local squaddieHasTravelMethod = squaddie:hasOneTravelMethod(
-              zoneNeighborInfo.travelMethods
+              ZoneLinkInfo.travelMethods
           )
           local withinSquaddieMovement = thisZoneInfo.distance + 1 <= squaddie.mapPresence:getDistancePerTurn()
-          -- Add the neighbor if the unit can reach and hasn't visited it already
+          -- Add the link if the unit can reach and hasn't visited it already
           if notVisitedYet and squaddieHasTravelMethod and withinSquaddieMovement then
             table.insert(
                 workingZones,

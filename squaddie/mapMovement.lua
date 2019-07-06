@@ -1,7 +1,7 @@
 --[[ Information about the Squaddie's movement.
 ]]
 
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 
 local MapMovement={}
 MapMovement.__index = MapMovement

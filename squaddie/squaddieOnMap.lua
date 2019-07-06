@@ -1,6 +1,6 @@
 --[[ Squaddie's presence on a given map.
 ]]
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 local MapTurn = require "squaddie/mapTurn"
 local MapMovement = require "squaddie/mapMovement"
 

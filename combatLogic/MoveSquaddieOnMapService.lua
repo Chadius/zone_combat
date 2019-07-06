@@ -2,7 +2,7 @@
 It is stateless.
 ]]
 
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 
 local MoveSquaddieOnMapService={}
 

@@ -3,7 +3,7 @@ The entity can take actions and may be destroyed.
 ]]
 
 local SquaddieOnMap = require "squaddie/squaddieOnMap"
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 local uuid = require("libraries/uuid")
 
 local Squaddie={}

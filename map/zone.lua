@@ -1,7 +1,7 @@
 --[[ Entity holds Squaddies on a Map.
 --]]
 
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 local ZoneLink = require "map/zoneLink"
 
 local Zone={}

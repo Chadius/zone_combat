@@ -1,7 +1,7 @@
 --[[ Value Object that marks the path between 2 Zones.
 ]]
 
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 
 local ZoneLink={}
 ZoneLink.__index = ZoneLink

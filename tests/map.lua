@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require "map"
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 
 if _VERSION >= 'Lua 5.2' then
     _ENV = lunit.module('enhanced','seeall')

@@ -1,6 +1,6 @@
 --[[ Map Turn shows the state for a Squaddie.
 ]]
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 
 local SquaddieMapTurn={}
 SquaddieMapTurn.__index = SquaddieMapTurn

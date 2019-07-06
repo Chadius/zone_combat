@@ -2,7 +2,7 @@
 --]]
 
 local Zone = require "map/zone"
-local TableUtility = require "tableUtility"
+local TableUtility = require ("utility/tableUtility")
 
 local Map={}
 Map.__index = Map

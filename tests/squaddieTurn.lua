@@ -73,7 +73,7 @@ end
 
 function testSquaddieOnMapHasTurn()
   -- Units have turns and can report on what they want to do this turn.
-  map:addSquaddie(bunny, "trail1")
+  map:addSquaddie(bunny, trail1)
 
   -- Map Unit's turn is ready
   assert_true(bunny:isTurnReady())
@@ -87,7 +87,7 @@ end
 
 function testTurnIsOver()
   -- Turn knows when it's over
-  map:addSquaddie(bunny, "trail1")
+  map:addSquaddie(bunny, trail1)
   assert_true(bunny:isTurnReady())
   assert_true(bunny:hasTurnPartAvailable("move"))
 
@@ -98,7 +98,7 @@ end
 
 function testCannotMoveTwiceInOneTurn()
   -- Units cannot move twice per turn
-  map:addSquaddie(bunny, "trail1")
+  map:addSquaddie(bunny, trail1)
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail2)
   assert_false(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, bunny, pond))
   assert_error_match(
@@ -110,21 +110,21 @@ function testCannotMoveTwiceInOneTurn()
   )
 
   -- Bunny is still in trail2
-  local trail2_units = map:getSquaddiesInZone("trail2")
+  local trail2_units = map:getSquaddiesInZone(trail2)
   assert_equal(1, #trail2_units)
   assert_equal(bunny, trail2_units[1])
 end
 
 function testResetUnitTurn()
   -- Turns can be reset
-  map:addSquaddie(bunny, "trail1")
+  map:addSquaddie(bunny, trail1)
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail2)
   bunny:startNewTurn()
 
   -- With a new turn, Bunny can move to trail3
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail3)
 
-  local trail3_units = map:getSquaddiesInZone("trail3")
+  local trail3_units = map:getSquaddiesInZone(trail3)
   assert_equal(1, #trail3_units)
   assert_equal(bunny, trail3_units[1])
 end

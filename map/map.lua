@@ -128,22 +128,11 @@ function Map:__tostring()
    return string.format("Map ID: %s", self.id)
 end
 
-function Map:addSquaddie(squaddie, zoneID)
-  --[[ Adds a squaddie to a given zone.
-  Args:
-    squaddie.
-    zoneID(string): Name of the zone
-  Returns:
-    nil
-  ]]
-
+function Map:addSquaddie(squaddie, zone)
   -- Check against nil squaddies.
   if squaddie == nil then
     error("nil squaddie cannot be added.")
   end
-
-  -- Make sure the zone exists
-  self:assertZoneExists(zoneID, "Map:addSquaddie")
 
   -- If the map unit was already added, raise an error
   if self:isSquaddieOnMap(squaddie.id) then
@@ -153,18 +142,11 @@ function Map:addSquaddie(squaddie, zoneID)
   -- Store in a zone.
   self.squaddieInfoByID[squaddie.id] = {
     squaddie = squaddie,
-    zone = zoneID
+    zone = zone.id
   }
 end
 
-function Map:getSquaddiesInZone(zoneID)
-  --[[ Return a table of active squaddies in a given zone.
-  Args:
-    zoneID(string): Name of the zone to inspect
-  Returns:
-    A table array
-  ]]
-
+function Map:getSquaddiesInZone(zone)
   local squaddiesByZone = {}
   TableUtility:each(
       self.squaddieInfoByID,
@@ -174,7 +156,7 @@ function Map:getSquaddiesInZone(zoneID)
         table.insert(squaddiesByZone[localZoneID], info.squaddie)
       end
   )
-  return squaddiesByZone[zoneID] or {}
+  return squaddiesByZone[zone.id] or {}
 end
 
 function Map:removeSquaddie(squaddieID)

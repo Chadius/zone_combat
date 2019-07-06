@@ -103,18 +103,18 @@ function test_place_unit_on_map()
   assert_not_equal(nil, human.id)
 
   -- Place human on the map, map knows its location
-  map:addSquaddie(human, "trail1")
+  map:addSquaddie(human, trail1)
 
-  trail1_units = map:getSquaddiesInZone("trail1")
+  trail1_units = map:getSquaddiesInZone(trail1)
   assert_equal(1, #trail1_units)
   assert_equal(human, trail1_units[1])
 end
 
 function test_one_SquaddieOnMap_location()
   -- Can't place the same unit on the map at two places at once
-  map:addSquaddie(human, "trail1")
+  map:addSquaddie(human, trail1)
   local bad_unit_add = function()
-    map:addSquaddie(human, "trail2")
+    map:addSquaddie(human, trail2)
   end
 
   assert_error_match(
@@ -122,63 +122,50 @@ function test_one_SquaddieOnMap_location()
       "Map:addSquaddie: human already exists.",
       bad_unit_add
   )
-  local trail1_units = map:getSquaddiesInZone("trail1")
+  local trail1_units = map:getSquaddiesInZone(trail1)
   assert_equal(1, #trail1_units)
   assert_equal(human, trail1_units[1])
 end
 
-function testNonexistentZoneAdd()
-  -- Can't put the unit in a zone that doesn't exist
-  local bad_unit_add = function()
-    map:addSquaddie(human, "bogus")
-  end
-
-  assert_error_match(
-      "Added human to trail that doesn't exist without error. That's bad.",
-      " Map:addSquaddie: zone does not exist: bogus",
-      bad_unit_add
-  )
-end
-
 function testremoveSquaddie()
   -- Can remove units from zones
-  map:addSquaddie(human, "trail1")
+  map:addSquaddie(human, trail1)
 
-  local trail1_units = map:getSquaddiesInZone("trail1")
+  local trail1_units = map:getSquaddiesInZone(trail1)
   assert_equal(1, #trail1_units)
   assert_equal(human, trail1_units[1])
 
   map:removeSquaddie(human.id)
 
-  trail1_units = map:getSquaddiesInZone("trail1")
+  trail1_units = map:getSquaddiesInZone(trail1)
   assert_equal(0, #trail1_units)
 end
 
 function testSquaddieOnMapIDIsConstant()
   -- Unit ID should not change if it's moved to another zone
-  map:addSquaddie(human, "trail1")
+  map:addSquaddie(human, trail1)
   local originalID = human.id
 
   map:removeSquaddie(human.id)
   assert_equal(originalID, human.id)
 
-  map:addSquaddie(human, "trail2")
+  map:addSquaddie(human, trail2)
   assert_equal(originalID, human.id)
 end
 
 function testHumanPositiveTravel()
   -- Human can move from trail1 to trail2 to trail3
-  map:addSquaddie(human, "trail1")
+  map:addSquaddie(human, trail1)
   assert_true(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, human, trail2))
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, human, trail2)
-  local trail2_units = map:getSquaddiesInZone("trail2")
+  local trail2_units = map:getSquaddiesInZone(trail2)
   assert_equal(1, #trail2_units)
   assert_equal(human, trail2_units[1])
   assert_true(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, human, trail3))
 
   human:startNewTurn()
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, human, trail3)
-  local trail3_units = map:getSquaddiesInZone("trail3")
+  local trail3_units = map:getSquaddiesInZone(trail3)
   assert_equal(1,   #trail3_units)
   assert_equal(human, trail3_units[1])
 end
@@ -186,7 +173,7 @@ end
 function testIllegalInquiries()
   -- Can't call SquaddieOnMap movement functions with nonexistent zones or SquaddieOnMap names
   local bad_unit_add = function()
-    map:addSquaddie(nil, "trail1")
+    map:addSquaddie(nil, trail1)
   end
 
   assert_error_match(
@@ -203,7 +190,7 @@ function testSquaddieOnMapKnowsTravelMethods()
 end
 
 function testFootlockedMovementLimits()
-  map:addSquaddie(human, "trail1")
+  map:addSquaddie(human, trail1)
 
   -- Human can't move from trail1 to trail3 directly
   assert_false(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, human, trail3))
@@ -227,7 +214,7 @@ function testFootlockedMovementLimits()
 end
 
 function testFootMovementIncreasedCanReachFurther()
-  map:addSquaddie(bunny, "trail1")
+  map:addSquaddie(bunny, trail1)
 
   -- bunny has more movement than a human
   assert_true(bunny.mapPresence:getDistancePerTurn() > human.mapPresence:getDistancePerTurn())
@@ -235,7 +222,7 @@ function testFootMovementIncreasedCanReachFurther()
   -- bunny can move from trail1 to trail3 directly
   assert_true(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, bunny, trail3))
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail3)
-  local trail3_units = map:getSquaddiesInZone("trail3")
+  local trail3_units = map:getSquaddiesInZone(trail3)
   assert_equal(1, #trail3_units)
   assert_equal(bunny, trail3_units[1])
 
@@ -255,19 +242,19 @@ end
 
 function testMovemethods()
   -- Turtles can walk to trail2 and swim to the pond but they aren't fast enough to get to trail3
-  map:addSquaddie(turtle, "trail1")
+  map:addSquaddie(turtle, trail1)
   assert_true(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, turtle, trail2))
   assert_true(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, turtle, pond))
   assert_false(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, turtle, trail3))
 
   -- Birds can fly to trail2 and trail3 but they can't land in the pond
-  map:addSquaddie(bird, "trail1")
+  map:addSquaddie(bird, trail1)
   assert_true(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, bird, trail2))
   assert_false(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, bird, pond))
   assert_true(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, bird, trail3))
 
   -- Stones can't move at all
-  map:addSquaddie(stone, "trail1")
+  map:addSquaddie(stone, trail1)
   assert_false(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, stone, trail2))
   assert_false(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, stone, pond))
   assert_false(MoveSquaddieOnMapService:canSquaddieMoveToAdjacentZone(map, stone, trail3))

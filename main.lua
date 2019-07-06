@@ -12,7 +12,7 @@ My graphical displays took too much time and effort to start, so we're going to 
 Movement lets you move between Zones unless an enemy is in the way. It's kind of like American football.
 --]]
 
-local Map = require "map"
+local Map = require ("map/map")
 
 function main()
   print("Zone combat, baby!")

@@ -1,5 +1,5 @@
 lunit = require "libraries/unitTesting/lunitx"
-local Map = require "map"
+local Map = require ("map/map")
 local TableUtility = require ("utility/tableUtility")
 
 if _VERSION >= 'Lua 5.2' then

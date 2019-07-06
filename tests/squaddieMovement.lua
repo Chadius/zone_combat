@@ -1,5 +1,5 @@
 lunit = require "libraries/unitTesting/lunitx"
-local Map = require "map"
+local Map = require ("map/map")
 local Squaddie = require "squaddie/squaddie"
 local MoveSquaddieOnMapService = require "combatLogic/MoveSquaddieOnMapService"
 

@@ -5,11 +5,13 @@ all()
 any()
 clone()
 contains()
+count()
 deepClone()
 each()
 empty()
 equaivalentSet()
 filter()
+isEmpty()
 keyCount()
 keys()
 listcomp()
@@ -17,7 +19,6 @@ map()
 pluck()
 size()
 sum()
-
 
 These functions only work on arrays (tables whose keys are integers starting with 1, table is ordered)
 equaivalent()
@@ -61,26 +62,27 @@ function TableUtility:keys(source)
   return result
 end
 
-function TableUtility:keyCount(source)
-  --[[ Returns the number of keys in this indexed table.
-  Args:
-    source(table)
-
-  Returns:
-    A number.
-  ]]
-
+function TableUtility:keyCount(source, filter_func)
   local count = 0
-  for _, _ in pairs(source) do
+  local tableToCount = source
+
+  if filter_func ~= nil then
+    tableToCount = TableUtility:filter(source, filter_func)
+  end
+
+  for _, _ in pairs(tableToCount) do
      count = count + 1
   end
 
   return count
 end
 
-function TableUtility:size(source)
-  -- Alias for keyCount
-  return TableUtility:keyCount(source)
+function TableUtility:size(source, filter_func)
+  return TableUtility:keyCount(source, filter_func)
+end
+
+function TableUtility:count(source, filter_func)
+  return TableUtility:keyCount(source, filter_func)
 end
 
 function TableUtility:map(source, map_func)
@@ -589,4 +591,9 @@ function TableUtility:empty(source)
   ]]
   return TableUtility:size(source) <= 0
 end
+
+function TableUtility:isEmpty(source)
+  return TableUtility:empty(source)
+end
+
 return TableUtility

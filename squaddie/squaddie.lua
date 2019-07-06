@@ -113,4 +113,16 @@ function Squaddie:isFriendUnit(otherSquaddie)
   return TableUtility:contains(friendlyAffiliations[self.affiliation], otherSquaddie.affiliation)
 end
 
+function Squaddie:hasOneOfTheseAffiliations(matchingAffiliations)
+  return TableUtility:contains(matchingAffiliations, self:getAffilation())
+end
+
+function Squaddie:isPlayerOrAlly()
+  return self:hasOneOfTheseAffiliations({"player", "ally"})
+end
+
+function Squaddie:isEnemy()
+  return self:hasOneOfTheseAffiliations({"enemy"})
+end
+
 return Squaddie

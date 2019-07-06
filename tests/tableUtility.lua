@@ -463,3 +463,8 @@ function testDeepCopy()
   local cloned_numbers = TableUtility:deepClone(numbers)
   assert_true(TableUtility:equivalent(numbers, cloned_numbers))
 end
+
+function testSizeFilter()
+  assert_equal(2, TableUtility:size(numbers, is_even))
+  assert_equal(2, TableUtility:count(numbers, is_even))
+end

@@ -32,14 +32,6 @@ local function setAffiliation(newSquaddie, affiliation)
   end
 end
 
-Squaddie.definedTravelMethods = {
-  "none",
-  "foot",
-  "swim",
-  "fly",
-  "shadow",
-}
-
 Squaddie.definedAffiliations = {
   "player",
   "ally",

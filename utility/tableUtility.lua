@@ -11,6 +11,7 @@ each()
 empty()
 equaivalentSet()
 filter()
+isEmpty()
 keyCount()
 keys()
 listcomp()
@@ -590,4 +591,9 @@ function TableUtility:empty(source)
   ]]
   return TableUtility:size(source) <= 0
 end
+
+function TableUtility:isEmpty(source)
+  return TableUtility:empty(source)
+end
+
 return TableUtility

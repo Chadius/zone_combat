@@ -468,3 +468,35 @@ function testSizeFilter()
   assert_equal(2, TableUtility:size(numbers, is_even))
   assert_equal(2, TableUtility:count(numbers, is_even))
 end
+
+function testMax()
+  assert_equal(5, TableUtility:max(numbers))
+
+  local expected = { age=8, color="blue" }
+
+  local sort_by_age = function(a, b)
+    if a.age < b.age then return true end
+    return false
+  end
+  
+  assert_true(TableUtility:equivalentSet(
+      expected,
+      TableUtility:max(children, sort_by_age)
+  ))
+end
+
+function testMin()
+  assert_equal(1, TableUtility:min(numbers))
+
+  local expected = { age=2, color="orange" }
+
+  local sort_by_age = function(a, b)
+    if a.age < b.age then return true end
+    return false
+  end
+
+  assert_true(TableUtility:equivalentSet(
+      expected,
+      TableUtility:min(children, sort_by_age)
+  ))
+end

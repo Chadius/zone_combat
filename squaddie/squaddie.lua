@@ -2,6 +2,7 @@
 The entity can take actions and may be destroyed.
 ]]
 
+local SquaddieHealthAndDeath = require ("squaddie/squaddieHealthAndDeath")
 local SquaddieOnMap = require "squaddie/squaddieOnMap"
 local TableUtility = require ("utility/tableUtility")
 local uuid = require("libraries/uuid")
@@ -46,6 +47,7 @@ function Squaddie:new(args)
   newSquaddie.name = args.displayName or "No name"
 
   newSquaddie.mapPresence = SquaddieOnMap:new(args)
+  newSquaddie.healthStatus = SquaddieHealthAndDeath:new(args)
 
   setAffiliation(newSquaddie, args.affiliation or "other")
 
@@ -123,6 +125,34 @@ end
 
 function Squaddie:isEnemy()
   return self:hasOneOfTheseAffiliations({"enemy"})
+end
+
+function Squaddie:currentHealth()
+  return self.healthStatus:currentHealth()
+end
+
+function Squaddie:maxHealth()
+  return self.healthStatus:maxHealth()
+end
+
+function Squaddie:isAlive()
+  return self.healthStatus:isAlive()
+end
+
+function Squaddie:addHealth(hitPoints)
+  return self.healthStatus:addHealth(hitPoints)
+end
+
+function Squaddie:setHealthToMax()
+  return self.healthStatus:setHealthToMax()
+end
+
+function Squaddie:loseHealth(hitPoints)
+  return self.healthStatus:loseHealth(hitPoints)
+end
+
+function Squaddie:isDead()
+  return self.healthStatus:isDead()
 end
 
 return Squaddie

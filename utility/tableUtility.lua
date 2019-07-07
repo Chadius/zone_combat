@@ -25,6 +25,7 @@ equaivalent()
 first()
 join()
 reverse()
+sort()
 swap()
 
 These functions only work on dictionaries (a table where keys are unordered)
@@ -594,6 +595,60 @@ end
 
 function TableUtility:isEmpty(source)
   return TableUtility:empty(source)
+end
+
+function TableUtility:max(source, comparison)
+  local currentMax
+
+  TableUtility:each(
+      source,
+      function(_, currentValue, _)
+        if currentMax == nil then
+          currentMax = currentValue
+          return
+        end
+
+        local isGreater = false
+        if comparison == nil then
+          isGreater = (currentValue > currentMax)
+        else
+          isGreater = comparison(currentMax, currentValue)
+        end
+
+        if isGreater then
+          currentMax = currentValue
+        end
+      end
+  )
+
+  return currentMax
+end
+
+function TableUtility:min(source, comparison)
+  local currentMin
+
+  TableUtility:each(
+      source,
+      function(_, currentValue, _)
+        if currentMin == nil then
+          currentMin = currentValue
+          return
+        end
+
+        local isLessThan = false
+        if comparison == nil then
+          isLessThan = (currentValue < currentMin)
+        else
+          isLessThan = comparison(currentValue, currentMin)
+        end
+
+        if isLessThan then
+          currentMin = currentValue
+        end
+      end
+  )
+
+  return currentMin
 end
 
 return TableUtility

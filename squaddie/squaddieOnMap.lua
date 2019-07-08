@@ -58,4 +58,9 @@ function SquaddieOnMap:getDistancePerTurn()
   return self.mapMovement.distancePerTurn
 end
 
+function SquaddieOnMap:chooseToWait()
+  local newMapTurn = self.mapTurn:turnPartCompleted("act")
+  self.mapTurn = newMapTurn
+end
+
 return SquaddieOnMap

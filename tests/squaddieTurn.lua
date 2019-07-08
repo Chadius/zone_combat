@@ -72,16 +72,13 @@ function teardown()
 end
 
 function testSquaddieOnMapHasTurn()
-  -- Units have turns and can report on what they want to do this turn.
   map:addSquaddie(bunny, trail1)
 
-  -- Map Unit's turn is ready
   assert_true(bunny:isTurnReady())
 
-  -- Map Unit can still move
   assert_true(bunny:hasTurnPartAvailable("move"))
+  assert_true(bunny:hasTurnPartAvailable("act"))
 
-  -- Map Unit's current phase is movement
   assert_equal("move", bunny:currentTurnPart())
 end
 
@@ -93,6 +90,10 @@ function testTurnIsOver()
 
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail3)
   assert_false(bunny:hasTurnPartAvailable("move"))
+  assert_true(bunny:hasTurnPartAvailable("act"))
+  assert_true(bunny:isTurnReady())
+
+  bunny:chooseToWait()
   assert_false(bunny:isTurnReady())
 end
 
@@ -119,13 +120,16 @@ function testResetUnitTurn()
   -- Turns can be reset
   map:addSquaddie(bunny, trail1)
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail2)
+  bunny:chooseToWait()
+  assert_false(bunny:hasTurnPartAvailable("act"))
   bunny:startNewTurn()
 
-  -- With a new turn, Bunny can move to trail3
   MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, bunny, trail3)
 
   local trail3_units = map:getSquaddiesInZone(trail3)
   assert_equal(1, #trail3_units)
   assert_equal(bunny, trail3_units[1])
+
+  assert_true(bunny:hasTurnPartAvailable("act"))
 end
 

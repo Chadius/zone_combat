@@ -62,6 +62,10 @@ function Squaddie:isTurnReady()
   return self.mapPresence:isTurnReady()
 end
 
+function Squaddie:chooseToWait()
+  return self.mapPresence:chooseToWait()
+end
+
 function Squaddie:hasTurnPartAvailable(partName)
   return self.mapPresence:hasTurnPartAvailable(partName)
 end

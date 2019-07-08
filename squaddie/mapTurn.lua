@@ -22,6 +22,7 @@ local function initializeForNewMapTurn(self)
   ]]
 
   self.turnParts["move"] = true
+  self.turnParts["act"] = true
   return self
 end
 
@@ -44,7 +45,12 @@ function SquaddieMapTurn:isTurnReady()
   Returns:
     A boolean
   ]]
-  return self.turnParts["move"]
+  return TableUtility:any(
+      { "move", "act" },
+      function(_, turnPart, _)
+        return self.turnParts[turnPart]
+      end
+  )
 end
 
 function SquaddieMapTurn:hasTurnPartAvailable(partName)

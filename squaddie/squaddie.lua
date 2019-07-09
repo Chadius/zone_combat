@@ -54,6 +54,7 @@ function Squaddie:new(args)
   return newSquaddie
 end
 
+-- mapPresence
 function Squaddie:hasOneTravelMethod(methods)
   return self.mapPresence:hasOneTravelMethod(methods)
 end
@@ -86,6 +87,7 @@ function Squaddie:startNewTurn()
   return self.mapPresence:startNewTurn()
 end
 
+-- affiliation
 function Squaddie:getAffilation()
   --[[ Returns the SquaddieOnMap's affiliation.
   Args:
@@ -131,6 +133,7 @@ function Squaddie:isEnemy()
   return self:hasOneOfTheseAffiliations({"enemy"})
 end
 
+-- healthStatus
 function Squaddie:currentHealth()
   return self.healthStatus:currentHealth()
 end

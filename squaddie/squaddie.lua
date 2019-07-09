@@ -54,6 +54,10 @@ function Squaddie:new(args)
   return newSquaddie
 end
 
+function Squaddie:isSameSquaddie(otherSquaddie)
+  return self.id == otherSquaddie.id
+end
+
 -- mapPresence
 function Squaddie:hasOneTravelMethod(methods)
   return self.mapPresence:hasOneTravelMethod(methods)
@@ -160,6 +164,10 @@ end
 
 function Squaddie:isDead()
   return self.healthStatus:isDead()
+end
+
+function Squaddie:instakill()
+  return self.healthStatus:instakill()
 end
 
 return Squaddie

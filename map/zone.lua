@@ -27,6 +27,10 @@ function Zone:new(args)
   return newZone
 end
 
+function Zone:isSameZone(otherZone)
+  return self.id == otherZone.id
+end
+
 function Zone:__tostring()
   return string.format("Zone ID: %s", self.id)
 end

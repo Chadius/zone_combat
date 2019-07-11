@@ -74,3 +74,9 @@ function testIsDead()
   injuredCitizen:loseHealth(10)
   assert_true(injuredCitizen:isDead())
 end
+
+function testInstakill()
+  assert_false(injuredCitizen:isDead())
+  injuredCitizen:instakill()
+  assert_true(injuredCitizen:isDead())
+end

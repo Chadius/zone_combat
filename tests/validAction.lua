@@ -13,7 +13,7 @@ local map = {}
 local firstAvenue
 local secondAvenue
 local shawn
-local rob
+local victim
 local zombie
 
 function setup()
@@ -43,7 +43,7 @@ function setup()
     distancePerTurn = 1
   })
 
-  rob = Squaddie:new({
+  victim = Squaddie:new({
     displayName = "Rob",
     affiliation = "ally",
     distancePerTurn = 1
@@ -58,8 +58,58 @@ end
 
 function testCannotAttackSelf()
   map:addSquaddie(shawn, firstAvenue)
-  assert_false(ActionResolver:CanAttackWithPower(shawn, shawn, map))
+  assert_false(ActionResolver:canAttackWithPower(shawn, shawn, map))
+  assert_equal("Cannot target self with this power", ActionResolver:getReasonCannotAttackWithPower(shawn, shawn, map))
 end
--- testCannotAttackAlly
--- testCanAttackEnemy
--- testCannotAttackOutOfRange
+
+function testCanAttackEnemy()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+  assert_true(ActionResolver:canAttackWithPower(shawn, zombie, map))
+  assert_equal(nil, ActionResolver:getReasonCannotAttackWithPower(shawn, zombie, map))
+end
+
+function testCannotAttackAlly()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(victim, firstAvenue)
+  assert_false(ActionResolver:canAttackWithPower(shawn, victim, map))
+  assert_equal("Cannot target ally with this power", ActionResolver:getReasonCannotAttackWithPower(shawn, victim, map))
+end
+
+function testCannotAttackOffMapTarget()
+  map:addSquaddie(shawn, firstAvenue)
+  assert_false(ActionResolver:canAttackWithPower(shawn, zombie, map))
+  assert_equal("Target is off map", ActionResolver:getReasonCannotAttackWithPower(shawn, zombie, map))
+end
+
+function testCannotAttackOffMapActor()
+  map:addSquaddie(zombie, firstAvenue)
+  assert_false(ActionResolver:canAttackWithPower(shawn, zombie, map))
+  assert_equal("Actor is off map", ActionResolver:getReasonCannotAttackWithPower(shawn, zombie, map))
+end
+
+function testCannotAttackOutOfRange()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, secondAvenue)
+  assert_false(ActionResolver:canAttackWithPower(shawn, zombie, map))
+  assert_equal("Target is out of range", ActionResolver:getReasonCannotAttackWithPower(shawn, zombie, map))
+end
+
+function testCannotAttackDead()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+  zombie:instakill()
+  assert_true(zombie:isDead())
+  assert_false(ActionResolver:canAttackWithPower(shawn, zombie, map))
+  assert_equal("Target is already dead", ActionResolver:getReasonCannotAttackWithPower(shawn, zombie, map))
+end
+
+-- testEnemyCanAttackPlayer
+-- testEnemyCanAttackAlly
+-- testEnemyCanAttackOther
+-- testEnemyCannotAttackEnemy
+
+-- testOtherCanAttackPlayer
+-- testOtherCanAttackAlly
+-- testOtherCanAttackOther
+-- testOtherCanAttackEnemy

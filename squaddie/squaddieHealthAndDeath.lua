@@ -41,4 +41,8 @@ function SquaddieHealthAndDeath:isDead()
   return (self:currentHealth() <= 0)
 end
 
+function SquaddieHealthAndDeath:instakill()
+  self.currentHP = 0
+end
+
 return SquaddieHealthAndDeath

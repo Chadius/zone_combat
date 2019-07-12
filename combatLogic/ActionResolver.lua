@@ -23,7 +23,7 @@ function ActionResolver:getReasonCannotAttackWithPower(actor, target, map)
     if actor:isSameSquaddie(target) then
       return "Cannot target self with this power"
     else
-      return "Cannot target ally with this power"
+      return "Cannot target friend with this power"
     end
   end
 
@@ -33,6 +33,11 @@ function ActionResolver:getReasonCannotAttackWithPower(actor, target, map)
     return "Target is out of range"
   end
   return nil
+end
+
+function ActionResolver:usePowerOnTarget(actor, target)
+  actor:turnPartCompleted("act")
+  target:instakill()
 end
 
 return ActionResolver

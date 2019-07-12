@@ -13,8 +13,11 @@ local map = {}
 local firstAvenue
 local secondAvenue
 local shawn
+local trashbag
+local trashbag2
 local victim
 local zombie
+local zombie2
 
 function setup()
   map = Map:new({
@@ -43,14 +46,32 @@ function setup()
     distancePerTurn = 1
   })
 
+  trashbag = Squaddie:new({
+    displayName = "Trashbag",
+    affiliation = "other",
+    distancePerTurn = 1
+  })
+
+  trashbag2 = Squaddie:new({
+    displayName = "Trashbag2",
+    affiliation = "other",
+    distancePerTurn = 1
+  })
+
   victim = Squaddie:new({
-    displayName = "Rob",
+    displayName = "Victim",
     affiliation = "ally",
     distancePerTurn = 1
   })
 
   zombie = Squaddie:new({
     displayName = "Zombie",
+    affiliation = "enemy",
+    distancePerTurn = 1
+  })
+
+  zombie2 = Squaddie:new({
+    displayName = "Zombie2",
     affiliation = "enemy",
     distancePerTurn = 1
   })
@@ -73,7 +94,7 @@ function testCannotAttackAlly()
   map:addSquaddie(shawn, firstAvenue)
   map:addSquaddie(victim, firstAvenue)
   assert_false(ActionResolver:canAttackWithPower(shawn, victim, map))
-  assert_equal("Cannot target ally with this power", ActionResolver:getReasonCannotAttackWithPower(shawn, victim, map))
+  assert_equal("Cannot target friend with this power", ActionResolver:getReasonCannotAttackWithPower(shawn, victim, map))
 end
 
 function testCannotAttackOffMapTarget()
@@ -104,12 +125,60 @@ function testCannotAttackDead()
   assert_equal("Target is already dead", ActionResolver:getReasonCannotAttackWithPower(shawn, zombie, map))
 end
 
--- testEnemyCanAttackPlayer
--- testEnemyCanAttackAlly
--- testEnemyCanAttackOther
--- testEnemyCannotAttackEnemy
+function testEnemyCanAttackPlayer()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+  assert_true(ActionResolver:canAttackWithPower(zombie, shawn, map))
+end
 
--- testOtherCanAttackPlayer
--- testOtherCanAttackAlly
--- testOtherCanAttackOther
--- testOtherCanAttackEnemy
+function testEnemyCanAttackAlly()
+  map:addSquaddie(zombie, firstAvenue)
+  map:addSquaddie(victim, firstAvenue)
+  assert_true(ActionResolver:canAttackWithPower(zombie, victim, map))
+end
+
+function testEnemyCanAttackOther()
+  map:addSquaddie(zombie, firstAvenue)
+  map:addSquaddie(trashbag, firstAvenue)
+  assert_true(ActionResolver:canAttackWithPower(zombie, trashbag, map))
+end
+
+function testEnemyCannotAttackEnemy()
+  map:addSquaddie(zombie, firstAvenue)
+  map:addSquaddie(zombie2, firstAvenue)
+  assert_false(ActionResolver:canAttackWithPower(zombie, zombie2, map))
+  assert_equal("Cannot target friend with this power", ActionResolver:getReasonCannotAttackWithPower(zombie, zombie2, map))
+end
+
+function testOtherCanAttackPlayer()
+  map:addSquaddie(trashbag, firstAvenue)
+  map:addSquaddie(shawn, firstAvenue)
+  assert_true(ActionResolver:canAttackWithPower(trashbag, shawn, map))
+end
+
+function testOtherCanAttackAlly()
+  map:addSquaddie(trashbag, firstAvenue)
+  map:addSquaddie(victim, firstAvenue)
+  assert_true(ActionResolver:canAttackWithPower(trashbag, victim, map))
+end
+
+function testOtherCanAttackOther()
+  map:addSquaddie(trashbag, firstAvenue)
+  map:addSquaddie(trashbag2, firstAvenue)
+  assert_true(ActionResolver:canAttackWithPower(trashbag, trashbag2, map))
+end
+
+function testOtherCanAttackEnemy()
+  map:addSquaddie(trashbag, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+  assert_true(ActionResolver:canAttackWithPower(trashbag, zombie, map))
+end
+
+function testCanKillTarget()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+  assert_equal(zombie:currentHealth(), zombie:maxHealth())
+  ActionResolver:usePowerOnTarget(shawn, zombie)
+  assert_true(zombie:currentHealth() < zombie:maxHealth())
+  assert_false(shawn:hasTurnPartAvailable("act"))
+end

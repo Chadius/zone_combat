@@ -1,7 +1,8 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require ("map/map")
-local Squaddie= require "squaddie/squaddie"
-local ActionResolver = require "combatLogic/ActionResolver"
+local Squaddie = require "squaddie/squaddie"
+local MissionPhaseService = require "combatLogic/MissionPhaseService"
+local MissionPhaseTracker = require "mission/MissionPhaseTracker"
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -10,14 +11,7 @@ else
 end
 
 --[[ TODO NOTE
-Mission has:
-- Map
-- Player (hero & sidekick)
-- Enemy (villain & henchman)
-- Ally (mayor & citizen)
-- Other (trashbag & trashbag2)
-
-PhaseTracker - Object with state
+MissionPhaseService
 
 testPlayerPhaseFirst
 testPlayerEndPhaseAfterAllPlayersFinishTurn
@@ -31,7 +25,7 @@ testAllyPhaseSkippedIfAllAlliesKilled
 testSpawningAllyMisMissionMeansAllyPhaseWillOccur
 ]]
 
-local mission
+local missionPhaseTracker
 local map
 local firstAvenue
 local secondAvenue
@@ -67,7 +61,7 @@ function setup()
   secondAvenue = map:getZoneByID("secondAvenue")
 
   -- TODO
-  mission = Mission:new(map)
+  missionPhaseTracker = MissionPhaseTracker:new()
 
   hero = Squaddie:new({
     displayName = "hero",
@@ -108,4 +102,9 @@ function setup()
     displayName = "moneybag",
     affiliation = "other"
   })
+end
+
+function testPlayerPhaseFirst()
+  local currentPhase = MissionPhaseService:getCurrentPhase(missionPhaseTracker, map)
+  assert_equal("PlayerPhaseStart" , currentPhase:getPhase())
 end

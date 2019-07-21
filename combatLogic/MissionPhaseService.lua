@@ -1,14 +1,13 @@
-local Squaddie = require ("squaddie/squaddie")
 local TableUtility = require ("utility/tableUtility")
 
 local MissionPhaseService = {}
 MissionPhaseService.__index = MissionPhaseService
 
-function MissionPhaseService:getCurrentPhase(missionPhaseTracker, map)
+function MissionPhaseService:getCurrentPhase(missionPhaseTracker)
   return missionPhaseTracker
 end
 
-function MissionPhaseService:startPhaseEnds(missionPhaseTracker, map)
+function MissionPhaseService:startPhaseEnds(missionPhaseTracker)
   if missionPhaseTracker:getSubphase() ~= "start" then
     error("Subphase is not start.")
   end
@@ -16,7 +15,7 @@ function MissionPhaseService:startPhaseEnds(missionPhaseTracker, map)
   return missionPhaseTracker:setSubphase("continue")
 end
 
-function MissionPhaseService:continuePhaseEnds(missionPhaseTracker, map)
+function MissionPhaseService:continuePhaseEnds(missionPhaseTracker)
   if missionPhaseTracker:getSubphase() ~= "continue" then
     error("Subphase is not continue.")
   end
@@ -28,11 +27,6 @@ function MissionPhaseService:finishPhaseEnds(missionPhaseTracker, map)
   if missionPhaseTracker:getSubphase() ~= "finish" then
     error("Subphase is not finish.")
   end
-
-  -- Ask Squaddie for a list of affiliations, in order, starting with the Mission Phase's affil
-  -- For each affil in the table
-  -- Ask the map for all of the squaddies of the affiliation who are alive
-  -- If any are alive, set the next phase to that affiliation and set the subphase to start
 
   local currentAffiliationOrder = missionPhaseTracker:getAffiliationsInOrder(missionPhaseTracker:getAffiliation())
   local nextAffiliation = currentAffiliationOrder[2]

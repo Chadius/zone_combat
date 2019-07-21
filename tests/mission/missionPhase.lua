@@ -2,7 +2,7 @@ lunit = require "libraries/unitTesting/lunitx"
 local Map = require ("map/map")
 local Squaddie = require "squaddie/squaddie"
 local MissionPhaseService = require "combatLogic/MissionPhaseService"
-local MissionPhaseTracker = require "mission/MissionPhaseTracker"
+local MissionPhaseTracker = require "mission/missionPhaseTracker"
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -156,4 +156,15 @@ function testChangeAffiliationAfterFinishSubphase()
   assert_equal("enemy" , currentPhase:getAffiliation())
   assert_equal("start" , currentPhase:getSubphase())
   assert_equal("enemystart" , currentPhase:getPhase())
+end
+
+function testErrorRaisedIfNoTeamsExist()
+  local phaseTracker = MissionPhaseTracker:new({ affiliation = "player", subphase = "finish"})
+
+  assert_error(
+      "No living squaddies on this map.",
+      function()
+        MissionPhaseService:finishPhaseEnds(phaseTracker, map)
+      end
+  )
 end

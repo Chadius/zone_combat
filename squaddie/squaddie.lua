@@ -137,25 +137,6 @@ function Squaddie:isEnemy()
   return self:hasOneOfTheseAffiliations({"enemy"})
 end
 
-function Squaddie:getAffilationOrder(startingAffiliation)
-  if startingAffiliation == nil then
-    startingAffiliation = Squaddie.definedAffiliations[1]
-  end
-
-  local affiliationsInOrder = {}
-  local startingIndex = TableUtility:keyOf(Squaddie.definedAffiliations, startingAffiliation)
-  local affiliationOrderIndex = startingIndex
-  for i=1, #Squaddie.definedAffiliations do
-    table.insert(affiliationsInOrder, Squaddie.definedAffiliations[affiliationOrderIndex])
-    affiliationOrderIndex = affiliationOrderIndex + 1
-    if affiliationOrderIndex > #Squaddie.definedAffiliations then
-      affiliationOrderIndex = 1
-    end
-  end
-
-  return affiliationsInOrder
-end
-
 -- healthStatus
 function Squaddie:currentHealth()
   return self.healthStatus:currentHealth()

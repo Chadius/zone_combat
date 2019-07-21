@@ -1,4 +1,5 @@
 local Squaddie = require ("squaddie/squaddie")
+local TableUtility = require ("utility/tableUtility")
 
 local MissionPhaseService = {}
 MissionPhaseService.__index = MissionPhaseService
@@ -33,13 +34,25 @@ function MissionPhaseService:finishPhaseEnds(missionPhaseTracker, map)
   -- Ask the map for all of the squaddies of the affiliation who are alive
   -- If any are alive, set the next phase to that affiliation and set the subphase to start
 
-  local maxAffiliationsToCheck = TableUtility:count(Squaddie.definedAffiliations)
-  for i=1, maxAffiliationsToCheck do
-    -- TODO
+  local currentAffiliationOrder = missionPhaseTracker:getAffiliationsInOrder(missionPhaseTracker:getAffiliation())
+  local nextAffiliation = currentAffiliationOrder[2]
+  local nextAffiliationOrder = missionPhaseTracker:getAffiliationsInOrder(nextAffiliation)
+
+  for _, affiliation in ipairs(nextAffiliationOrder) do
+    local squaddiesWithAffiliation = map:getSquaddiesByAffiliation(affiliation)
+    local livingSquaddies = TableUtility:filter(
+        squaddiesWithAffiliation,
+        function(_, squaddie, _)
+          return squaddie:isAlive()
+        end
+    )
+    if TableUtility:count(livingSquaddies) > 0 then
+      local missionPhaseTrackerNewAffiliation = missionPhaseTracker:setAffiliation(affiliation)
+      return missionPhaseTrackerNewAffiliation:setSubphase("start")
+    end
   end
 
-  -- TODO throw an error. We checked all affiliations and none of them have living squaddies.
-  return missionPhaseTracker:setSubphase("finish")
+  error("No living squaddies on this map.")
 end
 
 return MissionPhaseService

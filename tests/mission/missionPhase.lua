@@ -10,18 +10,6 @@ else
   module( "enhanced", package.seeall, lunit.testcase )
 end
 
---[[ TODO NOTE
-MissionPhaseService
-
-testPlayerEndPhaseAfterAllPlayersFinishTurn
-
-testAllyPhasesSkippedIfNoAlliesInMap
-
-testAllyPhaseSkippedIfAllAlliesKilled
-
-testSpawningAllyMisMissionMeansAllyPhaseWillOccur
-]]
-
 local missionPhaseTracker
 local map
 local firstAvenue
@@ -147,15 +135,15 @@ end
 
 function testChangeAffiliationAfterFinishSubphase()
   map:addSquaddie(hero, firstAvenue)
-  map:addSquaddie(villain, firstAvenue)
+  map:addSquaddie(mayor, firstAvenue)
   local phaseTracker = MissionPhaseTracker:new({ affiliation = "player", subphase = "finish"})
 
   local newTracker = MissionPhaseService:finishPhaseEnds(phaseTracker, map)
   local currentPhase = MissionPhaseService:getCurrentPhase(newTracker, map)
 
-  assert_equal("enemy" , currentPhase:getAffiliation())
+  assert_equal("ally" , currentPhase:getAffiliation())
   assert_equal("start" , currentPhase:getSubphase())
-  assert_equal("enemystart" , currentPhase:getPhase())
+  assert_equal("allystart" , currentPhase:getPhase())
 end
 
 function testErrorRaisedIfNoTeamsExist()
@@ -167,4 +155,46 @@ function testErrorRaisedIfNoTeamsExist()
         MissionPhaseService:finishPhaseEnds(phaseTracker, map)
       end
   )
+end
+
+function testAllyPhasesSkippedIfNoAlliesInMap()
+  map:addSquaddie(hero, firstAvenue)
+  map:addSquaddie(villain, firstAvenue)
+  local phaseTracker = MissionPhaseTracker:new({ affiliation = "player", subphase = "finish"})
+
+  local newTracker = MissionPhaseService:finishPhaseEnds(phaseTracker, map)
+  local currentPhase = MissionPhaseService:getCurrentPhase(newTracker, map)
+
+  assert_equal("enemy" , currentPhase:getAffiliation())
+  assert_equal("start" , currentPhase:getSubphase())
+  assert_equal("enemystart" , currentPhase:getPhase())
+end
+
+function testAllyPhaseSkippedIfAllAlliesKilled()
+  map:addSquaddie(hero, firstAvenue)
+  map:addSquaddie(mayor, firstAvenue)
+  map:addSquaddie(villain, firstAvenue)
+  local phaseTracker = MissionPhaseTracker:new({ affiliation = "player", subphase = "finish"})
+  mayor:instakill()
+
+  local newTracker = MissionPhaseService:finishPhaseEnds(phaseTracker, map)
+  local currentPhase = MissionPhaseService:getCurrentPhase(newTracker, map)
+
+  assert_equal("enemy" , currentPhase:getAffiliation())
+  assert_equal("start" , currentPhase:getSubphase())
+  assert_equal("enemystart" , currentPhase:getPhase())
+end
+
+function testSpawningAllyMisMissionMeansAllyPhaseWillOccur()
+  map:addSquaddie(hero, firstAvenue)
+  map:addSquaddie(villain, firstAvenue)
+  local phaseTracker = MissionPhaseTracker:new({ affiliation = "player", subphase = "finish"})
+
+  map:addSquaddie(mayor, firstAvenue)
+  local newTracker = MissionPhaseService:finishPhaseEnds(phaseTracker, map)
+  local currentPhase = MissionPhaseService:getCurrentPhase(newTracker, map)
+
+  assert_equal("ally" , currentPhase:getAffiliation())
+  assert_equal("start" , currentPhase:getSubphase())
+  assert_equal("allystart" , currentPhase:getPhase())
 end

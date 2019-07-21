@@ -1,5 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require ("map/map")
+local Squaddie = require ("squaddie/squaddie")
 local TableUtility = require ("utility/tableUtility")
 
 if _VERSION >= 'Lua 5.2' then
@@ -180,4 +181,92 @@ function test_map_link_points_to_zone()
       "Map:addZoneLinks: Zone nowheresville does not exist",
       make_bad_map
   )
+end
+
+function testFilterSquaddiesByAffiliation()
+  local hero = Squaddie:new({
+    displayName = "hero",
+    affiliation = "player"
+  })
+
+  local sidekick = Squaddie:new({
+    displayName = "sidekick",
+    affiliation = "player"
+  })
+
+  local villain = Squaddie:new({
+    displayName = "villain",
+    affiliation = "enemy"
+  })
+
+  local trashbag = Squaddie:new({
+    displayName = "trashbag",
+    affiliation = "other"
+  })
+
+  local moneybag = Squaddie:new({
+    displayName = "moneybag",
+    affiliation = "other"
+  })
+
+  local map = Map:new({
+    id = "test map",
+    zones = {
+      {
+        id="test_zone",
+        links={}
+      }
+    }
+  })
+
+  local test_zone = map:getZoneByID("test_zone")
+
+  map:addSquaddie(hero, test_zone)
+  map:addSquaddie(sidekick, test_zone)
+  map:addSquaddie(villain, test_zone)
+  map:addSquaddie(trashbag, test_zone)
+  map:addSquaddie(moneybag, test_zone)
+  trashbag:instakill()
+
+  local getIDFromSquaddies = function(squaddieList)
+    return TableUtility:map(
+        squaddieList,
+        function (_, squaddie, _)
+          return squaddie.id
+        end
+    )
+  end
+
+  local playerSquaddies
+  local playerSquaddieIDs
+  playerSquaddies = map:getSquaddiesByAffiliation("player")
+  playerSquaddieIDs = getIDFromSquaddies(playerSquaddies)
+
+  assert_equal(2, TableUtility:count(playerSquaddies))
+  assert_equal(2, TableUtility:count(playerSquaddieIDs))
+  assert_true( TableUtility:equivalentSet({hero.id, sidekick.id}, playerSquaddieIDs))
+
+  local enemySquaddies
+  local enemySquaddieIDs
+  enemySquaddies = map:getSquaddiesByAffiliation("enemy")
+  enemySquaddieIDs = getIDFromSquaddies(enemySquaddies)
+  assert_equal(1, TableUtility:count(enemySquaddies))
+  assert_equal(1, TableUtility:count(enemySquaddieIDs))
+  assert_true( TableUtility:equivalentSet({villain.id}, enemySquaddieIDs))
+
+  local allySquaddies
+  local allySquaddieIDs
+  allySquaddies = map:getSquaddiesByAffiliation("ally")
+  allySquaddieIDs = getIDFromSquaddies(allySquaddies)
+  assert_equal(0, TableUtility:count(allySquaddies))
+  assert_equal(0, TableUtility:count(allySquaddieIDs))
+
+  --assert_equal(2, TableUtility:count(map:getSquaddiesByAffiliation("other")))
+  local otherSquaddies
+  local otherSquaddieIDs
+  otherSquaddies = map:getSquaddiesByAffiliation("other")
+  otherSquaddieIDs = getIDFromSquaddies(otherSquaddies)
+  assert_equal(2, TableUtility:count(otherSquaddies))
+  assert_equal(2, TableUtility:count(otherSquaddieIDs))
+  assert_true( TableUtility:equivalentSet({trashbag.id, moneybag.id}, otherSquaddieIDs))
 end

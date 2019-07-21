@@ -13,10 +13,7 @@ end
 --[[ TODO NOTE
 MissionPhaseService
 
-testPlayerPhaseFirst
 testPlayerEndPhaseAfterAllPlayersFinishTurn
-
-testAllyPhaseAfterPlayerEndUpkeepFinish
 
 testAllyPhasesSkippedIfNoAlliesInMap
 
@@ -60,7 +57,6 @@ function setup()
   firstAvenue = map:getZoneByID("firstAvenue")
   secondAvenue = map:getZoneByID("secondAvenue")
 
-  -- TODO
   missionPhaseTracker = MissionPhaseTracker:new()
 
   hero = Squaddie:new({
@@ -104,7 +100,60 @@ function setup()
   })
 end
 
-function testPlayerPhaseFirst()
+function testPlayerPhaseStartFirst()
+  map:addSquaddie(hero, firstAvenue)
   local currentPhase = MissionPhaseService:getCurrentPhase(missionPhaseTracker, map)
-  assert_equal("PlayerPhaseStart" , currentPhase:getPhase())
+  assert_equal("player" , currentPhase:getAffiliation())
+  assert_equal("start" , currentPhase:getSubphase())
+  assert_equal("playerstart" , currentPhase:getPhase())
+end
+
+function testPlayerPhaseContinueAfterStartEnds()
+  map:addSquaddie(hero, firstAvenue)
+  local newTracker = MissionPhaseService:startPhaseEnds(missionPhaseTracker, map)
+  local currentPhase = MissionPhaseService:getCurrentPhase(newTracker, map)
+  assert_equal("player" , currentPhase:getAffiliation())
+  assert_equal("continue" , currentPhase:getSubphase())
+  assert_equal("playercontinue" , currentPhase:getPhase())
+end
+
+function testPlayerPhaseEndAfterContinueEnds()
+  map:addSquaddie(hero, firstAvenue)
+  local continueTracker = MissionPhaseService:startPhaseEnds(missionPhaseTracker, map)
+  local newTracker = MissionPhaseService:continuePhaseEnds(continueTracker, map)
+  local currentPhase = MissionPhaseService:getCurrentPhase(newTracker, map)
+  assert_equal("player" , currentPhase:getAffiliation())
+  assert_equal("finish" , currentPhase:getSubphase())
+  assert_equal("playerfinish" , currentPhase:getPhase())
+end
+
+function testAssertIfSubphaseDoesNotExist()
+  assert_error(
+      "bogus is not a subphase",
+    function()
+        MissionPhaseTracker:new({ affiliation = "player", subphase = "bogus" })
+      end
+  )
+end
+
+function testAssertIfAffiliationDoesNotExist()
+  assert_error(
+      "bogus is not an affiliation",
+      function()
+        MissionPhaseTracker:new({ affiliation = "bogus", subphase = "start" })
+      end
+  )
+end
+
+function testChangeAffiliationAfterFinishSubphase()
+  map:addSquaddie(hero, firstAvenue)
+  map:addSquaddie(villain, firstAvenue)
+  local phaseTracker = MissionPhaseTracker:new({ affiliation = "player", subphase = "finish"})
+
+  local newTracker = MissionPhaseService:finishPhaseEnds(phaseTracker, map)
+  local currentPhase = MissionPhaseService:getCurrentPhase(newTracker, map)
+
+  assert_equal("enemy" , currentPhase:getAffiliation())
+  assert_equal("start" , currentPhase:getSubphase())
+  assert_equal("enemystart" , currentPhase:getPhase())
 end

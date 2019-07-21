@@ -500,3 +500,8 @@ function testMin()
       TableUtility:min(children, sort_by_age)
   ))
 end
+
+function testKeyOf()
+  assert_equal(3, TableUtility:keyOf(numbers3, 5))
+  assert_equal("middle", TableUtility:keyOf(sandwich, "peanut butter"))
+end

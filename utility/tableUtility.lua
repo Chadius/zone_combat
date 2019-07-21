@@ -11,6 +11,7 @@ each()
 empty()
 equaivalentSet()
 filter()
+indexOf()
 isEmpty()
 keyCount()
 keys()
@@ -649,6 +650,18 @@ function TableUtility:min(source, comparison)
   )
 
   return currentMin
+end
+
+function TableUtility:keyOf(source, targetValue)
+  local iterator = TableUtility:getIterator(source)
+
+  for key, value in iterator(source) do
+    if value == targetValue then
+      return key
+    end
+  end
+
+  return nil
 end
 
 return TableUtility

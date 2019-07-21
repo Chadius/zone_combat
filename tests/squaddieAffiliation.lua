@@ -1,5 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Squaddie = require "squaddie/squaddie"
+local TableUtility = require ("utility/tableUtility")
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -122,4 +123,20 @@ function testAllyFriends()
 
   assert_false(mayor:isFriendUnit(trashbag))
   assert_false(mayor:isFriendUnit(moneybag))
+end
+
+function testAffiliationOrder()
+  assert_true(
+      TableUtility:equivalent(
+          Squaddie:getAffilationOrder("player"),
+          {
+            "player",
+            "ally",
+            "enemy",
+            "other"
+          }
+      )
+  )
+
+  print (TableUtility:join(Squaddie:getAffilationOrder("ally")))
 end

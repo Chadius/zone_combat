@@ -1,5 +1,7 @@
 lunit = require "libraries/unitTesting/lunitx"
-local Squaddie = require "squaddie/squaddie"
+local MissionPhaseTracker = require ("mission/missionPhaseTracker")
+local Squaddie = require ("squaddie/squaddie")
+local TableUtility = require ("utility/tableUtility")
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -122,4 +124,68 @@ function testAllyFriends()
 
   assert_false(mayor:isFriendUnit(trashbag))
   assert_false(mayor:isFriendUnit(moneybag))
+end
+
+
+function testAffiliationOrder()
+  assert_true(
+      TableUtility:equivalent(
+          MissionPhaseTracker:getAffilationOrder("player"),
+          {
+            "player",
+            "ally",
+            "enemy",
+            "other"
+          }
+      )
+  )
+
+  assert_true(
+      TableUtility:equivalent(
+          MissionPhaseTracker:getAffilationOrder("ally"),
+          {
+            "ally",
+            "enemy",
+            "other",
+            "player",
+          }
+      )
+  )
+
+  assert_true(
+      TableUtility:equivalent(
+          MissionPhaseTracker:getAffilationOrder("enemy"),
+          {
+            "enemy",
+            "other",
+            "player",
+            "ally",
+          }
+      )
+  )
+
+  assert_true(
+      TableUtility:equivalent(
+          MissionPhaseTracker:getAffilationOrder("other"),
+          {
+            "other",
+            "player",
+            "ally",
+            "enemy",
+          }
+      )
+  )
+
+  assert_error_match(
+      "bogus is not an affiliation",
+      function()
+        MissionPhaseTracker:getAffilationOrder("bogus")
+      end
+  )
+end
+
+function testSetAffiliation()
+  local missionPhaseTracker = MissionPhaseTracker:new({affiliation = "ally"})
+  local newMissionPhaseTracker = missionPhaseTracker:setAffiliation("other")
+  assert_equal("other", newMissionPhaseTracker:getAffiliation())
 end

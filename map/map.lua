@@ -209,4 +209,17 @@ function Map:getSquaddieCurrentZone(squaddie)
   return self:getZoneByID( self.squaddieInfoByID[squaddie.id].zone )
 end
 
+function Map:getSquaddiesByAffiliation(affiliation)
+  return TableUtility:listcomp(
+    self.squaddieInfoByID,
+    function (_, squaddieInfo, _)
+      return squaddieInfo.squaddie
+    end,
+    function (_, squaddieInfo, _)
+      local squaddie = squaddieInfo.squaddie
+      return squaddie:hasOneOfTheseAffiliations({affiliation})
+    end
+  )
+end
+
 return Map

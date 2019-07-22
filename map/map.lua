@@ -212,7 +212,7 @@ end
 function Map:getSquaddiesByAffiliation(affiliation)
   return TableUtility:listcomp(
     self.squaddieInfoByID,
-    function (squaddieID, squaddieInfo, _)
+    function (_, squaddieInfo, _)
       return squaddieInfo.squaddie
     end,
     function (_, squaddieInfo, _)

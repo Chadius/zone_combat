@@ -2,7 +2,7 @@ local TableUtility = require ("utility/tableUtility")
 
 local TerritoryControlCalculator={}
 
-function TerritoryControlCalculator:whichAffiliationsControlThisZone(map, zone)
+function TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, zone)
   local squaddiesInZone = map:getSquaddiesInZone(zone)
 
   local goodGuyCount = TableUtility:count(

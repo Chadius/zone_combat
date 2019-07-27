@@ -222,4 +222,12 @@ function Map:getSquaddiesByAffiliation(affiliation)
   )
 end
 
+function Map:updateAllZoneControl()
+
+end
+
+function Map:getControllingAffiliationsForZone(zone)
+  return {}
+end
+
 return Map

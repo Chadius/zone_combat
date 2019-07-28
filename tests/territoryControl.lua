@@ -5,8 +5,6 @@ local Squaddie = require "squaddie/squaddie"
 local TableUtility = require ("utility/tableUtility")
 local TerritoryControlCalculator = require "combatLogic/territoryControlCalculator"
 
-local dbg = require("libraries/debugger")
-
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
 else
@@ -177,27 +175,50 @@ end
 
 function testMapCanUpdateAllZonesWithTheirControl()
   map:addSquaddie(hero, townSquare)
-  map:updateAllZoneControl()
+  TerritoryControlCalculator:updateAllZoneControl(map)
   assertPlayerAndAllyAffiliation(
       map:getControllingAffiliationsForZone(townSquare)
   )
-  assert_true(TableUtility:contains(
+  assert_true(
+    TableUtility:contains(
       map:getControllingAffiliationsForZone(townSquare),
-      hero:getAffiliation())
+      hero:getAffilation()
+    )
   )
 end
 
---function testControlSticksWhenLeavingZones()
---  map:addSquaddie(hero, townSquare)
---  assertPlayerAndAllyAffiliation(
---      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
---  )
---
---  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, hero, firstStreet)
---
---  assertPlayerAndAllyAffiliation(
---      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
---  )
---end
+function testControlSticksWhenLeavingZones()
+  map:addSquaddie(hero, townSquare)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertPlayerAndAllyAffiliation(
+      map:getControllingAffiliationsForZone(townSquare)
+  )
 
---testAllyCannotControlStateIfAllAlliesAreDead
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, hero, firstStreet)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertPlayerAndAllyAffiliation(
+      map:getControllingAffiliationsForZone(townSquare)
+  )
+end
+
+function testAllyCannotControlStateIfAllAlliesAreDead()
+  map:addSquaddie(sidekick, townSquare)
+  sidekick:instakill()
+  assertNoAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
+  )
+end
+
+function testAllyCannotControlStateIfAllAlliesAreDead()
+  map:addSquaddie(mayor, townSquare)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertPlayerAndAllyAffiliation(
+      map:getControllingAffiliationsForZone(townSquare)
+  )
+
+  mayor:instakill()
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertNoAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
+  )
+end

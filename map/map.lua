@@ -1,7 +1,8 @@
 --[[ Maps hold multiple Zones.
 --]]
 
-local Zone = require "map/zone"
+local Zone = require ("map/zone")
+local ZoneControlRecord = require("map/ZoneControlRecord")
 local TableUtility = require ("utility/tableUtility")
 
 local Map={}
@@ -23,6 +24,7 @@ function Map:new(args)
   newMap.id = args.id
 
   newMap.zone_by_id = {}
+  newMap.zone_affiliation_control_by_zoneid = {}
 
   if newMap.id == nil then
     error("Map needs an id")
@@ -79,6 +81,8 @@ function Map:addZone(zone_info)
 
   -- Add the zone to the info.
   self.zone_by_id[newZone.id] = newZone
+  
+  self.zone_affiliation_control_by_zoneid[newZone.id] = ZoneControlRecord:new()
 end
 
 function Map:addZoneLinks(zone)
@@ -205,6 +209,10 @@ function Map:getZoneByID(zoneID)
   return self.zone_by_id[zoneID]
 end
 
+function Map:getAllZoneIDs()
+  return TableUtility:keys(self.zone_by_id)
+end
+
 function Map:getSquaddieCurrentZone(squaddie)
   return self:getZoneByID( self.squaddieInfoByID[squaddie.id].zone )
 end
@@ -222,12 +230,16 @@ function Map:getSquaddiesByAffiliation(affiliation)
   )
 end
 
-function Map:updateAllZoneControl()
-
+function Map:updateControllingAffiliationsForZone(zone, newAffiliations)
+  self:assertZoneExists(zone.id, "Map:updateControllingAffiliationsForZone")
+  local newZoneControlRecord = self.zone_affiliation_control_by_zoneid[zone.id]:cloneWithNewAffiliationsInControl(newAffiliations)
+  self.zone_affiliation_control_by_zoneid[zone.id] = newZoneControlRecord
 end
 
 function Map:getControllingAffiliationsForZone(zone)
-  return {}
+  self:assertZoneExists(zone.id, "Map:getControllingAffiliationsForZone")
+  local zoneToObserve = self.zone_affiliation_control_by_zoneid[zone.id]
+  return zoneToObserve:getAffiliationsInControl()
 end
 
 return Map

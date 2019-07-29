@@ -222,3 +222,20 @@ function testAllyCannotControlStateIfAllAlliesAreDead()
       TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
+
+function testLeavingContestedZoneChangesControl()
+  map:addSquaddie(hero, townSquare)
+  map:addSquaddie(sidekick, townSquare)
+  map:addSquaddie(villain, townSquare)
+  map:addSquaddie(henchman, townSquare)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertNoAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
+  )
+
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, hero, firstStreet)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertEnemyAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
+  )
+end

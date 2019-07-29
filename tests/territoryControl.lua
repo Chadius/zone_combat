@@ -1,5 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local Map = require ("map/map")
+local MoveSquaddieOnMapService = require ("combatLogic/MoveSquaddieOnMapService")
 local Squaddie = require "squaddie/squaddie"
 local TableUtility = require ("utility/tableUtility")
 local TerritoryControlCalculator = require "combatLogic/territoryControlCalculator"
@@ -87,7 +88,7 @@ end
 function teardown()
 end
 
-function assertPlayerOrAllyAffiliation(affiliations)
+function assertPlayerAndAllyAffiliation(affiliations)
   assert_true(
       TableUtility:equivalent(
           { "player", "ally" },
@@ -112,21 +113,21 @@ end
 
 function testEmptyZoneHasNoControl()
   assertNoAffiliation(
-      TerritoryControlCalculator:whichAffiliationsControlThisZone(map, townSquare)
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
 
 function testLonePlayerSquaddieCanControl()
   map:addSquaddie(hero, townSquare)
-  assertPlayerOrAllyAffiliation(
-      TerritoryControlCalculator:whichAffiliationsControlThisZone(map, townSquare)
+  assertPlayerAndAllyAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
 
 function testLoneEnemySquaddieCanControl()
   map:addSquaddie(villain, townSquare)
   assertEnemyAffiliation(
-      TerritoryControlCalculator:whichAffiliationsControlThisZone(map, townSquare)
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
 
@@ -135,7 +136,7 @@ function testMajorityControls()
   map:addSquaddie(villain, townSquare)
   map:addSquaddie(henchman, townSquare)
   assertEnemyAffiliation(
-      TerritoryControlCalculator:whichAffiliationsControlThisZone(map, townSquare)
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
 
@@ -146,15 +147,15 @@ function testNoMajorityMeansNoControl()
   map:addSquaddie(henchman, townSquare)
 
   assertNoAffiliation(
-      TerritoryControlCalculator:whichAffiliationsControlThisZone(map, townSquare)
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
 
 function testAllyContributesToPlayerTeam()
   map:addSquaddie(mayor, townSquare)
 
-  assertPlayerOrAllyAffiliation(
-      TerritoryControlCalculator:whichAffiliationsControlThisZone(map, townSquare)
+  assertPlayerAndAllyAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
 
@@ -162,12 +163,79 @@ function testOtherCannotControl()
   map:addSquaddie(trashcan, townSquare)
 
   assertNoAffiliation(
-      TerritoryControlCalculator:whichAffiliationsControlThisZone(map, townSquare)
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
 
 function testControlDoesNotEffectOtherZones()
   map:addSquaddie(hero, townSquare)
-  assertNoAffiliation(TerritoryControlCalculator:whichAffiliationsControlThisZone(map, firstStreet))
-  assertNoAffiliation(TerritoryControlCalculator:whichAffiliationsControlThisZone(map, thirdStreet))
+  assertNoAffiliation(TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, firstStreet))
+  assertNoAffiliation(TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, thirdStreet))
+end
+
+function testMapCanUpdateAllZonesWithTheirControl()
+  map:addSquaddie(hero, townSquare)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertPlayerAndAllyAffiliation(
+      map:getControllingAffiliationsForZone(townSquare)
+  )
+  assert_true(
+    TableUtility:contains(
+      map:getControllingAffiliationsForZone(townSquare),
+      hero:getAffilation()
+    )
+  )
+end
+
+function testControlSticksWhenLeavingZones()
+  map:addSquaddie(hero, townSquare)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertPlayerAndAllyAffiliation(
+      map:getControllingAffiliationsForZone(townSquare)
+  )
+
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, hero, firstStreet)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertPlayerAndAllyAffiliation(
+      map:getControllingAffiliationsForZone(townSquare)
+  )
+end
+
+function testAllyCannotControlStateIfAllAlliesAreDead()
+  map:addSquaddie(sidekick, townSquare)
+  sidekick:instakill()
+  assertNoAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
+  )
+end
+
+function testAllyCannotControlStateIfAllAlliesAreDead()
+  map:addSquaddie(mayor, townSquare)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertPlayerAndAllyAffiliation(
+      map:getControllingAffiliationsForZone(townSquare)
+  )
+
+  mayor:instakill()
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertNoAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
+  )
+end
+
+function testLeavingContestedZoneChangesControl()
+  map:addSquaddie(hero, townSquare)
+  map:addSquaddie(sidekick, townSquare)
+  map:addSquaddie(villain, townSquare)
+  map:addSquaddie(henchman, townSquare)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertNoAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
+  )
+
+  MoveSquaddieOnMapService:moveSquaddieAndSpendTurn(map, hero, firstStreet)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  assertEnemyAffiliation(
+      TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
+  )
 end

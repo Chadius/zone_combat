@@ -1,5 +1,5 @@
 lunit = require "libraries/unitTesting/lunitx"
-local Map = require ("map/map")
+local MapFactory = require ("map/mapFactory")
 local Squaddie = require "squaddie/squaddie"
 local MoveSquaddieOnMapService = require "combatLogic/MoveSquaddieOnMapService"
 
@@ -26,7 +26,7 @@ function setup()
   You can walk between the trails, swim across the pond,
   of fly directly from the start to the end.
   ]]
-  map = Map:new({
+  map = MapFactory:buildNewMap({
     id = "forest glade",
     zones = {
       {

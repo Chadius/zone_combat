@@ -25,6 +25,7 @@ function Map:new(args)
 
   newMap.zone_by_id = {}
   newMap.zone_affiliation_control_by_zoneid = {}
+  newMap.squaddieInfoByID = {}
 
   if newMap.id == nil then
     error("Map needs an id")
@@ -47,12 +48,13 @@ function Map:new(args)
     )
   end
 
-  -- Delete any invalid links.
-  newMap:VerifyZoneLink()
-
-  self.squaddieInfoByID = {}
-
+  newMap:checkInvariants()
   return newMap
+end
+
+function Map:checkInvariants()
+  -- Delete any invalid links.
+  self:VerifyZoneLink()
 end
 
 function Map:addZone(zone_info)

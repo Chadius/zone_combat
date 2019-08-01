@@ -1,7 +1,5 @@
 --[[ Maps hold multiple Zones.
 --]]
-
-local Zone = require ("map/zone")
 local ZoneControlRecord = require("map/ZoneControlRecord")
 local TableUtility = require ("utility/tableUtility")
 
@@ -57,34 +55,18 @@ function Map:checkInvariants()
   self:VerifyZoneLink()
 end
 
-function Map:addZone(zone_info)
-  --[[ Add the new zone to the list.
-  Args:
-    zone_info(table)
-      id(string)
-      zone(nil or table): If nil, a default zone information table is created.
-      links(nil or array): Each array holds a table.
-        to(string): Another zone id.
-        travelMethods(array): A table of strings, each containing a travel method
-  Returns:
-    nil
-  ]]
-
-  -- Create a new zone from the info
-  local zone_id = zone_info.id
-
-  if not zone_info.id then
-    error("Zone needs an id")
-  end
-
-  local newZone = Zone:new({
-    id=zone_id
-  })
-
-  -- Add the zone to the info.
+function Map:addZone(newZone)
   self.zone_by_id[newZone.id] = newZone
-  
   self.zone_affiliation_control_by_zoneid[newZone.id] = ZoneControlRecord:new()
+end
+
+function Map:connectTwoZonesWithLink(fromZone, toZone, movementCost, travelMethods)
+  local modifiedZone = fromZone:addLink(
+      toZone.id,
+      movementCost,
+      travelMethods
+  )
+  self.zone_by_id[fromZone.id] = modifiedZone
 end
 
 function Map:addZoneLinks(zone)

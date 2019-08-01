@@ -176,9 +176,8 @@ function test_map_link_points_to_zone()
     })
   end
 
-  assert_error_match(
+  assert_error(
       "Do not make zone links that point to nonexistent zones",
-      "Map:addZoneLinks: Zone nowheresville does not exist",
       make_bad_map
   )
 end

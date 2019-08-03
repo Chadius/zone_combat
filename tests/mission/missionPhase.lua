@@ -1,5 +1,5 @@
 lunit = require "libraries/unitTesting/lunitx"
-local Map = require ("map/map")
+local MapFactory = require ("map/mapFactory")
 local Squaddie = require "squaddie/squaddie"
 local MissionPhaseService = require "combatLogic/MissionPhaseService"
 local MissionPhaseTracker = require "mission/missionPhaseTracker"
@@ -25,7 +25,7 @@ local trashbag
 local moneybag
 
 function setup()
-  map = Map:new({
+  map = MapFactory:buildNewMap({
     id = "downtown",
     zones = {
       {

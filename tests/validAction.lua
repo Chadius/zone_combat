@@ -1,5 +1,5 @@
 lunit = require "libraries/unitTesting/lunitx"
-local Map = require ("map/map")
+local MapFactory = require ("map/mapFactory")
 local Squaddie= require "squaddie/squaddie"
 local ActionResolver = require "combatLogic/ActionResolver"
 
@@ -20,7 +20,7 @@ local zombie
 local zombie2
 
 function setup()
-  map = Map:new({
+  map = MapFactory:buildNewMap({
     id = "downtown",
     zones = {
       {

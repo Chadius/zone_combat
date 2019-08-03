@@ -1,5 +1,5 @@
 lunit = require "libraries/unitTesting/lunitx"
-local Map = require ("map/map")
+local MapFactory = require ("map/mapFactory")
 local MoveSquaddieOnMapService = require ("combatLogic/MoveSquaddieOnMapService")
 local Squaddie = require "squaddie/squaddie"
 local TableUtility = require ("utility/tableUtility")
@@ -24,7 +24,7 @@ local mayor
 local trashcan
 
 function setup()
-  map = Map:new({
+  map = MapFactory:buildNewMap({
     id = "lights district",
     zones = {
       {

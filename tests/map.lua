@@ -1,5 +1,5 @@
 lunit = require "libraries/unitTesting/lunitx"
-local Map = require ("map/map")
+local MapFactory = require ("map/mapFactory")
 local Squaddie = require ("squaddie/squaddie")
 local TableUtility = require ("utility/tableUtility")
 
@@ -17,7 +17,7 @@ end
 
 function test_map()
   -- Try to make a map with a single zone.
-  local map = Map:new({
+  local map = MapFactory:buildNewMap({
     id = "test map",
     zones = {
       {
@@ -35,7 +35,7 @@ end
 function test_map_no_id_makes_error()
   -- Try to make a map with no ID, expect an error
   local make_bad_map = function()
-    Map:new({
+    MapFactory:buildNewMap({
       zones = {
         {
           id="test_zone",
@@ -51,7 +51,7 @@ end
 function test_map_no_zone_id_makes_error()
   -- Make a map with 1 zone without an ID, expect an error
   local make_bad_map = function()
-    map = Map:new({
+    map = MapFactory:buildNewMap({
       id = "test map",
       zones = {
         {
@@ -83,7 +83,7 @@ end
 
 function test_map_connected_zones()
   -- Make a map with 2 zones and links connecting them
-  local map = Map:new({
+  local map = MapFactory:buildNewMap({
     id = "test map",
     zones = {
       {
@@ -110,7 +110,7 @@ end
 
 function test_map_connected_zones_bidirectional()
   -- Make a map with 2 zones and 1 bidirectional link connecting them
-  local map = Map:new({
+  local map = MapFactory:buildNewMap({
     id = "test map",
     zones = {
       {
@@ -142,7 +142,7 @@ end
 
 function test_map_no_circular_link()
   -- Make a map with 1 zone and 1 link pointing to itself, there should be no link
-  local map = Map:new({
+  local map = MapFactory:buildNewMap({
     id = "test map",
     zones = {
       {
@@ -161,7 +161,7 @@ end
 
 function test_map_link_points_to_zone()
   local make_bad_map = function()
-    Map:new({
+    MapFactory:buildNewMap({
       id = "test map",
       zones = {
         {
@@ -176,9 +176,8 @@ function test_map_link_points_to_zone()
     })
   end
 
-  assert_error_match(
+  assert_error(
       "Do not make zone links that point to nonexistent zones",
-      "Map:addZoneLinks: Zone nowheresville does not exist",
       make_bad_map
   )
 end
@@ -209,7 +208,7 @@ function testFilterSquaddiesByAffiliation()
     affiliation = "other"
   })
 
-  local map = Map:new({
+  local map = MapFactory:buildNewMap({
     id = "test map",
     zones = {
       {
@@ -261,7 +260,6 @@ function testFilterSquaddiesByAffiliation()
   assert_equal(0, TableUtility:count(allySquaddies))
   assert_equal(0, TableUtility:count(allySquaddieIDs))
 
-  --assert_equal(2, TableUtility:count(map:getSquaddiesByAffiliation("other")))
   local otherSquaddies
   local otherSquaddieIDs
   otherSquaddies = map:getSquaddiesByAffiliation("other")

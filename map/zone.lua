@@ -42,7 +42,7 @@ function Zone:clone()
   })
 end
 
-function Zone:addlink(toZoneID, movementCost, travelMethods)
+function Zone:addLink(toZoneID, movementCost, travelMethods)
   local newLink = ZoneLink:new({
     from = self.id,
     to = toZoneID,

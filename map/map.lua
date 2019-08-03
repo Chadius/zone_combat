@@ -6,14 +6,6 @@ local TableUtility = require ("utility/tableUtility")
 local Map={}
 Map.__index = Map
 
-local function AddZoneLink(self, from, to, cost, travelMethods)
-  --[[ Create a new zone link and add it to the map's zone information
-  ]]
-  -- Add to this zone
-  local newZone = self.zone_by_id[from]:addlink(to, cost, travelMethods)
-  self.zone_by_id[from] = newZone
-end
-
 function Map:new(args)
   --[[ Create a new Map.
   --]]
@@ -29,23 +21,6 @@ function Map:new(args)
     error("Map needs an id")
   end
 
-  if args.zones and args.zones ~= nil then
-    -- Add the zones
-    TableUtility:each(
-        args.zones,
-        function(_, zone, _)
-          newMap:addZone(zone)
-        end
-    )
-
-    TableUtility:each(
-        args.zones,
-        function(_, zone, _)
-          newMap:addZoneLinks(zone)
-        end
-    )
-  end
-
   newMap:checkInvariants()
   return newMap
 end
@@ -58,6 +33,7 @@ end
 function Map:addZone(newZone)
   self.zone_by_id[newZone.id] = newZone
   self.zone_affiliation_control_by_zoneid[newZone.id] = ZoneControlRecord:new()
+  self:checkInvariants()
 end
 
 function Map:connectTwoZonesWithLink(fromZone, toZone, movementCost, travelMethods)
@@ -67,36 +43,6 @@ function Map:connectTwoZonesWithLink(fromZone, toZone, movementCost, travelMetho
       travelMethods
   )
   self.zone_by_id[fromZone.id] = modifiedZone
-end
-
-function Map:addZoneLinks(zone)
-  --[[ All zones have been added. Time to add links.
-  ]]
-
-  for _, link_info in ipairs(zone.links or {}) do
-    if self.zone_by_id[link_info.to] == nil then
-      error("Map:addZoneLinks: Zone " .. link_info.to .. " does not exist")
-    end
-
-    AddZoneLink(
-      self,
-      zone.id,
-      link_info.to,
-      link_info.cost,
-      link_info.travelMethods
-    )
-
-    -- If the link is bidirectional, add a link with reversed direction.
-    if link_info.bidirectional then
-      AddZoneLink(
-        self,
-        link_info.to,
-        zone.id,
-        link_info.cost,
-        link_info.travelMethods
-      )
-    end
-  end
 end
 
 function Map:VerifyZoneLink()
@@ -132,6 +78,8 @@ function Map:addSquaddie(squaddie, zone)
     squaddie = squaddie,
     zone = zone.id
   }
+
+  self:checkInvariants()
 end
 
 function Map:getSquaddiesInZone(zone)
@@ -157,6 +105,8 @@ function Map:removeSquaddie(squaddieID)
   if self:isSquaddieOnMap(squaddieID) then
     self.squaddieInfoByID[squaddieID] = nil
   end
+
+  self:checkInvariants()
 end
 
 function Map:isSquaddieOnMap(squaddieID)
@@ -181,6 +131,7 @@ end
 
 function Map:changeSquaddieZone(squaddie, zone)
   self.squaddieInfoByID[squaddie.id].zone = zone.id
+  self:checkInvariants()
 end
 
 function Map:getSquaddieByID(squaddieID)

@@ -46,8 +46,8 @@ function Squaddie:new(args)
   newSquaddie.id = uuid()
   newSquaddie.name = args.displayName or "No name"
 
-  newSquaddie.mapPresence = SquaddieOnMap:new(args)
-  newSquaddie.healthStatus = SquaddieHealthAndDeath:new(args)
+  newSquaddie.mapPresence = SquaddieOnMap:new(args) -- TODO replace this with hook up functions
+  newSquaddie.healthStatus = SquaddieHealthAndDeath:new(args) -- TODO replace this with hook up functions
 
   setAffiliation(newSquaddie, args.affiliation or "other")
 

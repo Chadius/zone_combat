@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local MapFactory = require ("map/mapFactory")
-local Squaddie = require "squaddie/squaddie"
+local SquaddieFactory = require ("squaddie/squaddieFactory")
 local MoveSquaddieOnMapService = require "combatLogic/MoveSquaddieOnMapService"
 
 if _VERSION >= 'Lua 5.2' then
@@ -62,26 +62,26 @@ function setup()
     }
   })
 
-  human = Squaddie:new({
+  human = SquaddieFactory:buildNewSquaddie({
     displayName = "human"
   })
 
-  bunny = Squaddie:new({
+  bunny = SquaddieFactory:buildNewSquaddie({
     displayName = "bunny",
     distancePerTurn = 2
   })
 
-  turtle = Squaddie:new({
+  turtle = SquaddieFactory:buildNewSquaddie({
     displayName = "turtle",
     travelMethods = {"foot", "swim"}
   })
 
-  bird = Squaddie:new({
+  bird = SquaddieFactory:buildNewSquaddie({
     displayName = "bird",
     travelMethods = {"foot", "fly"}
   })
 
-  stone = Squaddie:new({
+  stone = SquaddieFactory:buildNewSquaddie({
     displayName = "stone",
     travelMethods = {"none"}
   })

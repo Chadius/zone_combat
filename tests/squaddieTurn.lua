@@ -1,7 +1,7 @@
 lunit = require "libraries/unitTesting/lunitx"
 local MapFactory = require ("map/mapFactory")
-local Squaddie= require "squaddie/squaddie"
 local MoveSquaddieOnMapService = require "combatLogic/MoveSquaddieOnMapService"
+local SquaddieFactory = require ("squaddie/squaddieFactory")
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -57,7 +57,7 @@ function setup()
     }
   })
 
-  bunny = Squaddie:new({
+  bunny = SquaddieFactory:buildNewSquaddie({
     displayName = "bunny",
     distancePerTurn = 2
   })

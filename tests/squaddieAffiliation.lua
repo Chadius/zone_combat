@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local MissionPhaseTracker = require ("mission/missionPhaseTracker")
-local Squaddie = require ("squaddie/squaddie")
+local SquaddieFactory = require ("squaddie/squaddieFactory")
 local TableUtility = require ("utility/tableUtility")
 
 if _VERSION >= 'Lua 5.2' then
@@ -19,42 +19,42 @@ local trashbag
 local moneybag
 
 function setup()
-  hero = Squaddie:new({
+  hero = SquaddieFactory:buildNewSquaddie({
     displayName = "hero",
     affiliation = "player"
   })
 
-  sidekick = Squaddie:new({
+  sidekick = SquaddieFactory:buildNewSquaddie({
     displayName = "sidekick",
     affiliation = "player"
   })
 
-  villain = Squaddie:new({
+  villain = SquaddieFactory:buildNewSquaddie({
     displayName = "villain",
     affiliation = "enemy"
   })
 
-  henchman = Squaddie:new({
+  henchman = SquaddieFactory:buildNewSquaddie({
     displayName = "henchman",
     affiliation = "enemy"
   })
 
-  mayor = Squaddie:new({
+  mayor = SquaddieFactory:buildNewSquaddie({
     displayName = "mayor",
     affiliation = "ally"
   })
 
-  citizen = Squaddie:new({
+  citizen = SquaddieFactory:buildNewSquaddie({
     displayName = "citizen",
     affiliation = "ally"
   })
 
-  trashbag = Squaddie:new({
+  trashbag = SquaddieFactory:buildNewSquaddie({
     displayName = "trashbag",
     affiliation = "other"
   })
 
-  moneybag = Squaddie:new({
+  moneybag = SquaddieFactory:buildNewSquaddie({
     displayName = "moneybag",
     affiliation = "other"
   })
@@ -65,7 +65,7 @@ function testHeroIdentifyAffiliation ()
   assert_equal("player", hero:getAffilation())
   -- If you make a SquaddieOnMap on an unknown affiliation, it raises an error
   local badAffiliation = function()
-    Squaddie:new({
+    SquaddieFactory:buildNewSquaddie({
       displayName = "badAffiliation",
       affiliation = "bogus"
     })

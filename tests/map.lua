@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local MapFactory = require ("map/mapFactory")
-local Squaddie = require ("squaddie/squaddie")
+local SquaddieFactory = require ("squaddie/squaddieFactory")
 local TableUtility = require ("utility/tableUtility")
 
 if _VERSION >= 'Lua 5.2' then
@@ -183,27 +183,27 @@ function test_map_link_points_to_zone()
 end
 
 function testFilterSquaddiesByAffiliation()
-  local hero = Squaddie:new({
+  local hero = SquaddieFactory:buildNewSquaddie({
     displayName = "hero",
     affiliation = "player"
   })
 
-  local sidekick = Squaddie:new({
+  local sidekick = SquaddieFactory:buildNewSquaddie({
     displayName = "sidekick",
     affiliation = "player"
   })
 
-  local villain = Squaddie:new({
+  local villain = SquaddieFactory:buildNewSquaddie({
     displayName = "villain",
     affiliation = "enemy"
   })
 
-  local trashbag = Squaddie:new({
+  local trashbag = SquaddieFactory:buildNewSquaddie({
     displayName = "trashbag",
     affiliation = "other"
   })
 
-  local moneybag = Squaddie:new({
+  local moneybag = SquaddieFactory:buildNewSquaddie({
     displayName = "moneybag",
     affiliation = "other"
   })

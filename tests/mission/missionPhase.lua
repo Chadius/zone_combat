@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local MapFactory = require ("map/mapFactory")
-local Squaddie = require "squaddie/squaddie"
+local SquaddieFactory = require ("squaddie/squaddieFactory")
 local MissionPhaseService = require "combatLogic/MissionPhaseService"
 local MissionPhaseTracker = require "mission/missionPhaseTracker"
 
@@ -47,42 +47,42 @@ function setup()
 
   missionPhaseTracker = MissionPhaseTracker:new()
 
-  hero = Squaddie:new({
+  hero = SquaddieFactory:buildNewSquaddie({
     displayName = "hero",
     affiliation = "player"
   })
 
-  sidekick = Squaddie:new({
+  sidekick = SquaddieFactory:buildNewSquaddie({
     displayName = "sidekick",
     affiliation = "player"
   })
 
-  villain = Squaddie:new({
+  villain = SquaddieFactory:buildNewSquaddie({
     displayName = "villain",
     affiliation = "enemy"
   })
 
-  henchman = Squaddie:new({
+  henchman = SquaddieFactory:buildNewSquaddie({
     displayName = "henchman",
     affiliation = "enemy"
   })
 
-  mayor = Squaddie:new({
+  mayor = SquaddieFactory:buildNewSquaddie({
     displayName = "mayor",
     affiliation = "ally"
   })
 
-  citizen = Squaddie:new({
+  citizen = SquaddieFactory:buildNewSquaddie({
     displayName = "citizen",
     affiliation = "ally"
   })
 
-  trashbag = Squaddie:new({
+  trashbag = SquaddieFactory:buildNewSquaddie({
     displayName = "trashbag",
     affiliation = "other"
   })
 
-  moneybag = Squaddie:new({
+  moneybag = SquaddieFactory:buildNewSquaddie({
     displayName = "moneybag",
     affiliation = "other"
   })

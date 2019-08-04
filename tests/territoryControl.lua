@@ -1,7 +1,7 @@
 lunit = require "libraries/unitTesting/lunitx"
 local MapFactory = require ("map/mapFactory")
 local MoveSquaddieOnMapService = require ("combatLogic/MoveSquaddieOnMapService")
-local Squaddie = require "squaddie/squaddie"
+local SquaddieFactory = require ("squaddie/squaddieFactory")
 local TableUtility = require ("utility/tableUtility")
 local TerritoryControlCalculator = require "combatLogic/territoryControlCalculator"
 
@@ -53,32 +53,32 @@ function setup()
   townSquare = map:getZoneByID("town square")
   thirdStreet= map:getZoneByID("3rd street")
 
-  hero = Squaddie:new({
+  hero = SquaddieFactory:buildNewSquaddie({
     displayName = "hero",
     affiliation = "player"
   })
 
-  sidekick = Squaddie:new({
+  sidekick = SquaddieFactory:buildNewSquaddie({
     displayName = "sidekick",
     affiliation = "player"
   })
 
-  villain = Squaddie:new({
+  villain = SquaddieFactory:buildNewSquaddie({
     displayName = "villain",
     affiliation = "enemy"
   })
 
-  henchman = Squaddie:new({
+  henchman = SquaddieFactory:buildNewSquaddie({
     displayName = "henchman",
     affiliation = "enemy"
   })
 
-  mayor = Squaddie:new({
+  mayor = SquaddieFactory:buildNewSquaddie({
     displayName = "mayor",
     affiliation = "ally"
   })
 
-  trashcan = Squaddie:new({
+  trashcan = SquaddieFactory:buildNewSquaddie({
     displayName = "trashcan",
     affiliation = "other"
   })

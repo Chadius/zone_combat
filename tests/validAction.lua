@@ -1,6 +1,6 @@
 lunit = require "libraries/unitTesting/lunitx"
 local MapFactory = require ("map/mapFactory")
-local Squaddie= require "squaddie/squaddie"
+local SquaddieFactory = require ("squaddie/squaddieFactory")
 local ActionResolver = require "combatLogic/ActionResolver"
 
 if _VERSION >= 'Lua 5.2' then
@@ -40,37 +40,37 @@ function setup()
   firstAvenue = map:getZoneByID("firstAvenue")
   secondAvenue = map:getZoneByID("secondAvenue")
 
-  shawn = Squaddie:new({
+  shawn = SquaddieFactory:buildNewSquaddie({
     displayName = "Shawn",
     affiliation = "player",
     distancePerTurn = 1
   })
 
-  trashbag = Squaddie:new({
+  trashbag = SquaddieFactory:buildNewSquaddie({
     displayName = "Trashbag",
     affiliation = "other",
     distancePerTurn = 1
   })
 
-  trashbag2 = Squaddie:new({
+  trashbag2 = SquaddieFactory:buildNewSquaddie({
     displayName = "Trashbag2",
     affiliation = "other",
     distancePerTurn = 1
   })
 
-  victim = Squaddie:new({
+  victim = SquaddieFactory:buildNewSquaddie({
     displayName = "Victim",
     affiliation = "ally",
     distancePerTurn = 1
   })
 
-  zombie = Squaddie:new({
+  zombie = SquaddieFactory:buildNewSquaddie({
     displayName = "Zombie",
     affiliation = "enemy",
     distancePerTurn = 1
   })
 
-  zombie2 = Squaddie:new({
+  zombie2 = SquaddieFactory:buildNewSquaddie({
     displayName = "Zombie2",
     affiliation = "enemy",
     distancePerTurn = 1

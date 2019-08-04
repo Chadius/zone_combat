@@ -1,5 +1,5 @@
 lunit = require ("libraries/unitTesting/lunitx")
-local Squaddie = require ("squaddie/squaddie")
+local SquaddieFactory = require ("squaddie/squaddieFactory")
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -12,19 +12,19 @@ local hero
 local injuredCitizen
 
 function setup()
-  hero = Squaddie:new({
+  hero = SquaddieFactory:buildNewSquaddie({
     displayName = "hero",
     affiliation = "player"
   })
 
-  injuredCitizen = Squaddie:new({
+  injuredCitizen = SquaddieFactory:buildNewSquaddie({
     displayName = "injuredCitizen",
     affiliation = "ally",
     maxHealth = 10,
     currentHealth = 5
   })
 
-  citizen = Squaddie:new({
+  citizen = SquaddieFactory:buildNewSquaddie({
     displayName = "citizen",
     affiliation = "ally",
     maxHealth = 10

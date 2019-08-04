@@ -2,54 +2,17 @@
 The entity can take actions and may be destroyed.
 ]]
 
-local SquaddieHealthAndDeath = require ("squaddie/squaddieHealthAndDeath")
-local SquaddieOnMap = require "squaddie/squaddieOnMap"
 local TableUtility = require ("utility/tableUtility")
 local uuid = require("libraries/uuid")
 
 local Squaddie={}
 Squaddie.__index = Squaddie
 
-local function setAffiliation(newSquaddie, affiliation)
-  --[[ Set the Squaddie's affiliation.
-  Throws an error if an invalid affiliation is passed.
-    Args:
-      newSquaddie(object)
-      affiliation(string) Should be one of the Squaddie.definedAffiliations values.
-    Returns:
-      nil
-  ]]
-  if not TableUtility:contains(Squaddie.definedAffiliations, affiliation) then
-    error("Affiliation "
-        .. affiliation
-        .. " does not exist. Valid affiliations are "
-        .. TableUtility:join(
-        Squaddie.definedAffiliations,
-        ", "
-    )
-    )
-  else
-    newSquaddie.affiliation = affiliation
-  end
-end
-
-Squaddie.definedAffiliations = {
-  "player",
-  "ally",
-  "enemy",
-  "other",
-}
-
 function Squaddie:new(args)
   local newSquaddie = {}
   setmetatable(newSquaddie, Squaddie)
   newSquaddie.id = uuid()
   newSquaddie.name = args.displayName or "No name"
-
-  newSquaddie.mapPresence = SquaddieOnMap:new(args) -- TODO replace this with hook up functions
-  newSquaddie.healthStatus = SquaddieHealthAndDeath:new(args) -- TODO replace this with hook up functions
-
-  setAffiliation(newSquaddie, args.affiliation or "other")
 
   return newSquaddie
 end
@@ -59,6 +22,10 @@ function Squaddie:isSameSquaddie(otherSquaddie)
 end
 
 -- mapPresence
+function Squaddie:setMapPresence(mapPresence)
+  self.mapPresence = mapPresence
+end
+
 function Squaddie:hasOneTravelMethod(methods)
   return self.mapPresence:hasOneTravelMethod(methods)
 end
@@ -138,6 +105,10 @@ function Squaddie:isEnemy()
 end
 
 -- healthStatus
+function Squaddie:setHealthStatus(healthStatus)
+  self.healthStatus = healthStatus
+end
+
 function Squaddie:currentHealth()
   return self.healthStatus:currentHealth()
 end

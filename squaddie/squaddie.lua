@@ -141,4 +141,13 @@ function Squaddie:instakill()
   return self.healthStatus:instakill()
 end
 
+-- Squaddie Actions
+function Squaddie:getActions()
+  return self.actions:getAllActions()
+end
+
+function Squaddie:addAction(action)
+  self.actions:addAction(action)
+end
+
 return Squaddie

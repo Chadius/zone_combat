@@ -3,7 +3,7 @@ local TableUtility = require ("utility/tableUtility")
 local SquaddieAction = {}
 SquaddieAction.__index = SquaddieAction
 
-function SquaddieAction:new(args)
+function SquaddieAction:new()
   local newSquaddieAction = {}
   newSquaddieAction.actionsByName = {}
   setmetatable(newSquaddieAction, SquaddieAction)
@@ -16,7 +16,7 @@ function SquaddieAction:addAction(action)
 end
 
 function SquaddieAction:getAllActions()
-  return TableUtility:keys(self.actionsByName)
+  return TableUtility:values(self.actionsByName)
 end
 
 return SquaddieAction

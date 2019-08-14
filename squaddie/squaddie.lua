@@ -59,7 +59,7 @@ function Squaddie:startNewTurn()
 end
 
 -- affiliation
-function Squaddie:getAffilation()
+function Squaddie:getAffiliation()
   --[[ Returns the SquaddieOnMap's affiliation.
   Args:
     nil
@@ -93,7 +93,7 @@ function Squaddie:isFriendUnit(otherSquaddie)
 end
 
 function Squaddie:hasOneOfTheseAffiliations(matchingAffiliations)
-  return TableUtility:contains(matchingAffiliations, self:getAffilation())
+  return TableUtility:contains(matchingAffiliations, self:getAffiliation())
 end
 
 function Squaddie:isPlayerOrAlly()
@@ -142,6 +142,10 @@ function Squaddie:instakill()
 end
 
 -- Squaddie Actions
+function Squaddie:setSquaddieActions(newSquaddieActions)
+  self.actions = newSquaddieActions
+end
+
 function Squaddie:getActions()
   return self.actions:getAllActions()
 end

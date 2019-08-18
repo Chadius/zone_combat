@@ -37,9 +37,17 @@ function ActionResolver:getReasonCannotAttackWithPower(actor, action, target, ma
   return nil
 end
 
-function ActionResolver:usePowerOnTarget(actor, target)
+function ActionResolver:useActionOnTarget(actor, action, target)
   actor:turnPartCompleted("act")
-  target:instakill()
+
+  if action:isInstakill() then
+    target:instakill()
+    return
+  end
+
+  local rawDamage = action:getDamage()
+  target:loseHealth(rawDamage)
+  return
 end
 
 return ActionResolver

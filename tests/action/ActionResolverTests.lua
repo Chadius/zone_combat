@@ -52,7 +52,7 @@ function setup()
       descriptions = {
         {
           name = "Cricket Bat",
-          damage = 5,
+          damage = 4,
           target = {"opponent"}
         },
         {
@@ -218,18 +218,39 @@ function testOtherCanAttackEnemy()
   assert_true(ActionResolver:canAttackWithPower(trashbag, spillJunk, zombie, map))
 end
 
-function testCanKillTarget()
+function testCanInstakillTargetWithAction()
   map:addSquaddie(shawn, firstAvenue)
   map:addSquaddie(zombie, firstAvenue)
+
   assert_equal(zombie:currentHealth(), zombie:maxHealth())
-  ActionResolver:usePowerOnTarget(shawn, zombie)
+  assert_true(superCricketBat:isInstakill())
+  ActionResolver:useActionOnTarget(shawn, superCricketBat, zombie)
   assert_true(zombie:currentHealth() < zombie:maxHealth())
   assert_false(shawn:hasTurnPartAvailable("act"))
+  assert_true(zombie:isDead())
 end
 
-function testCannotUsePowerItDoesNotOwn()
+function testCannotUseActionItDoesNotOwn()
     map:addSquaddie(shawn, firstAvenue)
     map:addSquaddie(zombie, firstAvenue)
     assert_false(ActionResolver:canAttackWithPower(shawn, spillJunk, zombie, map))
     assert_equal("User does not have power", ActionResolver:getReasonCannotAttackWithPower(shawn, spillJunk, zombie, map))
+end
+
+function testCanDamageTargetWithAction()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+
+  assert_equal(zombie:currentHealth(), zombie:maxHealth())
+  assert_false(cricketBat:isInstakill())
+  assert_true(cricketBat:getDamage() < zombie:maxHealth())
+
+  ActionResolver:useActionOnTarget(shawn, cricketBat, zombie)
+  assert_equal(
+      cricketBat:getDamage(),
+      zombie:maxHealth() - zombie:currentHealth()
+  )
+
+  assert_false(shawn:hasTurnPartAvailable("act"))
+  assert_false(zombie:isDead())
 end

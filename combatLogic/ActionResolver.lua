@@ -1,12 +1,14 @@
--- local CLASSNAME = require ("")
-
 local ActionResolver = {}
 
-function ActionResolver:canAttackWithPower(actor, target, map)
-  return ActionResolver:getReasonCannotAttackWithPower(actor, target, map) == nil
+function ActionResolver:canAttackWithPower(actor, action, target, map)
+  return ActionResolver:getReasonCannotAttackWithPower(actor, action, target, map) == nil
 end
 
-function ActionResolver:getReasonCannotAttackWithPower(actor, target, map)
+function ActionResolver:getReasonCannotAttackWithPower(actor, action, target, map)
+  if actor:hasAction(action) == false then
+    return "User does not have power"
+  end
+
   if target:isDead() then
     return "Target is already dead"
   end

@@ -37,13 +37,23 @@ function SquaddieFactory:buildNewSquaddie(args)
   setAffiliation(newSquaddie, args.affiliation or "other")
   newSquaddie:setSquaddieActions(SquaddieAction:new(args))
 
-  TableUtility:each(
-      args.actions or {},
-      function(_, actionArgs)
-        local newAction = Action:new(actionArgs)
-        newSquaddie:addAction(newAction)
-      end
-  )
+  if args.actions and args.actions.descriptions then
+    TableUtility:each(
+        args.actions.descriptions,
+        function(_, actionArgs)
+          local newAction = Action:new(actionArgs)
+          newSquaddie:addAction(newAction)
+        end
+    )
+  end
+  if args.actions and args.actions.objects then
+    TableUtility:each(
+        args.actions.objects,
+        function(_, newAction)
+          newSquaddie:addAction(newAction)
+        end
+    )
+  end
 
   return newSquaddie
 end

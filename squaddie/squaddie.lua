@@ -154,4 +154,12 @@ function Squaddie:addAction(action)
   self.actions:addAction(action)
 end
 
+function Squaddie:getActionByName(name)
+  return self.actions:getActionByName(name)
+end
+
+function Squaddie:hasAction(action)
+  return self.actions:hasActionByName(action:getName())
+end
+
 return Squaddie

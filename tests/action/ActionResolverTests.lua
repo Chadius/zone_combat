@@ -254,3 +254,25 @@ function testCanDamageTargetWithAction()
   assert_false(shawn:hasTurnPartAvailable("act"))
   assert_false(zombie:isDead())
 end
+
+function testActionResults()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+
+  local actionResult = ActionResolver:useActionOnTarget(shawn, cricketBat, zombie)
+  assert_equal(shawn, actionResult:getActor())
+  assert_equal(cricketBat, actionResult:getAction())
+  assert_equal(zombie, actionResult:getTarget())
+  assert_equal(cricketBat:getDamage(), actionResult:getDamageDealt())
+end
+
+function testInstakillActionResults()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+
+  local actionResult = ActionResolver:useActionOnTarget(shawn, superCricketBat, zombie)
+  assert_equal(shawn, actionResult:getActor())
+  assert_equal(superCricketBat, actionResult:getAction())
+  assert_equal(zombie, actionResult:getTarget())
+  assert_true(actionResult:targetWasInstakilled())
+end

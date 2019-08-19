@@ -1,3 +1,5 @@
+local ActionResult = require("action/actionResult")
+
 local ActionResolver = {}
 
 function ActionResolver:canAttackWithPower(actor, action, target, map)
@@ -40,14 +42,18 @@ end
 function ActionResolver:useActionOnTarget(actor, action, target)
   actor:turnPartCompleted("act")
 
+  local result = ActionResult:new()
+
   if action:isInstakill() then
     target:instakill()
-    return
+    result:actorInstakilledTarget(actor, action, target)
+    return result
   end
 
   local rawDamage = action:getDamage()
   target:loseHealth(rawDamage)
-  return
+  result:actorAttackedTarget(actor, action, target, rawDamage)
+  return result
 end
 
 return ActionResolver

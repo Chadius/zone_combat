@@ -20,6 +20,7 @@ map()
 pluck()
 size()
 sum()
+values()
 
 These functions only work on arrays (tables whose keys are integers starting with 1, table is ordered)
 equaivalent()
@@ -662,6 +663,15 @@ function TableUtility:keyOf(source, targetValue)
   end
 
   return nil
+end
+
+function TableUtility:values(source)
+  local result = {}
+  for _, value in pairs(source) do
+    table.insert(result, value)
+  end
+
+  return result
 end
 
 return TableUtility

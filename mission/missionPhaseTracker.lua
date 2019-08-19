@@ -65,7 +65,7 @@ function MissionPhaseTracker:setAffiliation(newAffiliation)
   return newMissionPhaseTracker
 end
 
-function MissionPhaseTracker:getAffilationOrder(startingAffiliation)
+function MissionPhaseTracker:getAffiliationOrder(startingAffiliation)
   if startingAffiliation == nil then
     startingAffiliation = MissionPhaseTracker.AffiliationOrder[1]
   end
@@ -77,7 +77,7 @@ function MissionPhaseTracker:getAffilationOrder(startingAffiliation)
   local affiliationsInOrder = {}
   local startingIndex = TableUtility:keyOf(MissionPhaseTracker.AffiliationOrder, startingAffiliation)
   local affiliationOrderIndex = startingIndex
-  for i=1, #MissionPhaseTracker.AffiliationOrder do
+  for _=1, #MissionPhaseTracker.AffiliationOrder do
     table.insert(affiliationsInOrder, MissionPhaseTracker.AffiliationOrder[affiliationOrderIndex])
     affiliationOrderIndex = affiliationOrderIndex + 1
     if affiliationOrderIndex > #MissionPhaseTracker.AffiliationOrder then
@@ -119,7 +119,7 @@ function MissionPhaseTracker:getAffiliationsInOrder(startingAffiliation)
   local affiliationsInOrder = {}
   local startingIndex = TableUtility:keyOf(MissionPhaseTracker.AffiliationOrder, startingAffiliation)
   local affiliationOrderIndex = startingIndex
-  for i=1, #MissionPhaseTracker.AffiliationOrder do
+  for _=1, #MissionPhaseTracker.AffiliationOrder do
     table.insert(affiliationsInOrder, MissionPhaseTracker.AffiliationOrder[affiliationOrderIndex])
     affiliationOrderIndex = affiliationOrderIndex + 1
     if affiliationOrderIndex > #MissionPhaseTracker.AffiliationOrder then

@@ -505,3 +505,19 @@ function testKeyOf()
   assert_equal(3, TableUtility:keyOf(numbers3, 5))
   assert_equal("middle", TableUtility:keyOf(sandwich, "peanut butter"))
 end
+
+function testValues()
+  assert_true(
+      TableUtility:equivalent(
+          {1,2,3,4,5},
+          TableUtility:values(numbers)
+      )
+  )
+
+  assert_true(
+      TableUtility:equivalent(
+          {"bread", "peanut butter", "bread"},
+          TableUtility:values(sandwich)
+      )
+  )
+end

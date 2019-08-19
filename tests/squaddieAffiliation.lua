@@ -62,7 +62,7 @@ end
 
 function testHeroIdentifyAffiliation ()
   -- hero identifies itself on the player affiliation
-  assert_equal("player", hero:getAffilation())
+  assert_equal("player", hero:getAffiliation())
   -- If you make a SquaddieOnMap on an unknown affiliation, it raises an error
   local badAffiliation = function()
     SquaddieFactory:buildNewSquaddie({
@@ -130,7 +130,7 @@ end
 function testAffiliationOrder()
   assert_true(
       TableUtility:equivalent(
-          MissionPhaseTracker:getAffilationOrder("player"),
+          MissionPhaseTracker:getAffiliationOrder("player"),
           {
             "player",
             "ally",
@@ -142,7 +142,7 @@ function testAffiliationOrder()
 
   assert_true(
       TableUtility:equivalent(
-          MissionPhaseTracker:getAffilationOrder("ally"),
+          MissionPhaseTracker:getAffiliationOrder("ally"),
           {
             "ally",
             "enemy",
@@ -154,7 +154,7 @@ function testAffiliationOrder()
 
   assert_true(
       TableUtility:equivalent(
-          MissionPhaseTracker:getAffilationOrder("enemy"),
+          MissionPhaseTracker:getAffiliationOrder("enemy"),
           {
             "enemy",
             "other",
@@ -166,7 +166,7 @@ function testAffiliationOrder()
 
   assert_true(
       TableUtility:equivalent(
-          MissionPhaseTracker:getAffilationOrder("other"),
+          MissionPhaseTracker:getAffiliationOrder("other"),
           {
             "other",
             "player",
@@ -179,7 +179,7 @@ function testAffiliationOrder()
   assert_error_match(
       "bogus is not an affiliation",
       function()
-        MissionPhaseTracker:getAffilationOrder("bogus")
+        MissionPhaseTracker:getAffiliationOrder("bogus")
       end
   )
 end

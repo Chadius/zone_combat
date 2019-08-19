@@ -1,12 +1,16 @@
--- local CLASSNAME = require ("")
+local ActionResult = require("action/actionResult")
 
 local ActionResolver = {}
 
-function ActionResolver:canAttackWithPower(actor, target, map)
-  return ActionResolver:getReasonCannotAttackWithPower(actor, target, map) == nil
+function ActionResolver:canAttackWithPower(actor, action, target, map)
+  return ActionResolver:getReasonCannotAttackWithPower(actor, action, target, map) == nil
 end
 
-function ActionResolver:getReasonCannotAttackWithPower(actor, target, map)
+function ActionResolver:getReasonCannotAttackWithPower(actor, action, target, map)
+  if actor:hasAction(action) == false then
+    return "User does not have power"
+  end
+
   if target:isDead() then
     return "Target is already dead"
   end
@@ -35,9 +39,21 @@ function ActionResolver:getReasonCannotAttackWithPower(actor, target, map)
   return nil
 end
 
-function ActionResolver:usePowerOnTarget(actor, target)
+function ActionResolver:useActionOnTarget(actor, action, target)
   actor:turnPartCompleted("act")
-  target:instakill()
+
+  local result = ActionResult:new()
+
+  if action:isInstakill() then
+    target:instakill()
+    result:actorInstakilledTarget(actor, action, target)
+    return result
+  end
+
+  local rawDamage = action:getDamage()
+  target:loseHealth(rawDamage)
+  result:actorAttackedTarget(actor, action, target, rawDamage)
+  return result
 end
 
 return ActionResolver

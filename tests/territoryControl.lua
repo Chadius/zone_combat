@@ -182,7 +182,7 @@ function testMapCanUpdateAllZonesWithTheirControl()
   assert_true(
     TableUtility:contains(
       map:getControllingAffiliationsForZone(townSquare),
-      hero:getAffilation()
+      hero:getAffiliation()
     )
   )
 end

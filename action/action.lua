@@ -13,10 +13,6 @@ function Action:new(args)
     default={}
   }
 
-  -- TODO Remove this
-  newAction.damageDealt = args.damage or args.damageDealt or 0
-  newAction.instakill = args.instakill or false
-
   if not newAction.name then error("action must have a name") end
 
   return newAction
@@ -26,23 +22,55 @@ function Action:getName()
   return self.name
 end
 
--- TODO Add default effects getters
-function Action:getDamage()
-  local defaultDamageDealingEffect = TableUtility:first(
-      self.effects.default,
+function Action:filterByEffectType(effects, effectType)
+  return TableUtility:filter(
+      effects,
       function(_, effect)
-        return effect:getType() == "damageDealt"
+        return effect:getType() == effectType
+      end
+  )
+end
+
+function Action:getDamageDealt()
+  local defaultDamageDealingEffects = self:filterByEffectType(
+      self.effects.default,
+      "damageDealt"
+  )
+  if #defaultDamageDealingEffects == 0 then
+    return nil
+  end
+
+  local damageDealtByEffect = TableUtility:map(
+      defaultDamageDealingEffects,
+      function(_, effect)
+        return effect:getDamageDealt()
       end
   )
 
-  if defaultDamageDealingEffect then
-    return defaultDamageDealingEffect:getDamageDealt()
-  end
-  return nil
+  return damageDealtByEffect[1]
+end
+
+function Action:getDamage()
+  return self:getDamageDealt()
 end
 
 function Action:isInstakill()
-  return self.instakill
+  local defaultInstakillEffects = self:filterByEffectType(
+      self.effects.default,
+      "instakill"
+  )
+  if #defaultInstakillEffects == 0 then
+    return false
+  end
+
+  local effectInstakills = TableUtility:map(
+      defaultInstakillEffects,
+      function(_, effect)
+        return effect:isInstakill()
+      end
+  )
+
+  return effectInstakills[1]
 end
 
 function Action:addDefaultAction(newAction)

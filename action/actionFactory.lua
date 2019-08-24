@@ -1,5 +1,6 @@
 local Action = require ("action/action")
 local EffectDealsDamage = require ("action/effectDealsDamage")
+local EffectInstakills = require ("action/effectInstakills")
 local TableUtility = require ("utility/tableUtility")
 
 local ActionFactory = {}
@@ -11,13 +12,18 @@ function ActionFactory:buildNewAction(args)
     TableUtility:each(
         args.effects.default,
         function(_, effectArgs)
-          local newEffect = nil
-          if effectArgs.damage then
-            newEffect = EffectDealsDamage:new(effectArgs)
+          if effectArgs.damage or effectArgs.dealsDamage then
+            table.insert(
+                newAction.effects.default,
+                EffectDealsDamage:new(effectArgs)
+            )
           end
 
-          if newEffect then
-            table.insert(newAction.effects.default, newEffect)
+          if effectArgs.instakill or effectArgs.isInstakill then
+            table.insert(
+                newAction.effects.default,
+                EffectInstakills:new(effectArgs)
+            )
           end
         end
     )

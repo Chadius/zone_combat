@@ -38,7 +38,6 @@ function SquaddieFactory:buildNewSquaddie(args)
   setAffiliation(newSquaddie, args.affiliation or "other")
   newSquaddie:setSquaddieActions(SquaddieAction:new(args))
 
-  -- TODO Ask the ActionFactory to make each action
   if args.actions and args.actions.descriptions then
     TableUtility:each(
         args.actions.descriptions,
@@ -48,7 +47,6 @@ function SquaddieFactory:buildNewSquaddie(args)
         end
     )
   end
-
 
   if args.actions and args.actions.objects then
     TableUtility:each(

@@ -1,5 +1,3 @@
--- local CLASSNAME = require ("")
-
 local EffectDealsDamage = {}
 EffectDealsDamage.__index = EffectDealsDamage
 

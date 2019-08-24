@@ -55,8 +55,10 @@ function setup()
           name = "Cricket Bat",
           effects ={
             default={
-              damage = 4,
-              target = {"opponent"}
+              {
+                damage = 4,
+                target = {"opponent"}
+              }
             }
           },
         },
@@ -64,8 +66,10 @@ function setup()
           name = "Super Cricket Bat",
           effects = {
             default = {
-              instakill = true,
-              target = { "opponent" }
+              {
+                instakill = true,
+                target = { "opponent" }
+              }
             }
           }
         },
@@ -86,8 +90,10 @@ function setup()
           name = "Spill Junk",
           effects = {
             default = {
-              damage = 1,
-              target = { "opponent" }
+              {
+                damage = 1,
+                target = { "opponent" }
+              }
             }
           }
         }
@@ -120,9 +126,13 @@ function setup()
         {
           name = "Zombie Bite",
           effects = {
-            {
-              damage = 3,
-              target = { "opponent" }
+            descriptions = {
+              default = {
+                {
+                  damage = 3,
+                  target = { "opponent" }
+                }
+              }
             }
           }
         }

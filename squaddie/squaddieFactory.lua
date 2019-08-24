@@ -1,4 +1,5 @@
 local Action = require("action/action")
+local ActionFactory = require("action/actionFactory")
 local Squaddie = require ("squaddie/squaddie")
 local SquaddieAction = require ("squaddie/squaddieAction")
 local SquaddieHealthAndDeath = require ("squaddie/squaddieHealthAndDeath")
@@ -37,15 +38,18 @@ function SquaddieFactory:buildNewSquaddie(args)
   setAffiliation(newSquaddie, args.affiliation or "other")
   newSquaddie:setSquaddieActions(SquaddieAction:new(args))
 
+  -- TODO Ask the ActionFactory to make each action
   if args.actions and args.actions.descriptions then
     TableUtility:each(
         args.actions.descriptions,
         function(_, actionArgs)
-          local newAction = Action:new(actionArgs)
+          local newAction = ActionFactory:buildNewAction(actionArgs)
           newSquaddie:addAction(newAction)
         end
     )
   end
+
+
   if args.actions and args.actions.objects then
     TableUtility:each(
         args.actions.objects,

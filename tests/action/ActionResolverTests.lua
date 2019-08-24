@@ -15,6 +15,7 @@ local secondAvenue
 local shawn
 local cricketBat
 local superCricketBat
+local controllingCricketBat
 local trashbag
 local trashbag2
 local spillJunk
@@ -52,19 +53,28 @@ function setup()
       descriptions = {
         {
           name = "Cricket Bat",
-          damage = 4,
-          target = {"opponent"}
+          effects ={
+            default={
+              damage = 4,
+              target = {"opponent"}
+            }
+          },
         },
         {
           name = "Super Cricket Bat",
-          instakill = true,
-          target = {"opponent"}
-        }
+          effects = {
+            default = {
+              instakill = true,
+              target = { "opponent" }
+            }
+          }
+        },
       }
     }
   })
   cricketBat = shawn:getActionByName("Cricket Bat")
   superCricketBat = shawn:getActionByName("Super Cricket Bat")
+  -- TODO controllingCricketBat = shawn:getActionByName("Controlling Cricket Bat")
 
   trashbag = SquaddieFactory:buildNewSquaddie({
     displayName = "Trashbag",
@@ -74,8 +84,12 @@ function setup()
       descriptions = {
         {
           name = "Spill Junk",
-          damage = 1,
-          target = { "opponent" }
+          effects = {
+            default = {
+              damage = 1,
+              target = { "opponent" }
+            }
+          }
         }
       }
     }
@@ -105,8 +119,12 @@ function setup()
       descriptions = {
         {
           name = "Zombie Bite",
-          damage = 3,
-          target = { "opponent" }
+          effects = {
+            {
+              damage = 3,
+              target = { "opponent" }
+            }
+          }
         }
       }
     }

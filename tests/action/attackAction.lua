@@ -1,5 +1,6 @@
 lunit = require ("libraries/unitTesting/lunitx")
 local Action = require("action/action")
+local ActionFactory = require("action/actionFactory")
 local SquaddieFactory = require ("squaddie/squaddieFactory")
 local TableUtility = require ("utility/tableUtility")
 
@@ -25,55 +26,64 @@ function testNoNameMakesError()
 end
 
 function testGetDamage()
-  local newAction = Action:new({
+  local newAction = ActionFactory:buildNewAction({
     name = "Slappywag",
-    damage = 5
-  })
-  assert_equal(5, newAction:getDamage())
-end
-
-function testSquaddieHasAction()
-  local hero = SquaddieFactory:buildNewSquaddie({
-    displayName = "hero",
-    affiliation = "player",
-    actions = {
-      descriptions = {
+    effects = {
+      default = {
         {
-          name = "Fist of Justice",
           damage = 5
         }
       }
     }
   })
-
-  local actions = hero:getActions()
-  assert_equal(1, TableUtility:size(actions))
-  actualAction = actions[1]
-  assert_equal("Fist of Justice", actualAction:getName())
-  assert_equal(5, actualAction:getDamage())
-
-  local fistAction = hero:getActionByName("Fist of Justice")
-  assert_equal("Fist of Justice", fistAction:getName())
-  assert_equal(5, fistAction:getDamage())
+  assert_equal(5, newAction:getDamage())
 end
 
-function testRaiseErrorIfActionNameDoesNotExist()
-  local hero = SquaddieFactory:buildNewSquaddie({
-    displayName = "hero",
-    affiliation = "player"
-  })
+--function testSquaddieHasAction()
+--  local hero = SquaddieFactory:buildNewSquaddie({
+--    displayName = "hero",
+--    affiliation = "player",
+--    actions = {
+--      descriptions = {
+--        {
+--          name = "Fist of Justice",
+--          effects = {
+--            default = {
+--              damage = 5
+--            }
+--          }
+--        }
+--      }
+--    }
+--  })
 
-  local bad_func = function()
-    hero:getActionByName("Fist of Justice")
-  end
+--  local actions = hero:getActions()
+--  assert_equal(1, TableUtility:size(actions))
+--  actualAction = actions[1]
+--  assert_equal("Fist of Justice", actualAction:getName())
+--  assert_equal(5, actualAction:getDamage())
 
-  assert_error(
-      "No action with that name exists: Fist of Justice",
-      bad_func
-  )
-end
+--  local fistAction = hero:getActionByName("Fist of Justice")
+--  assert_equal("Fist of Justice", fistAction:getName())
+--  assert_equal(5, fistAction:getDamage())
+--end
 
--- Test you create an ActionResult after acting
--- Test you can see the damage from the ActionResult
+--function testRaiseErrorIfActionNameDoesNotExist()
+--  local hero = SquaddieFactory:buildNewSquaddie({
+--    displayName = "hero",
+--    affiliation = "player"
+--  })
+
+--  local bad_func = function()
+--    hero:getActionByName("Fist of Justice")
+--  end
+
+--  assert_error(
+--      "No action with that name exists: Fist of Justice",
+--      bad_func
+--  )
+--end
+
+testGetDamage()
 
 -- Test that once the zone is under control, you get the extra benefits of Zone Control.

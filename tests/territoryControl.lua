@@ -239,3 +239,15 @@ function testLeavingContestedZoneChangesControl()
       TerritoryControlCalculator:whichAffiliationsHaveTheMajorityInThisZone(map, townSquare)
   )
 end
+
+function testMapKnowsIfSquaddieIsControlling()
+  map:addSquaddie(hero, townSquare)
+  map:addSquaddie(sidekick, townSquare)
+  map:addSquaddie(villain, townSquare)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+
+  assert_true(map:squaddieIsInControl(hero))
+  assert_true(map:squaddieIsInControl(sidekick))
+  assert_false(map:squaddieIsInControl(villain))
+  assert_false(map:squaddieIsInControl(mayor))
+end

@@ -39,20 +39,24 @@ function ActionResolver:getReasonCannotAttackWithPower(actor, action, target, ma
   return nil
 end
 
-function ActionResolver:useActionOnTarget(actor, action, target)
+function ActionResolver:useActionOnTarget(actor, action, target, map)
   actor:turnPartCompleted("act")
 
   local result = ActionResult:new()
-
-  if action:isInstakill() then
-    target:instakill()
-    result:actorInstakilledTarget(actor, action, target)
-    return result
-  end
-
-  local rawDamage = action:getDamage()
-  target:loseHealth(rawDamage)
-  result:actorAttackedTarget(actor, action, target, rawDamage)
+  local actorIsInControl = map:squaddieIsInControl(actor)
+  local actionEffects = action:getEffects(actorIsInControl)
+  actionEffects:each(
+      function(effect)
+        if effect:getType() == "damageDealt" then
+          local rawDamage = effect:getDamageDealt()
+          target:loseHealth(rawDamage)
+          result:actorAttackedTarget(actor, action, target, rawDamage)
+        elseif effect:getType() == "instakill" then
+          target:instakill()
+          result:actorInstakilledTarget(actor, action, target)
+        end
+      end
+  )
   return result
 end
 

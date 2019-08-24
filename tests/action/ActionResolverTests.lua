@@ -2,6 +2,7 @@ lunit = require "libraries/unitTesting/lunitx"
 local MapFactory = require ("map/mapFactory")
 local SquaddieFactory = require ("squaddie/squaddieFactory")
 local ActionResolver = require "combatLogic/ActionResolver"
+local TerritoryControlCalculator = require "combatLogic/territoryControlCalculator"
 
 if _VERSION >= 'Lua 5.2' then
   _ENV = lunit.module('enhanced','seeall')
@@ -15,6 +16,7 @@ local secondAvenue
 local shawn
 local cricketBat
 local superCricketBat
+local controllingCricketBat
 local trashbag
 local trashbag2
 local spillJunk
@@ -52,19 +54,49 @@ function setup()
       descriptions = {
         {
           name = "Cricket Bat",
-          damage = 4,
-          target = {"opponent"}
+          effects ={
+            default={
+              {
+                damage = 4,
+                target = {"opponent"}
+              }
+            }
+          },
         },
         {
           name = "Super Cricket Bat",
-          instakill = true,
-          target = {"opponent"}
-        }
+          effects = {
+            default = {
+              {
+                instakill = true,
+                target = { "opponent" }
+              }
+            }
+          }
+        },
+        {
+          name = "Controlling Cricket Bat",
+          effects = {
+            default={
+              {
+                damage = 4,
+                target = {"opponent"}
+              }
+            },
+            inControl = {
+              {
+                instakill = true,
+                target = { "opponent" }
+              }
+            }
+          }
+        },
       }
     }
   })
   cricketBat = shawn:getActionByName("Cricket Bat")
   superCricketBat = shawn:getActionByName("Super Cricket Bat")
+  controllingCricketBat = shawn:getActionByName("Controlling Cricket Bat")
 
   trashbag = SquaddieFactory:buildNewSquaddie({
     displayName = "Trashbag",
@@ -74,8 +106,14 @@ function setup()
       descriptions = {
         {
           name = "Spill Junk",
-          damage = 1,
-          target = { "opponent" }
+          effects = {
+            default = {
+              {
+                damage = 1,
+                target = { "opponent" }
+              }
+            }
+          }
         }
       }
     }
@@ -105,8 +143,16 @@ function setup()
       descriptions = {
         {
           name = "Zombie Bite",
-          damage = 3,
-          target = { "opponent" }
+          effects = {
+            descriptions = {
+              default = {
+                {
+                  damage = 3,
+                  target = { "opponent" }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -223,8 +269,8 @@ function testCanInstakillTargetWithAction()
   map:addSquaddie(zombie, firstAvenue)
 
   assert_equal(zombie:currentHealth(), zombie:maxHealth())
-  assert_true(superCricketBat:isInstakill())
-  ActionResolver:useActionOnTarget(shawn, superCricketBat, zombie)
+  assert_true(superCricketBat:hasDefaultEffect("instakill"))
+  ActionResolver:useActionOnTarget(shawn, superCricketBat, zombie, map)
   assert_true(zombie:currentHealth() < zombie:maxHealth())
   assert_false(shawn:hasTurnPartAvailable("act"))
   assert_true(zombie:isDead())
@@ -242,12 +288,12 @@ function testCanDamageTargetWithAction()
   map:addSquaddie(zombie, firstAvenue)
 
   assert_equal(zombie:currentHealth(), zombie:maxHealth())
-  assert_false(cricketBat:isInstakill())
-  assert_true(cricketBat:getDamage() < zombie:maxHealth())
+  assert_false(cricketBat:hasDefaultEffect("instakill"))
+  assert_true(cricketBat:getDefaultDamage() < zombie:maxHealth())
 
-  ActionResolver:useActionOnTarget(shawn, cricketBat, zombie)
+  ActionResolver:useActionOnTarget(shawn, cricketBat, zombie, map)
   assert_equal(
-      cricketBat:getDamage(),
+      cricketBat:getDefaultDamage(),
       zombie:maxHealth() - zombie:currentHealth()
   )
 
@@ -259,20 +305,36 @@ function testActionResults()
   map:addSquaddie(shawn, firstAvenue)
   map:addSquaddie(zombie, firstAvenue)
 
-  local actionResult = ActionResolver:useActionOnTarget(shawn, cricketBat, zombie)
+  local actionResult = ActionResolver:useActionOnTarget(shawn, cricketBat, zombie, map)
   assert_equal(shawn, actionResult:getActor())
   assert_equal(cricketBat, actionResult:getAction())
   assert_equal(zombie, actionResult:getTarget())
-  assert_equal(cricketBat:getDamage(), actionResult:getDamageDealt())
+  assert_equal(cricketBat:getDefaultDamage(), actionResult:getDamageDealt())
 end
 
 function testInstakillActionResults()
   map:addSquaddie(shawn, firstAvenue)
   map:addSquaddie(zombie, firstAvenue)
 
-  local actionResult = ActionResolver:useActionOnTarget(shawn, superCricketBat, zombie)
+  local actionResult = ActionResolver:useActionOnTarget(shawn, superCricketBat, zombie, map)
   assert_equal(shawn, actionResult:getActor())
   assert_equal(superCricketBat, actionResult:getAction())
   assert_equal(zombie, actionResult:getTarget())
+  assert_true(actionResult:targetWasInstakilled())
+end
+
+function testNoControlBonusOfferedWhenNoControl()
+  map:addSquaddie(shawn, firstAvenue)
+  map:addSquaddie(zombie, firstAvenue)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  local actionResult = ActionResolver:useActionOnTarget(shawn, controllingCricketBat, zombie, map)
+  assert_equal(controllingCricketBat:getDefaultDamage(), actionResult:getDamageDealt())
+end
+
+function testControlBonusOfferedWhenInControl()
+  map:addSquaddie(shawn, firstAvenue)
+  TerritoryControlCalculator:updateAllZoneControl(map)
+  map:addSquaddie(zombie, firstAvenue)
+  local actionResult = ActionResolver:useActionOnTarget(shawn, controllingCricketBat, zombie, map)
   assert_true(actionResult:targetWasInstakilled())
 end

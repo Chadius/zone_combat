@@ -110,7 +110,7 @@ function Map:removeSquaddie(squaddieID)
 end
 
 function Map:isSquaddieOnMap(squaddieID)
-  return self.squaddieInfoByID[squaddieID]
+  return self.squaddieInfoByID[squaddieID] ~= nil
 end
 
 function Map:assertSquaddieIsOnMap(squaddieID, nameOfCaller)
@@ -175,6 +175,19 @@ function Map:getControllingAffiliationsForZone(zone)
   self:assertZoneExists(zone.id, "Map:getControllingAffiliationsForZone")
   local zoneToObserve = self.zone_affiliation_control_by_zoneid[zone.id]
   return zoneToObserve:getAffiliationsInControl()
+end
+
+function Map:squaddieIsInControl(squaddie)
+  if self:isSquaddieOnMap(squaddie:getId()) ~= true then
+    return false
+  end
+
+  local squaddieCurrentZone = self:getSquaddieCurrentZone(squaddie)
+  local controllingAffilliations = self:getControllingAffiliationsForZone(squaddieCurrentZone)
+  return TableUtility:contains(
+      controllingAffilliations,
+      squaddie:getAffiliation()
+  )
 end
 
 return Map

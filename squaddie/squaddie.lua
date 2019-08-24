@@ -17,6 +17,14 @@ function Squaddie:new(args)
   return newSquaddie
 end
 
+function Squaddie:getId()
+  return self.id
+end
+
+function Squaddie:getID()
+  return self:getId()
+end
+
 function Squaddie:isSameSquaddie(otherSquaddie)
   return self.id == otherSquaddie.id
 end

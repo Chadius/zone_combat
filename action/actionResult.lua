@@ -1,6 +1,6 @@
-local TableUtility = require("utility/TableUtility")
 local DetailsDamage = require("action/detailsDamage")
 local DetailsInstakill = require("action/detailsInstakill")
+local ArrayTable = require ("utility/arrayTable")
 
 local ActionResult = {}
 ActionResult.__index = ActionResult
@@ -11,7 +11,7 @@ function ActionResult:new()
   newActionResult.actor = nil
   newActionResult.target = nil
   setmetatable(newActionResult, ActionResult)
-  newActionResult.details = {}
+  newActionResult.details = ArrayTable:new()
 
   return newActionResult
 end
@@ -24,16 +24,18 @@ end
 
 function ActionResult:actorAttackedTarget(actor, action, target, damageDealt)
   self:setActorActionTarget(actor, action, target)
-
-  local damageResult = DetailsDamage:new({damageDealt = damageDealt})
-  table.insert(self.details, damageResult)
+  self.details:insert(
+      DetailsDamage:new(
+          {damageDealt = damageDealt}
+      )
+  )
 end
 
 function ActionResult:actorInstakilledTarget(actor, action, target)
   self:setActorActionTarget(actor, action, target)
-
-  local instakillResult = DetailsInstakill:new()
-  table.insert(self.details, instakillResult)
+  self.details:insert(
+      DetailsInstakill:new()
+  )
 end
 
 function ActionResult:getActor()
@@ -57,9 +59,8 @@ function ActionResult:targetWasInstakilled()
 end
 
 function ActionResult:getFirstDetailOfType(detailType)
-  local firstDetail = TableUtility:first(
-      self.details,
-      function(_, detail)
+  local firstDetail = self.details:first(
+      function(detail)
         return detail.getType() == detailType
       end
   )

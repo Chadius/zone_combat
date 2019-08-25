@@ -18,4 +18,8 @@ function EffectInstakills:getType()
   return "instakill"
 end
 
+function EffectInstakills:clone()
+  return EffectInstakills:new()
+end
+
 return EffectInstakills

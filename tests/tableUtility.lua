@@ -529,3 +529,42 @@ function testHasKey()
   assert_true(TableUtility:hasKey(numbers, 4))
   assert_false(TableUtility:hasKey(numbers, 8))
 end
+
+function testAppend()
+  assert_true(
+      TableUtility:equivalent(
+          TableUtility:append(numbers, {}),
+          numbers
+      )
+  )
+
+  assert_true(
+      TableUtility:equivalent(
+          TableUtility:append({}, numbers),
+          numbers
+      )
+  )
+
+  assert_true(
+      TableUtility:equivalent(
+          TableUtility:append(numbers, {6, 7, 8}),
+          {1,2,3,4,5,6,7,8}
+      )
+  )
+
+  local error_func = function()
+    TableUtility:append(children, {"only works on indexed tables"})
+  end
+
+  assert_error(
+      "First argument must be an ordered table (numerical index)",
+      error_func
+  )
+
+  assert_true(
+      TableUtility:equivalent(
+          TableUtility:append(numbers, {6, 7, 8}, {9, 10}),
+          {1,2,3,4,5,6,7,8,9,10}
+      )
+  )
+end

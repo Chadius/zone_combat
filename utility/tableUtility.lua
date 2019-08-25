@@ -25,6 +25,7 @@ sum()
 values()
 
 These functions only work on arrays (tables whose keys are integers starting with 1, table is ordered)
+append()
 equaivalent()
 first()
 join()
@@ -687,6 +688,32 @@ end
 
 function TableUtility:containsKey(source, desiredKey)
   return TableUtility:hasKey(source, desiredKey)
+end
+
+function TableUtility:append(firstTable, ...)
+  if TableUtility:empty(firstTable) ~= true and TableUtility:getIterator(firstTable) == pairs then
+    error("First argument must be an ordered table (numerical index)")
+  end
+
+  local copiedTable = {}
+
+  local addToCopiedTable = function(_, tableToAppend)
+    TableUtility:each(
+        tableToAppend,
+        function(_, value)
+          table.insert(copiedTable, value)
+        end
+    )
+  end
+
+  addToCopiedTable(_, firstTable)
+
+  TableUtility:each(
+      arg,
+      addToCopiedTable
+  )
+
+  return copiedTable
 end
 
 return TableUtility

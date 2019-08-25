@@ -18,4 +18,8 @@ function EffectDealsDamage:getType()
   return "damageDealt"
 end
 
+function EffectDealsDamage:clone()
+  return EffectDealsDamage:new({damageDealt = self:getDamageDealt()})
+end
+
 return EffectDealsDamage

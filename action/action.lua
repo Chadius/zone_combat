@@ -3,6 +3,22 @@ local TableUtility = require ("utility/tableUtility")
 local Action = {}
 Action.__index = Action
 
+local cloneEffects = function(source)
+  local clonedEffects = {}
+
+  TableUtility:each(
+      source,
+      function(_, effect)
+        table.insert(
+            clonedEffects,
+            effect:clone()
+        )
+      end
+  )
+
+  return clonedEffects
+end
+
 function Action:new(args)
   local newAction = {}
 
@@ -10,7 +26,8 @@ function Action:new(args)
   newAction.name = args.name or nil
 
   newAction.effects = {
-    default={}
+    default={},
+    inControl={}
   }
 
   if not newAction.name then error("action must have a name") end
@@ -73,8 +90,12 @@ function Action:isInstakill()
   return effectInstakills[1]
 end
 
-function Action:addDefaultAction(newAction)
-  table.insert(newAction.defaultEffects, newAction)
+function Action:getDefaultEffects()
+  return cloneEffects(self.effects.default)
+end
+
+function Action:getInControlEffects()
+  return cloneEffects(self.effects.inControl)
 end
 
 return Action

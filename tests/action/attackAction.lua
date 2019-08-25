@@ -131,7 +131,7 @@ function testInstakillAction()
 end
 
 function testDefaultActionEffects()
-  local newAction = ActionFactory:buildNewAction({
+  local damageDealingAction = ActionFactory:buildNewAction({
     name = "Fist of Justice",
     effects = {
       default = {
@@ -142,8 +142,48 @@ function testDefaultActionEffects()
     }
   })
 
-  local attackEffects = newAction:getDefaultEffects()
-  -- TODO test upon the attackEffects
+  local attackEffects = damageDealingAction:getDefaultEffects()
+  assert_equal(1, TableUtility:size(attackEffects))
+  actualDamageDealingAffect = attackEffects[1]
+  assert_equal(5, actualDamageDealingAffect:getDamageDealt())
+
+  local instakillAction = ActionFactory:buildNewAction({
+    name = "Nuke from Orbit",
+    effects = {
+      default = {
+        {
+          instakill = true
+        }
+      }
+    }
+  })
+  attackEffects = instakillAction:getDefaultEffects()
+  assert_equal(1, TableUtility:size(attackEffects))
+  actualInstakillEffect = attackEffects[1]
+  assert_true(actualInstakillEffect:isInstakill())
+end
+
+function testAttackActionInstakillsWhenInControl()
+  local finishingBlow = ActionFactory:buildNewAction({
+    name = "Finishing Blow",
+    effects = {
+      default = {
+        {
+          damage = 5
+        }
+      },
+      inControl = {
+        {
+          instakill = true
+        }
+      }
+    }
+  })
+
+  attackEffects = finishingBlow:getInControlEffects()
+  assert_equal(1, TableUtility:size(attackEffects))
+  actualInstakillEffect = attackEffects[1]
+  assert_true(actualInstakillEffect:isInstakill())
 end
 
 -- Test that once the zone is under control, you get the extra benefits of Zone Control.

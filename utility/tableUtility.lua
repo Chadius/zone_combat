@@ -5,12 +5,14 @@ all()
 any()
 clone()
 contains()
+containsKey()
 count()
 deepClone()
 each()
 empty()
 equaivalentSet()
 filter()
+hasKey()
 indexOf()
 isEmpty()
 keyCount()
@@ -672,6 +674,19 @@ function TableUtility:values(source)
   end
 
   return result
+end
+
+function TableUtility:hasKey(source, desiredKey)
+  return TableUtility:any(
+      source,
+      function(sourceKey)
+        return sourceKey == desiredKey
+      end
+  )
+end
+
+function TableUtility:containsKey(source, desiredKey)
+  return TableUtility:hasKey(source, desiredKey)
 end
 
 return TableUtility

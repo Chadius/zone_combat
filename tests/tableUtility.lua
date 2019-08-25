@@ -521,3 +521,11 @@ function testValues()
       )
   )
 end
+
+function testHasKey()
+  assert_true(TableUtility:hasKey(children, "alex"))
+  assert_true(TableUtility:containsKey(children, "sydney"))
+  assert_false(TableUtility:hasKey(children, "this key is not in children"))
+  assert_true(TableUtility:hasKey(numbers, 4))
+  assert_false(TableUtility:hasKey(numbers, 8))
+end

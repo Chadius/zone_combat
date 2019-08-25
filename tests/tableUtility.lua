@@ -567,4 +567,24 @@ function testAppend()
           {1,2,3,4,5,6,7,8,9,10}
       )
   )
+
+  assert_true(
+      TableUtility:equivalent(
+          TableUtility:append({}, children),
+          {children}
+      )
+  )
+
+  assert_true(
+      TableUtility:equivalent(
+          TableUtility:append({}, children, sandwich),
+          {children, sandwich}
+      )
+  )
+end
+
+function testIsOrderedTable()
+  assert_true(TableUtility:isOrdered(numbers))
+  assert_false(TableUtility:isOrdered(children))
+  assert_true(TableUtility:isOrdered({}))
 end

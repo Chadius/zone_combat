@@ -15,6 +15,7 @@ filter()
 hasKey()
 indexOf()
 isEmpty()
+isOrdered()
 keyCount()
 keys()
 listcomp()
@@ -24,7 +25,7 @@ size()
 sum()
 values()
 
-These functions only work on arrays (tables whose keys are integers starting with 1, table is ordered)
+These functions only work on arrays (ordered tables whose keys are integers starting with 1, isOrdered returns true)
 append()
 equaivalent()
 first()
@@ -691,19 +692,23 @@ function TableUtility:containsKey(source, desiredKey)
 end
 
 function TableUtility:append(firstTable, ...)
-  if TableUtility:empty(firstTable) ~= true and TableUtility:getIterator(firstTable) == pairs then
+  if TableUtility:isOrdered(firstTable) ~= true then
     error("First argument must be an ordered table (numerical index)")
   end
 
   local copiedTable = {}
 
   local addToCopiedTable = function(_, tableToAppend)
-    TableUtility:each(
-        tableToAppend,
-        function(_, value)
-          table.insert(copiedTable, value)
-        end
-    )
+    if TableUtility:isOrdered(tableToAppend) then
+      TableUtility:each(
+          tableToAppend,
+          function(_, value)
+            table.insert(copiedTable, value)
+          end
+      )
+    else
+      table.insert(copiedTable, tableToAppend)
+    end
   end
 
   addToCopiedTable(_, firstTable)
@@ -714,6 +719,10 @@ function TableUtility:append(firstTable, ...)
   )
 
   return copiedTable
+end
+
+function TableUtility:isOrdered(source)
+  return TableUtility:empty(source) == true or TableUtility:getIterator(source) == ipairs
 end
 
 return TableUtility

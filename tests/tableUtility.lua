@@ -588,3 +588,45 @@ function testIsOrderedTable()
   assert_false(TableUtility:isOrdered(children))
   assert_true(TableUtility:isOrdered({}))
 end
+
+function testUpdateTable()
+  local alphabetPart1 = {
+    a = "apple",
+    b = "banana",
+    c = "carrot"
+  }
+
+  local alphabetPart2 = {
+    b = "broccoli",
+    d = "daikon",
+    r = "radish"
+  }
+
+  assert_true(
+      TableUtility:equivalentSet(
+          TableUtility:update({}, alphabetPart1),
+          alphabetPart1
+      )
+  )
+
+  assert_true(
+      TableUtility:equivalentSet(
+          TableUtility:update(alphabetPart2, {}),
+          alphabetPart2
+      )
+  )
+
+  local combinedAlphabet = TableUtility:update(alphabetPart1, alphabetPart2)
+  assert_true(
+      TableUtility:equivalentSet(
+          combinedAlphabet,
+          {
+            a = "apple",
+            b = "broccoli",
+            c = "carrot",
+            d = "daikon",
+            r = "radish"
+          }
+      )
+  )
+end

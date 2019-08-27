@@ -725,4 +725,22 @@ function TableUtility:isOrdered(source)
   return TableUtility:empty(source) == true or TableUtility:getIterator(source) == ipairs
 end
 
+function TableUtility:update(firstTable, ...)
+  local combinedTable = {}
+
+  local setKeyValuePairs = function(_, newTable)
+    for key, value in pairs(newTable) do
+      combinedTable[key] = value
+    end
+  end
+
+  setKeyValuePairs(_, firstTable)
+  TableUtility:each(
+      arg,
+      setKeyValuePairs
+  )
+
+  return combinedTable
+end
+
 return TableUtility

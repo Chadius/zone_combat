@@ -1,5 +1,15 @@
 local TableUtility = require ("utility/tableUtility")
 
+local getValuesToAdd = function(arguments)
+  if arguments ~= nil then
+    if type(arguments[1]) == "table" and #arguments == 1  then
+      return arguments[1]
+    end
+    return arguments
+  end
+  return {}
+end
+
 local ArrayTable = {}
 ArrayTable.__index = function(table, key)
   if rawget(ArrayTable, key) ~= nil then
@@ -9,10 +19,14 @@ ArrayTable.__index = function(table, key)
   return table.container[key]
 end
 
-function ArrayTable:new(args)
+function ArrayTable:new(...)
   local newArrayTable = {}
   setmetatable(newArrayTable, ArrayTable)
-  newArrayTable.container = args or {}
+
+  newArrayTable.container = {}
+  for _, value in ipairs(getValuesToAdd(arg)) do
+    table.insert(newArrayTable.container, value)
+  end
 
   return newArrayTable
 end
@@ -57,7 +71,15 @@ function ArrayTable:containsKey(keyToFind)
 end
 
 function ArrayTable:count(predicate)
-  return TableUtility:count(self:getContents(), predicate)
+  return TableUtility:count(
+      self:getContents(),
+      function (_, value, source)
+        if predicate ~= nil then
+          return predicate(value, source)
+        end
+        return true
+      end
+  )
 end
 
 function ArrayTable:deepClone()
@@ -107,11 +129,25 @@ function ArrayTable:isEquivalentSet(other)
   return self:equivalentSet(other)
 end
 
---function ArrayTable:filter()
---end
+function ArrayTable:filter(predicate)
+  return ArrayTable:new(
+      TableUtility:filter(
+          self:getContents(),
+          function (_, value, source)
+            return predicate(value, source)
+          end
+      )
+  )
+end
 
---function ArrayTable:first()
---end
+function ArrayTable:first(predicate)
+  return TableUtility:first(
+      self:getContents(),
+      function (_, value, source)
+        return predicate(value, source)
+      end
+  )
+end
 
 --function ArrayTable:contains()
 --end
@@ -153,7 +189,9 @@ function ArrayTable:map(action)
   return ArrayTable:new(
       TableUtility:map(
           self:getContents(),
-          action
+          function (_, value, source)
+            return action(value, source)
+          end
       )
   )
 end

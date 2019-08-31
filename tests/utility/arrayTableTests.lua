@@ -21,7 +21,7 @@ function setup()
   startOfAlphabetTable = {"a","b","c"}
   startOfAlphabet = ArrayTable:new(startOfAlphabetTable)
 
-  numbersTable = {1,2,3,4,5}
+  numbersTable = {6,7,8,9,10}
   numbers = ArrayTable:new(numbersTable)
 
   isEven = function(val) return(val % 2 == 0) end
@@ -56,8 +56,8 @@ function testAny()
 end
 
 function testGetContents()
-  local numberContents = {1,2,3,4,5}
-  local notNumberContents = {1,2,3}
+  local numberContents = {6,7,8,9,10}
+  local notNumberContents = {5,7,8}
   assert_true(
     TableUtility:equivalent(
         numbers:getContents(),
@@ -102,10 +102,10 @@ function testEquivalent()
   assert_true(numbers:equivalent(numbers))
   assert_true(numbers:isEquivalent(numbers))
 
-  local sameItemsAsNumbers = ArrayTable:new({1,2,3,4,5})
+  local sameItemsAsNumbers = ArrayTable:new({6,7,8,9,10})
   assert_true(numbers:equivalent(sameItemsAsNumbers))
 
-  local differentItemsAsNumbers = ArrayTable:new({1,2,3,4,6})
+  local differentItemsAsNumbers = ArrayTable:new({6,7,8,9,1})
   assert_false(numbers:equivalent(differentItemsAsNumbers))
 end
 
@@ -113,10 +113,10 @@ function testEquivalentSet()
   assert_true(numbers:equivalentSet(numbers))
   assert_true(numbers:isEquivalentSet(numbers))
 
-  local numbersInDifferentOrder = ArrayTable:new({1,3,5,2,4})
+  local numbersInDifferentOrder = ArrayTable:new(7,9,8,10,6)
   assert_true(numbers:equivalentSet(numbersInDifferentOrder))
 
-  local extraNumberAdded = ArrayTable:new({1,2,3,4,5,6})
+  local extraNumberAdded = ArrayTable:new({5,6,7,8,9,10})
   assert_false(numbers:equivalentSet(extraNumberAdded))
 end
 
@@ -145,7 +145,7 @@ function testAppend()
   local numbersAndLetters = numbers:append(startOfAlphabet)
   assert_true(
       numbersAndLetters:equivalent(
-          ArrayTable:new({1,2,3,4,5, "a","b","c"})
+          ArrayTable:new({6,7,8,9,10, "a","b","c"})
       )
   )
 
@@ -171,7 +171,7 @@ end
 
 function testCount()
   assert_equal(5, numbers:count())
-  assert_equal(2, numbers:count(isEven))
+  assert_equal(3, numbers:count(isEven))
   assert_equal(0, numbers:count(isNegative))
 end
 
@@ -185,14 +185,14 @@ function testDeepClone()
 end
 
 function testInsert()
-  numbers:insert(6)
+  numbers:insert(1)
   assert_true(
-      numbers:equivalent(ArrayTable:new({1,2,3,4,5,6}))
+      numbers:equivalent(ArrayTable:new({6,7,8,9,10,1}))
   )
 
   numbers:insert(nil)
   assert_true(
-      numbers:equivalent(ArrayTable:new({1,2,3,4,5,6}))
+      numbers:equivalent(ArrayTable:new({6,7,8,9,10,1}))
   )
 end
 
@@ -206,7 +206,7 @@ function testEach()
   assert_true(
       TableUtility:equivalent(
           doubledValues,
-          {2,4,6,8,10}
+          {12,14,16,18,20}
       )
   )
 end
@@ -217,8 +217,37 @@ function testEmpty()
   assert_true(emptyArray:isEmpty())
   assert_false(startOfAlphabet:empty())
 end
---filter()
---first()
+
+function testFilter()
+  local evenNumbersOnly = numbers:filter(isEven)
+  assert_true(
+      evenNumbersOnly:equivalent(
+          ArrayTable:new({6,8,10})
+      )
+  )
+  assert_not_equal(numbers, evenNumbersOnly)
+  assert_true(
+      numbers:filter(isNegative):isEmpty()
+  )
+end
+
+function testNewArrayTableWithoutBracket()
+  local noBracketAlphabet = ArrayTable:new("a", "b", "c")
+  assert_false(noBracketAlphabet:empty())
+  assert_true(startOfAlphabet:equivalent(noBracketAlphabet))
+end
+
+function testFirst()
+  assert_equal(
+      6,
+      numbers:first(isEven)
+  )
+  assert_equal(
+      nil,
+      numbers:first(isNegative)
+  )
+end
+
 --hasKey()
 --isEmpty()
 --isOrdered()
@@ -228,8 +257,8 @@ end
 --listcomp()
 
 function testMap()
-  local doubleNumber = function(_, x)return 2 * x end
-  local expectedArray = ArrayTable:new({2,4,6,8,10})
+  local doubleNumber = function(x)return 2 * x end
+  local expectedArray = ArrayTable:new({12,14,16,18,20})
   local actualArray = numbers:map(doubleNumber)
   assert_true(expectedArray:equivalent(actualArray))
 end

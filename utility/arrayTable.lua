@@ -52,20 +52,38 @@ function ArrayTable:containsValue(valueToFind)
   return self:contains(valueToFind)
 end
 
---function ArrayTable:containsKey()
---end
+function ArrayTable:containsKey(keyToFind)
+  return TableUtility:containsKey(self:getContents(), keyToFind)
+end
 
---function ArrayTable:count()
---end
+function ArrayTable:count(predicate)
+  return TableUtility:count(self:getContents(), predicate)
+end
 
---function ArrayTable:deepClone()
---end
+function ArrayTable:deepClone()
+  return ArrayTable:new(
+      TableUtility:deepClone(
+          self:getContents()
+      )
+  )
+end
 
---function ArrayTable:each()
---end
+function ArrayTable:each(action)
+  TableUtility:each(
+      self:getContents(),
+      function (_, value)
+        action(value)
+      end
+ )
+end
 
---function ArrayTable:empty()
---end
+function ArrayTable:empty()
+  return TableUtility:empty(self:getContents())
+end
+
+function ArrayTable:isEmpty()
+  return self:empty()
+end
 
 function ArrayTable:equivalent(other)
   return TableUtility:equivalent(
@@ -131,8 +149,18 @@ end
 --function ArrayTable:listcomp()
 --end
 
---function ArrayTable:map()
---end
+function ArrayTable:map(action)
+  return ArrayTable:new(
+      TableUtility:map(
+          self:getContents(),
+          action
+      )
+  )
+end
+
+function ArrayTable:insert(value)
+  table.insert(self.container, value)
+end
 
 --function ArrayTable:pluck()
 --end

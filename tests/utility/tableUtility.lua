@@ -184,6 +184,12 @@ function test_accumulate()
   local letters = {"M", "i", "k", "e"}
   local glued = TableUtility:sum(letters, concat, "Hi ")
   assert_equal("Hi Mike", glued)
+
+  local addAge = function(ageAccumulated, childInfo)
+    return ageAccumulated + childInfo.age
+  end
+  local sumChildrenAge = TableUtility:sum(children, addAge, 0)
+  assert_equal(5+8+2, sumChildrenAge)
 end
 
 function test_each()

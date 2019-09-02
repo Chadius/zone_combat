@@ -40,11 +40,27 @@ function ArrayTable:at(index)
 end
 
 function ArrayTable:all(predicate)
-  return TableUtility:all(self.container, predicate)
+  return TableUtility:all(
+      self.container,
+      function (_, value, source)
+        if predicate ~= nil then
+          return predicate(value, source)
+        end
+        return true
+      end
+  )
 end
 
 function ArrayTable:any(predicate)
-  return TableUtility:any(self.container, predicate)
+  return TableUtility:any(
+      self.container,
+      function (_, value, source)
+        if predicate ~= nil then
+          return predicate(value, source)
+        end
+        return true
+      end
+  )
 end
 
 function ArrayTable:append(other)

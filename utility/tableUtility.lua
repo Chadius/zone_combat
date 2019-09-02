@@ -15,13 +15,13 @@ filter()
 hasKey()
 isEmpty()
 isOrdered()
-keyCount()
 keys()
 listcomp()
 map()
 pluck()
 size()
 sum()
+update()
 values()
 
 These functions only work on arrays (ordered tables whose keys are integers starting with 1, isOrdered returns true)
@@ -164,7 +164,7 @@ function TableUtility:sum(source, accumulator, start_value)
     Args:
       source(table)
       accumulator(function, optional): Signature(sum, value). The accumulator will
-        transofrm the value as necessary and apply to the sum.
+        transform the value as necessary and apply to the sum.
         The default function is numeric addition.
       start_value(object, optional, default=""): Start value to begin adding/
         Default is 0.
@@ -175,7 +175,8 @@ function TableUtility:sum(source, accumulator, start_value)
     sum = 0
   end
 
-  for _, value in ipairs(source) do
+  local iterator = TableUtility:getIterator(source)
+  for _, value in iterator(source) do
     if accumulator then
       sum = accumulator(sum, value)
     else

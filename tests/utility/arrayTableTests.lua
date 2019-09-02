@@ -15,6 +15,7 @@ local numbers
 local isEven
 local isPositive
 local isNegative
+local isBiggerThanFive
 local children
 local numbersInDifferentOrder
 
@@ -30,6 +31,7 @@ function setup()
   isEven = function(val) return(val % 2 == 0) end
   isPositive = function(val) return(val > 0) end
   isNegative = function(val) return(val < 0) end
+  isBiggerThanFive = function(val) return(val > 5) end
 
   children = ArrayTable:new({
     { name="billi", age=5, color="red" },
@@ -51,11 +53,13 @@ end
 function testAll()
   assert_true(numbers:all(isPositive))
   assert_false(numbers:all(isEven))
+  assert_true(numbers:all(isBiggerThanFive))
 end
 
 function testAny()
   assert_true(numbers:any(isEven))
   assert_false(numbers:any(isNegative))
+  assert_true(numbers:any(isBiggerThanFive))
 end
 
 function testGetContents()
